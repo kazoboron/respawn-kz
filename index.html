@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="respawn.kz — онлайн-бронирование компьютерных клубов в Алматы. Найди клуб, забронируй слот, оплати картой." />
-  <title>respawn.kz — Бронируй компьютерные клубы Алматы</title>
+  <meta name="description" content="respawn.kz — онлайн-бронирование компьютерных клубов в Казахстане. Найди клуб, забронируй слот, оплати картой." />
+  <title>respawn.kz — Бронируй компьютерные клубы в Казахстане</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -38,22 +38,32 @@
       <div class="container hero__inner">
         <h1 class="hero__title">
           Забронируй компьютерный клуб <br />
-          в Алматы за <span class="glitch" data-text="30 секунд">30 секунд</span>
+          в Казахстане за <span class="glitch" data-text="30 секунд">30 секунд</span>
         </h1>
         <p class="hero__subtitle">
-          Лучшие клубы города в одном месте. Выбирай слот, оплачивай онлайн, приходи играть.
+          Лучшие клубы страны в одном месте. Выбирай слот, оплачивай онлайн, приходи играть.
         </p>
 
         <form class="search" id="search-form">
           <label class="search__field">
-            <span class="search__label">Район</span>
-            <select name="district" class="search__input">
-              <option value="">Все районы</option>
-              <option value="almalinsky">Алмалинский</option>
-              <option value="bostandyk">Бостандыкский</option>
-              <option value="medeu">Медеуский</option>
-              <option value="auezov">Ауэзовский</option>
+            <span class="search__label">
+              Город
+              <button type="button" class="geo-btn" id="geo-btn" title="Определить мой город">📍 Мой город</button>
+            </span>
+            <select name="city" id="city-select" class="search__input">
+              <option value="">Все города</option>
+              <option value="almaty">Алматы</option>
+              <option value="astana">Астана</option>
+              <option value="shymkent">Шымкент</option>
+              <option value="karaganda">Караганда</option>
+              <option value="aktobe">Актобе</option>
+              <option value="taraz">Тараз</option>
+              <option value="pavlodar">Павлодар</option>
+              <option value="oskemen">Усть-Каменогорск</option>
+              <option value="semey">Семей</option>
+              <option value="atyrau">Атырау</option>
             </select>
+            <span class="geo-status" id="geo-status" hidden></span>
           </label>
           <label class="search__field">
             <span class="search__label">Дата</span>
@@ -69,9 +79,9 @@
         </form>
 
         <div class="hero__stats">
-          <div class="stat"><span class="stat__value">4 800+</span><span class="stat__label">игроков</span></div>
-          <div class="stat"><span class="stat__value">24</span><span class="stat__label">клуба-партнёра</span></div>
-          <div class="stat"><span class="stat__value">4.8</span><span class="stat__label">средний рейтинг</span></div>
+          <div class="stat"><span class="stat__value">12 000+</span><span class="stat__label">игроков</span></div>
+          <div class="stat"><span class="stat__value">80+</span><span class="stat__label">клубов</span></div>
+          <div class="stat"><span class="stat__value">10</span><span class="stat__label">городов</span></div>
         </div>
       </div>
     </section>
@@ -89,7 +99,7 @@
     <!-- CLUBS -->
     <section class="clubs" id="clubs">
       <div class="container">
-        <h2 class="section__title">Топ клубы в Алматы</h2>
+        <h2 class="section__title">Топ клубы в Казахстане</h2>
         <p class="section__subtitle">Проверенные клубы с лучшим рейтингом</p>
         <div class="clubs__grid" id="clubs-grid">
           <!-- populated by JS -->
@@ -122,7 +132,7 @@
     <div class="container footer__inner">
       <div class="footer__col">
         <div class="logo">RESPAWN<span class="logo__accent">.kz</span></div>
-        <p class="footer__desc">Платформа онлайн-бронирования компьютерных клубов в Алматы.</p>
+        <p class="footer__desc">Платформа онлайн-бронирования компьютерных клубов в Казахстане.</p>
         <p class="footer__copy">© 2026 respawn.kz</p>
       </div>
       <div class="footer__col">

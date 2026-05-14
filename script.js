@@ -38,13 +38,28 @@ const STEPS = [
   },
 ];
 
+const CITIES = [
+  { id: "almaty",    label: "Алматы",            lat: 43.2389, lon: 76.8897 },
+  { id: "astana",    label: "Астана",            lat: 51.1605, lon: 71.4704 },
+  { id: "shymkent",  label: "Шымкент",           lat: 42.3417, lon: 69.5901 },
+  { id: "karaganda", label: "Караганда",         lat: 49.8047, lon: 73.1094 },
+  { id: "aktobe",    label: "Актобе",            lat: 50.2839, lon: 57.1670 },
+  { id: "taraz",     label: "Тараз",             lat: 42.9000, lon: 71.3667 },
+  { id: "pavlodar",  label: "Павлодар",          lat: 52.2873, lon: 76.9670 },
+  { id: "oskemen",   label: "Усть-Каменогорск",  lat: 49.9468, lon: 82.6075 },
+  { id: "semey",     label: "Семей",             lat: 50.4111, lon: 80.2275 },
+  { id: "atyrau",    label: "Атырау",            lat: 47.1167, lon: 51.8833 },
+];
+
+const CITY_LABELS = Object.fromEntries(CITIES.map((c) => [c.id, c.label]));
+
 const CLUBS = [
   {
     name: "Cyberzone",
     initial: "C",
     gradient: "linear-gradient(135deg, #00f0ff, #0066ff)",
-    district: "Алмалинский",
-    distance: "2.3 км",
+    city: "almaty",
+    district: "Алмалинский р-н",
     rating: 4.9,
     reviews: 312,
     price: 1200,
@@ -54,8 +69,8 @@ const CLUBS = [
     name: "Colizeum",
     initial: "C",
     gradient: "linear-gradient(135deg, #ff2e9a, #8b00ff)",
-    district: "Бостандыкский",
-    distance: "4.1 км",
+    city: "astana",
+    district: "Есильский р-н",
     rating: 4.8,
     reviews: 189,
     price: 1500,
@@ -65,8 +80,8 @@ const CLUBS = [
     name: "RAGE Arena",
     initial: "R",
     gradient: "linear-gradient(135deg, #fef300, #ff6a00)",
-    district: "Медеуский",
-    distance: "5.8 км",
+    city: "shymkent",
+    district: "Аль-Фарабийский р-н",
     rating: 4.7,
     reviews: 256,
     price: 1000,
@@ -76,8 +91,8 @@ const CLUBS = [
     name: "IGNITE",
     initial: "I",
     gradient: "linear-gradient(135deg, #ff2e9a, #00f0ff)",
-    district: "Ауэзовский",
-    distance: "6.2 км",
+    city: "karaganda",
+    district: "Казыбек би р-н",
     rating: 4.6,
     reviews: 98,
     price: 800,
@@ -87,8 +102,8 @@ const CLUBS = [
     name: "NetGame",
     initial: "N",
     gradient: "linear-gradient(135deg, #00f0ff, #14141c)",
-    district: "Алмалинский",
-    distance: "1.5 км",
+    city: "aktobe",
+    district: "Центр",
     rating: 4.5,
     reviews: 67,
     price: 600,
@@ -98,8 +113,8 @@ const CLUBS = [
     name: "GamerHub",
     initial: "G",
     gradient: "linear-gradient(135deg, #8b00ff, #ff2e9a)",
-    district: "Бостандыкский",
-    distance: "3.7 км",
+    city: "almaty",
+    district: "Бостандыкский р-н",
     rating: 4.8,
     reviews: 145,
     price: 900,
@@ -180,9 +195,9 @@ function renderClubs() {
           <span class="club-card__rating">★ ${c.rating}</span>
         </div>
         <div class="club-card__meta">
-          <span>${c.district}</span>
+          <span>${CITY_LABELS[c.city] ?? c.city}</span>
           <span class="club-card__meta-sep">·</span>
-          <span>${c.distance}</span>
+          <span>${c.district}</span>
           <span class="club-card__meta-sep">·</span>
           <span class="club-card__reviews">${c.reviews} отзывов</span>
         </div>
@@ -312,25 +327,17 @@ function setupModal() {
 }
 
 // ---------- Search form ----------
-const DISTRICT_LABELS = {
-  "": "всех районах",
-  almalinsky: "Алмалинском",
-  bostandyk: "Бостандыкском",
-  medeu: "Медеуском",
-  auezov: "Ауэзовском",
-};
-
 function setupSearchForm() {
   const form = document.getElementById("search-form");
   if (!form) return;
   form.addEventListener("submit", (e) => {
     e.preventDefault();
     const data = new FormData(form);
-    const district = data.get("district") || "";
+    const city = data.get("city") || "";
     const date = data.get("date") || "—";
     const time = data.get("time") || "любое время";
 
-    const districtLabel = DISTRICT_LABELS[district] ?? "всех районах";
+    const cityLabel = city ? CITY_LABELS[city] : "Все города";
     const dateLabel = date && date !== "—"
       ? new Date(date).toLocaleDateString("ru-RU", { day: "numeric", month: "long" })
       : "—";
@@ -340,10 +347,86 @@ function setupSearchForm() {
     openModal({
       title: `Найдено ${count} клубов`,
       body: `
-        <p>В <strong>${districtLabel}</strong> на <span class="modal__highlight">${dateLabel}</span> в <span class="modal__highlight">${time}</span>.</p>
+        <p><span class="modal__highlight">${cityLabel}</span> · <span class="modal__highlight">${dateLabel}</span> · <span class="modal__highlight">${time}</span></p>
         <p style="margin-top:12px">Это демо-версия лендинга. В полной версии здесь будет список доступных слотов с возможностью бронирования.</p>
       `,
     });
+  });
+}
+
+// ---------- Geolocation ----------
+function distanceKm(lat1, lon1, lat2, lon2) {
+  const R = 6371;
+  const toRad = (d) => (d * Math.PI) / 180;
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(a));
+}
+
+function findClosestCity(lat, lon) {
+  let best = null;
+  let bestDist = Infinity;
+  for (const c of CITIES) {
+    const d = distanceKm(lat, lon, c.lat, c.lon);
+    if (d < bestDist) {
+      bestDist = d;
+      best = c;
+    }
+  }
+  return { city: best, distance: bestDist };
+}
+
+function setGeoStatus(text, state) {
+  const el = document.getElementById("geo-status");
+  if (!el) return;
+  el.textContent = text;
+  el.hidden = !text;
+  el.className = "geo-status" + (state ? ` geo-status--${state}` : "");
+}
+
+function setupGeolocation() {
+  const btn = document.getElementById("geo-btn");
+  const select = document.getElementById("city-select");
+  if (!btn || !select) return;
+
+  btn.addEventListener("click", () => {
+    if (!navigator.geolocation) {
+      setGeoStatus("Геолокация не поддерживается", "error");
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = "Определяем…";
+    setGeoStatus("");
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude, longitude } = pos.coords;
+        const { city, distance } = findClosestCity(latitude, longitude);
+        select.value = city.id;
+        select.dispatchEvent(new Event("change"));
+        const distText = distance < 1
+          ? "вы внутри города"
+          : `~${Math.round(distance)} км до центра`;
+        setGeoStatus(`📍 ${city.label} · ${distText}`, "success");
+        btn.disabled = false;
+        btn.textContent = "📍 Мой город";
+      },
+      (err) => {
+        const messages = {
+          1: "Доступ к геолокации запрещён",
+          2: "Не удалось определить позицию",
+          3: "Превышено время ожидания",
+        };
+        setGeoStatus(messages[err.code] || "Ошибка геолокации", "error");
+        btn.disabled = false;
+        btn.textContent = "📍 Мой город";
+      },
+      { timeout: 8000, maximumAge: 60000 }
+    );
   });
 }
 
@@ -410,4 +493,5 @@ document.addEventListener("DOMContentLoaded", () => {
   setupSearchForm();
   setupBookingButtons();
   setupGlitch();
+  setupGeolocation();
 });

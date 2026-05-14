@@ -467,6 +467,63 @@ body.menu-open .hamburger span:nth-child(3) {
   color: var(--text-muted);
   font-weight: 500;
   padding-left: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.geo-btn {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  text-transform: none;
+  color: var(--neon-cyan);
+  padding: 2px 8px;
+  border: 1px solid rgba(0, 240, 255, 0.2);
+  border-radius: 100px;
+  background: rgba(0, 240, 255, 0.06);
+  transition: all var(--t-fast);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.geo-btn:hover:not(:disabled) {
+  background: rgba(0, 240, 255, 0.14);
+  border-color: var(--border-hover);
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.25);
+}
+
+.geo-btn:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.geo-status {
+  font-size: 12px;
+  padding: 6px 12px;
+  margin-top: 4px;
+  border-radius: var(--radius-sm);
+  font-family: "JetBrains Mono", monospace;
+  letter-spacing: 0.02em;
+  animation: geo-fade 250ms ease;
+}
+
+@keyframes geo-fade {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.geo-status--success {
+  background: rgba(0, 240, 255, 0.08);
+  border: 1px solid rgba(0, 240, 255, 0.2);
+  color: var(--neon-cyan);
+}
+
+.geo-status--error {
+  background: rgba(255, 46, 154, 0.08);
+  border: 1px solid rgba(255, 46, 154, 0.2);
+  color: var(--neon-magenta);
 }
 
 .search__input {
