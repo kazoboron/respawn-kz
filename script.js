@@ -111,6 +111,44 @@ function formatPrice(value) {
   return value.toLocaleString("ru-RU");
 }
 
+const BENEFITS = [
+  {
+    title: "Онлайн-бронирование",
+    desc: "Не нужно звонить и держать место. Бронь подтверждается мгновенно.",
+    icon: `<svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="5" width="22" height="20" rx="3"/>
+      <path d="M3 11 H25"/>
+      <path d="M9 2 V8 M19 2 V8"/>
+      <path d="M9 17 L13 21 L21 13" stroke="currentColor"/>
+    </svg>`,
+  },
+  {
+    title: "Оплата картой",
+    desc: "Visa, Mastercard, Kaspi. Без наличных и предоплаты администратору.",
+    icon: `<svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="2" y="6" width="24" height="16" rx="3"/>
+      <path d="M2 11 H26"/>
+      <path d="M6 17 H10 M14 17 H18"/>
+    </svg>`,
+  },
+  {
+    title: "Проверенные клубы",
+    desc: "Все клубы прошли модерацию. Реальные отзывы, реальные рейтинги.",
+    icon: `<svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M14 2 L4 6 V14 C4 20 14 26 14 26 C14 26 24 20 24 14 V6 Z"/>
+      <path d="M9 14 L13 18 L19 11"/>
+    </svg>`,
+  },
+  {
+    title: "Бонусная программа",
+    desc: "Кэшбек 5% часами за каждое посещение. Бонусы не сгорают.",
+    icon: `<svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="14" cy="14" r="11"/>
+      <path d="M14 7 L16 12 L22 12 L17 15 L19 21 L14 17 L9 21 L11 15 L6 12 L12 12 Z" fill="currentColor" stroke="none"/>
+    </svg>`,
+  },
+];
+
 // ---------- Renderers ----------
 function renderSteps() {
   const root = document.getElementById("how-steps");
@@ -163,8 +201,25 @@ function renderClubs() {
   ).join("");
 }
 
+function renderBenefits() {
+  const root = document.getElementById("benefits-grid");
+  if (!root) return;
+  root.innerHTML = BENEFITS.map(
+    (b) => `
+    <div class="benefit">
+      <div class="benefit__icon">${b.icon}</div>
+      <div class="benefit__content">
+        <h3 class="benefit__title">${b.title}</h3>
+        <p class="benefit__desc">${b.desc}</p>
+      </div>
+    </div>
+  `
+  ).join("");
+}
+
 // ---------- Init ----------
 document.addEventListener("DOMContentLoaded", () => {
   renderSteps();
   renderClubs();
+  renderBenefits();
 });
