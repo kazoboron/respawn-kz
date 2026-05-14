@@ -373,6 +373,30 @@ function setupBookingButtons() {
   });
 }
 
+// ---------- Glitch animation ----------
+function setupGlitch() {
+  const target = document.querySelector(".glitch");
+  if (!target) return;
+
+  const trigger = () => {
+    target.classList.add("is-glitching");
+    setTimeout(() => target.classList.remove("is-glitching"), 600);
+  };
+
+  // первый запуск через 500мс после load
+  setTimeout(trigger, 500);
+
+  // повторять каждые 7-12 секунд (случайно)
+  const loop = () => {
+    const delay = 7000 + Math.random() * 5000;
+    setTimeout(() => {
+      trigger();
+      loop();
+    }, delay);
+  };
+  loop();
+}
+
 // ---------- Init ----------
 document.addEventListener("DOMContentLoaded", () => {
   renderSteps();
@@ -385,4 +409,5 @@ document.addEventListener("DOMContentLoaded", () => {
   setupModal();
   setupSearchForm();
   setupBookingButtons();
+  setupGlitch();
 });
