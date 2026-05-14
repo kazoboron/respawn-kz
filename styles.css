@@ -960,3 +960,111 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 body.menu-open {
   overflow: hidden;
 }
+
+/* ============================================
+   MODAL
+   ============================================ */
+.modal[hidden] {
+  display: none;
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: modal-in 250ms ease;
+}
+
+@keyframes modal-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(5, 5, 10, 0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.modal__panel {
+  position: relative;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  max-width: 480px;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), var(--glow-cyan);
+  animation: panel-in 300ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes panel-in {
+  from { opacity: 0; transform: translateY(20px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.modal__close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  font-size: 16px;
+  transition: all var(--t-fast);
+}
+
+.modal__close:hover {
+  background: var(--bg-elevated);
+  color: var(--neon-cyan);
+}
+
+.modal__title {
+  font-size: 22px;
+  margin-bottom: 12px;
+  padding-right: 32px;
+}
+
+.modal__body {
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.modal__body strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.modal__body .modal__highlight {
+  display: inline-block;
+  padding: 2px 8px;
+  background: rgba(0, 240, 255, 0.1);
+  border: 1px solid rgba(0, 240, 255, 0.2);
+  border-radius: 6px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  color: var(--neon-cyan);
+  margin: 0 2px;
+}
+
+.modal__qr {
+  margin: 20px 0;
+  padding: 16px;
+  background: var(--bg-elevated);
+  border-radius: var(--radius-md);
+  border: 1px dashed var(--border);
+  text-align: center;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  color: var(--text-muted);
+}

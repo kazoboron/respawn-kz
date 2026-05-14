@@ -279,6 +279,100 @@ function setupMobileMenu() {
   });
 }
 
+// ---------- Modal ----------
+function openModal({ title, body }) {
+  const modal = document.getElementById("modal");
+  const titleEl = document.getElementById("modal-title");
+  const bodyEl = document.getElementById("modal-body");
+  if (!modal || !titleEl || !bodyEl) return;
+  titleEl.textContent = title;
+  bodyEl.innerHTML = body;
+  modal.hidden = false;
+  document.body.classList.add("modal-open");
+}
+
+function closeModal() {
+  const modal = document.getElementById("modal");
+  if (!modal) return;
+  modal.hidden = true;
+  document.body.classList.remove("modal-open");
+}
+
+function setupModal() {
+  const modal = document.getElementById("modal");
+  if (!modal) return;
+
+  modal.addEventListener("click", (e) => {
+    if (e.target.hasAttribute("data-modal-close")) closeModal();
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !modal.hidden) closeModal();
+  });
+}
+
+// ---------- Search form ----------
+const DISTRICT_LABELS = {
+  "": "всех районах",
+  almalinsky: "Алмалинском",
+  bostandyk: "Бостандыкском",
+  medeu: "Медеуском",
+  auezov: "Ауэзовском",
+};
+
+function setupSearchForm() {
+  const form = document.getElementById("search-form");
+  if (!form) return;
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const data = new FormData(form);
+    const district = data.get("district") || "";
+    const date = data.get("date") || "—";
+    const time = data.get("time") || "любое время";
+
+    const districtLabel = DISTRICT_LABELS[district] ?? "всех районах";
+    const dateLabel = date && date !== "—"
+      ? new Date(date).toLocaleDateString("ru-RU", { day: "numeric", month: "long" })
+      : "—";
+
+    const count = Math.floor(3 + Math.random() * 9);
+
+    openModal({
+      title: `Найдено ${count} клубов`,
+      body: `
+        <p>В <strong>${districtLabel}</strong> на <span class="modal__highlight">${dateLabel}</span> в <span class="modal__highlight">${time}</span>.</p>
+        <p style="margin-top:12px">Это демо-версия лендинга. В полной версии здесь будет список доступных слотов с возможностью бронирования.</p>
+      `,
+    });
+  });
+}
+
+// ---------- Booking ----------
+function setupBookingButtons() {
+  const grid = document.getElementById("clubs-grid");
+  if (!grid) return;
+  grid.addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-book]");
+    if (!btn) return;
+    const clubName = btn.getAttribute("data-book");
+    const club = CLUBS.find((c) => c.name === clubName);
+    if (!club) return;
+
+    openModal({
+      title: `Бронирование — ${club.name}`,
+      body: `
+        <p><strong>${club.name}</strong> · ${club.district} · ${club.distance}</p>
+        <p style="margin-top:8px">Цена: <span class="modal__highlight">${formatPrice(club.price)} ₸/час</span></p>
+        <div class="modal__qr">
+          QR-код придёт на email после оплаты<br />
+          <span style="color:var(--neon-cyan)">▢▢▢▢▢ ▢▢▢▢▢</span>
+        </div>
+        <p>Это демо-версия — реальное бронирование появится в продакшен-версии платформы.</p>
+      `,
+    });
+  });
+}
+
 // ---------- Init ----------
 document.addEventListener("DOMContentLoaded", () => {
   renderSteps();
@@ -288,4 +382,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setupTimeSelect();
   setupDateDefault();
   setupMobileMenu();
+  setupModal();
+  setupSearchForm();
+  setupBookingButtons();
 });
