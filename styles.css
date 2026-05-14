@@ -953,3 +953,10 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   color: var(--neon-cyan);
   box-shadow: var(--glow-cyan);
 }
+
+/* ============================================
+   MOBILE MENU
+   ============================================ */
+body.menu-open {
+  overflow: hidden;
+}

@@ -256,6 +256,29 @@ function setupDateDefault() {
   input.min = `${yyyy}-${mm}-${dd}`;
 }
 
+// ---------- Mobile menu ----------
+function setupMobileMenu() {
+  const hamburger = document.getElementById("hamburger");
+  const nav = document.getElementById("nav");
+  if (!hamburger || !nav) return;
+
+  const close = () => {
+    document.body.classList.remove("menu-open");
+  };
+
+  hamburger.addEventListener("click", () => {
+    document.body.classList.toggle("menu-open");
+  });
+
+  nav.addEventListener("click", (e) => {
+    if (e.target.matches(".nav__link")) close();
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") close();
+  });
+}
+
 // ---------- Init ----------
 document.addEventListener("DOMContentLoaded", () => {
   renderSteps();
@@ -264,4 +287,5 @@ document.addEventListener("DOMContentLoaded", () => {
   setupHeaderScroll();
   setupTimeSelect();
   setupDateDefault();
+  setupMobileMenu();
 });
