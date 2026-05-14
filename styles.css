@@ -1,1 +1,204 @@
-/* ALMATY.GG — styles */
+/* ============================================
+   ALMATY.GG — Landing styles
+   ============================================ */
+
+/* ---------- Design tokens ---------- */
+:root {
+  /* Backgrounds */
+  --bg-base: #0a0a0f;
+  --bg-surface: #14141c;
+  --bg-elevated: #1c1c28;
+
+  /* Text */
+  --text-primary: #f0f0ff;
+  --text-secondary: #a0a0b8;
+  --text-muted: #60607a;
+
+  /* Neon accents */
+  --neon-cyan: #00f0ff;
+  --neon-magenta: #ff2e9a;
+  --neon-yellow: #fef300;
+
+  /* Borders */
+  --border: rgba(0, 240, 255, 0.15);
+  --border-hover: rgba(0, 240, 255, 0.4);
+  --border-soft: rgba(255, 255, 255, 0.06);
+
+  /* Glow */
+  --glow-cyan: 0 0 24px rgba(0, 240, 255, 0.4);
+  --glow-magenta: 0 0 24px rgba(255, 46, 154, 0.4);
+
+  /* Radii */
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+
+  /* Container */
+  --container-max: 1200px;
+  --container-pad: 20px;
+
+  /* Transitions */
+  --t-fast: 150ms ease;
+  --t-base: 250ms ease;
+  --t-slow: 400ms ease;
+}
+
+/* ---------- Reset ---------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--text-primary);
+  background: var(--bg-base);
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+button,
+input,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: color var(--t-fast);
+}
+
+a:hover {
+  color: var(--neon-cyan);
+}
+
+ul {
+  list-style: none;
+}
+
+/* ---------- Layout ---------- */
+.container {
+  width: 100%;
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding-left: var(--container-pad);
+  padding-right: var(--container-pad);
+}
+
+/* ---------- Typography ---------- */
+h1,
+h2,
+h3,
+h4 {
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.section__title {
+  font-size: clamp(28px, 4vw, 40px);
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.section__subtitle {
+  color: var(--text-secondary);
+  text-align: center;
+  margin-bottom: 48px;
+  font-size: 18px;
+}
+
+/* ---------- Logo ---------- */
+.logo {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  display: inline-block;
+}
+
+.logo__accent {
+  color: var(--neon-cyan);
+  text-shadow: 0 0 10px rgba(0, 240, 255, 0.6);
+}
+
+/* ---------- Buttons ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 15px;
+  transition: all var(--t-base);
+  white-space: nowrap;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.btn--primary {
+  background: var(--neon-cyan);
+  color: #001014;
+  box-shadow: var(--glow-cyan);
+}
+
+.btn--primary:hover {
+  background: #5af5ff;
+  box-shadow: 0 0 32px rgba(0, 240, 255, 0.6);
+  transform: translateY(-2px);
+}
+
+.btn--ghost {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--text-primary);
+}
+
+.btn--ghost:hover {
+  border-color: var(--neon-cyan);
+  color: var(--neon-cyan);
+}
+
+.btn--large {
+  padding: 18px 40px;
+  font-size: 17px;
+}
+
+/* ---------- Section base spacing ---------- */
+section {
+  padding: 96px 0;
+  position: relative;
+}
+
+/* ---------- Focus ---------- */
+:focus-visible {
+  outline: 2px solid var(--neon-cyan);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
