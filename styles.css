@@ -591,3 +591,168 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   font-size: 15px;
   line-height: 1.6;
 }
+
+/* ============================================
+   CLUBS
+   ============================================ */
+.clubs {
+  background:
+    radial-gradient(ellipse 60% 40% at 90% 20%, rgba(255, 46, 154, 0.06), transparent 60%),
+    var(--bg-base);
+}
+
+.clubs__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.club-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: transform var(--t-base), border-color var(--t-base), box-shadow var(--t-base);
+  display: flex;
+  flex-direction: column;
+}
+
+.club-card:hover {
+  transform: translateY(-6px);
+  border-color: var(--border-hover);
+  box-shadow: 0 12px 40px rgba(0, 240, 255, 0.15), 0 0 24px rgba(0, 240, 255, 0.1);
+}
+
+.club-card__media {
+  aspect-ratio: 16 / 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.club-card__media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 50%, rgba(10, 10, 15, 0.7) 100%);
+}
+
+.club-card__initial {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 72px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.85);
+  letter-spacing: -0.04em;
+  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+  position: relative;
+  z-index: 1;
+}
+
+.club-card__body {
+  padding: 20px 22px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+}
+
+.club-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.club-card__name {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.club-card__rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(254, 243, 0, 0.1);
+  color: var(--neon-yellow);
+  padding: 4px 10px;
+  border-radius: 100px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.club-card__meta {
+  color: var(--text-secondary);
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.club-card__meta-sep {
+  opacity: 0.4;
+}
+
+.club-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.club-card__tag {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: rgba(0, 240, 255, 0.08);
+  color: var(--neon-cyan);
+  border: 1px solid rgba(0, 240, 255, 0.15);
+  letter-spacing: 0.02em;
+}
+
+.club-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-soft);
+}
+
+.club-card__price {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 16px;
+}
+
+.club-card__price-from {
+  color: var(--text-muted);
+  font-size: 12px;
+  margin-right: 4px;
+}
+
+.club-card__price-value {
+  color: var(--neon-cyan);
+  font-weight: 600;
+}
+
+.club-card__price-unit {
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.club-card__btn {
+  padding: 8px 16px;
+  font-size: 13px;
+  border-radius: var(--radius-sm);
+}
+
+.club-card__reviews {
+  color: var(--text-muted);
+  font-size: 12px;
+}

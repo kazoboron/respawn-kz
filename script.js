@@ -38,6 +38,79 @@ const STEPS = [
   },
 ];
 
+const CLUBS = [
+  {
+    name: "Cyberzone",
+    initial: "C",
+    gradient: "linear-gradient(135deg, #00f0ff, #0066ff)",
+    district: "Алмалинский",
+    distance: "2.3 км",
+    rating: 4.9,
+    reviews: 312,
+    price: 1200,
+    tags: ["PC", "PS5", "VR"],
+  },
+  {
+    name: "Colizeum",
+    initial: "C",
+    gradient: "linear-gradient(135deg, #ff2e9a, #8b00ff)",
+    district: "Бостандыкский",
+    distance: "4.1 км",
+    rating: 4.8,
+    reviews: 189,
+    price: 1500,
+    tags: ["PC", "Sim Racing"],
+  },
+  {
+    name: "RAGE Arena",
+    initial: "R",
+    gradient: "linear-gradient(135deg, #fef300, #ff6a00)",
+    district: "Медеуский",
+    distance: "5.8 км",
+    rating: 4.7,
+    reviews: 256,
+    price: 1000,
+    tags: ["PC", "PS5"],
+  },
+  {
+    name: "IGNITE",
+    initial: "I",
+    gradient: "linear-gradient(135deg, #ff2e9a, #00f0ff)",
+    district: "Ауэзовский",
+    distance: "6.2 км",
+    rating: 4.6,
+    reviews: 98,
+    price: 800,
+    tags: ["PC"],
+  },
+  {
+    name: "NetGame",
+    initial: "N",
+    gradient: "linear-gradient(135deg, #00f0ff, #14141c)",
+    district: "Алмалинский",
+    distance: "1.5 км",
+    rating: 4.5,
+    reviews: 67,
+    price: 600,
+    tags: ["PC", "PS5"],
+  },
+  {
+    name: "GamerHub",
+    initial: "G",
+    gradient: "linear-gradient(135deg, #8b00ff, #ff2e9a)",
+    district: "Бостандыкский",
+    distance: "3.7 км",
+    rating: 4.8,
+    reviews: 145,
+    price: 900,
+    tags: ["PC", "VR"],
+  },
+];
+
+function formatPrice(value) {
+  return value.toLocaleString("ru-RU");
+}
+
 // ---------- Renderers ----------
 function renderSteps() {
   const root = document.getElementById("how-steps");
@@ -54,7 +127,44 @@ function renderSteps() {
   ).join("");
 }
 
+function renderClubs() {
+  const root = document.getElementById("clubs-grid");
+  if (!root) return;
+  root.innerHTML = CLUBS.map(
+    (c) => `
+    <article class="club-card" data-club="${c.name}">
+      <div class="club-card__media" style="background: ${c.gradient};">
+        <span class="club-card__initial">${c.initial}</span>
+      </div>
+      <div class="club-card__body">
+        <div class="club-card__header">
+          <h3 class="club-card__name">${c.name}</h3>
+          <span class="club-card__rating">★ ${c.rating}</span>
+        </div>
+        <div class="club-card__meta">
+          <span>${c.district}</span>
+          <span class="club-card__meta-sep">·</span>
+          <span>${c.distance}</span>
+          <span class="club-card__meta-sep">·</span>
+          <span class="club-card__reviews">${c.reviews} отзывов</span>
+        </div>
+        <div class="club-card__tags">
+          ${c.tags.map((t) => `<span class="club-card__tag">${t}</span>`).join("")}
+        </div>
+        <div class="club-card__footer">
+          <div class="club-card__price">
+            <span class="club-card__price-from">от</span><span class="club-card__price-value">${formatPrice(c.price)} ₸</span><span class="club-card__price-unit"> /час</span>
+          </div>
+          <button class="btn btn--primary club-card__btn" data-book="${c.name}">Забронировать</button>
+        </div>
+      </div>
+    </article>
+  `
+  ).join("");
+}
+
 // ---------- Init ----------
 document.addEventListener("DOMContentLoaded", () => {
   renderSteps();
+  renderClubs();
 });
