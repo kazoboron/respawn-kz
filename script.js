@@ -1,5 +1,5 @@
 // ============================================
-// ALMATY.GG — Landing interactions
+// respawn.kz — Landing interactions
 // ============================================
 
 // ---------- Data ----------
