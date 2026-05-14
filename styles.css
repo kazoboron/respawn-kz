@@ -196,6 +196,10 @@ section {
   position: relative;
 }
 
+section[id] {
+  scroll-margin-top: 80px;
+}
+
 /* ---------- Focus ---------- */
 :focus-visible {
   outline: 2px solid var(--neon-cyan);

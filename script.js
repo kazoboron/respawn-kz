@@ -217,9 +217,51 @@ function renderBenefits() {
   ).join("");
 }
 
+// ---------- Header scroll behavior ----------
+function setupHeaderScroll() {
+  const header = document.getElementById("header");
+  if (!header) return;
+  const onScroll = () => {
+    if (window.scrollY > 50) {
+      header.classList.add("scrolled");
+    } else {
+      header.classList.remove("scrolled");
+    }
+  };
+  window.addEventListener("scroll", onScroll, { passive: true });
+  onScroll();
+}
+
+// ---------- Time select population ----------
+function setupTimeSelect() {
+  const select = document.getElementById("time-select");
+  if (!select) return;
+  const options = ['<option value="">Любое</option>'];
+  for (let h = 0; h < 24; h++) {
+    const value = `${String(h).padStart(2, "0")}:00`;
+    options.push(`<option value="${value}">${value}</option>`);
+  }
+  select.innerHTML = options.join("");
+}
+
+// ---------- Date input default ----------
+function setupDateDefault() {
+  const input = document.querySelector('input[name="date"]');
+  if (!input) return;
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth() + 1).padStart(2, "0");
+  const dd = String(today.getDate()).padStart(2, "0");
+  input.value = `${yyyy}-${mm}-${dd}`;
+  input.min = `${yyyy}-${mm}-${dd}`;
+}
+
 // ---------- Init ----------
 document.addEventListener("DOMContentLoaded", () => {
   renderSteps();
   renderClubs();
   renderBenefits();
+  setupHeaderScroll();
+  setupTimeSelect();
+  setupDateDefault();
 });
