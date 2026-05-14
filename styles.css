@@ -1068,3 +1068,179 @@ body.menu-open {
   font-size: 13px;
   color: var(--text-muted);
 }
+
+/* ============================================
+   RESPONSIVE — Tablet (≤1024)
+   ============================================ */
+@media (max-width: 1024px) {
+  section {
+    padding: 72px 0;
+  }
+
+  .clubs__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .footer__inner {
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+  }
+
+  .footer__col:first-child {
+    grid-column: 1 / -1;
+  }
+
+  .hero__stats {
+    gap: 40px;
+  }
+}
+
+/* ============================================
+   RESPONSIVE — Mobile (≤768)
+   ============================================ */
+@media (max-width: 768px) {
+  :root {
+    --container-pad: 16px;
+  }
+
+  section {
+    padding: 56px 0;
+  }
+
+  /* Header mobile */
+  .hamburger {
+    display: inline-flex;
+  }
+
+  .header__actions .btn--ghost {
+    display: none;
+  }
+
+  .nav {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: min(280px, 80vw);
+    background: var(--bg-surface);
+    border-left: 1px solid var(--border);
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 0;
+    padding: 88px 24px 24px;
+    transform: translateX(100%);
+    transition: transform var(--t-base);
+    z-index: 90;
+  }
+
+  body.menu-open .nav {
+    transform: translateX(0);
+    box-shadow: -20px 0 60px rgba(0, 0, 0, 0.5);
+  }
+
+  .nav__link {
+    padding: 14px 0;
+    font-size: 17px;
+    border-bottom: 1px solid var(--border-soft);
+  }
+
+  .nav__link::after { display: none; }
+
+  /* Hero */
+  .hero {
+    min-height: auto;
+    padding-top: 120px;
+    padding-bottom: 56px;
+  }
+
+  .hero__title {
+    margin-bottom: 16px;
+  }
+
+  .hero__subtitle {
+    margin-bottom: 32px;
+  }
+
+  .search {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    padding: 14px;
+  }
+
+  .search__submit {
+    height: auto;
+    padding: 14px;
+  }
+
+  .hero__stats {
+    gap: 24px;
+  }
+
+  .stat__value {
+    font-size: 22px;
+  }
+
+  /* How */
+  .how__steps {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  /* Clubs */
+  .clubs__grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Benefits */
+  .benefits__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .benefit {
+    padding: 22px;
+    gap: 16px;
+  }
+
+  /* CTA */
+  .cta__inner {
+    padding: 40px 24px;
+  }
+
+  /* Footer */
+  .footer {
+    padding: 40px 0 24px;
+  }
+
+  .footer__inner {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  /* Modal */
+  .modal__panel {
+    padding: 24px;
+  }
+}
+
+/* ============================================
+   RESPONSIVE — Small phones (≤480)
+   ============================================ */
+@media (max-width: 480px) {
+  .section__subtitle {
+    margin-bottom: 32px;
+  }
+
+  .club-card__media {
+    aspect-ratio: 16 / 8;
+  }
+
+  .club-card__initial {
+    font-size: 56px;
+  }
+
+  .hero__stats {
+    flex-direction: column;
+    align-items: center;
+  }
+}
