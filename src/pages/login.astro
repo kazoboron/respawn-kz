@@ -12,6 +12,10 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         <h1 class="auth-card__title">Войти</h1>
         <p class="auth-card__subtitle">Введи email — мы отправим ссылку. Кликнешь — войдёшь. Без пароля.</p>
 
+        <div class="demo-banner" id="login-demo-banner" hidden>
+          ⚙️ <strong>Demo-режим</strong>: данные сохраняются локально в браузере. Любой email подойдёт, письмо не отправляется.
+        </div>
+
         <form class="auth-form" id="login-form">
           <label class="auth-field">
             <span class="auth-label">Email</span>

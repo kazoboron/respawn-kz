@@ -1,11 +1,17 @@
-import { supabase } from '../lib/supabase';
-import { saveReturnUrl } from './auth';
+import { supabase, supabaseConfigured } from '../lib/supabase';
+import { saveReturnUrl, popReturnUrl } from './auth';
 
 export function setupLoginPage(): void {
   const form = document.getElementById('login-form') as HTMLFormElement | null;
   const successEl = document.getElementById('login-success');
   const errorEl = document.getElementById('login-error');
+  const demoBanner = document.getElementById('login-demo-banner');
   if (!form) return;
+
+  // Показать demo-баннер если работаем без Supabase
+  if (!supabaseConfigured && demoBanner) {
+    demoBanner.hidden = false;
+  }
 
   // Если есть ?return= — сохраняем
   const params = new URLSearchParams(window.location.search);
@@ -22,7 +28,7 @@ export function setupLoginPage(): void {
     if (errorEl) errorEl.hidden = true;
     const btn = form.querySelector('button[type="submit"]') as HTMLButtonElement;
     btn.disabled = true;
-    btn.textContent = 'Отправляем…';
+    btn.textContent = supabaseConfigured ? 'Отправляем…' : 'Входим…';
 
     const { error } = await supabase.auth.signInWithOtp({
       email,
@@ -31,10 +37,9 @@ export function setupLoginPage(): void {
       },
     });
 
-    btn.disabled = false;
-    btn.textContent = 'Получить ссылку';
-
     if (error) {
+      btn.disabled = false;
+      btn.textContent = supabaseConfigured ? 'Получить ссылку' : 'Войти';
       if (errorEl) {
         errorEl.textContent = `Ошибка: ${error.message}`;
         errorEl.hidden = false;
@@ -42,6 +47,16 @@ export function setupLoginPage(): void {
       return;
     }
 
+    if (!supabaseConfigured) {
+      // В демо-режиме signInWithOtp уже создал сессию — сразу редиректим
+      const target = popReturnUrl() || '/me/';
+      window.location.replace(target);
+      return;
+    }
+
+    // Реальный Supabase: показываем «письмо отправлено»
+    btn.disabled = false;
+    btn.textContent = 'Получить ссылку';
     if (successEl) {
       successEl.querySelector('[data-email]')!.textContent = email;
       successEl.hidden = false;

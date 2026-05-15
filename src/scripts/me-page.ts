@@ -1,4 +1,4 @@
-import { supabase } from '../lib/supabase';
+import { supabase, supabaseConfigured } from '../lib/supabase';
 import { getCurrentUser } from './auth';
 import { type Booking, STATUS_LABELS } from '../data/supabase-types';
 import { CITY_LABELS } from '../data/cities';
@@ -71,6 +71,12 @@ export async function setupMePage(): Promise<void> {
   }
 
   if (emailEl) emailEl.textContent = user.email ?? '';
+
+  // Demo-режим: показать индикатор
+  if (!supabaseConfigured) {
+    const banner = document.getElementById('me-demo-banner');
+    if (banner) banner.hidden = false;
+  }
 
   const bookings = await loadBookings();
   if (loadingEl) loadingEl.hidden = true;

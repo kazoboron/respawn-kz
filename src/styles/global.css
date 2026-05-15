@@ -2368,3 +2368,19 @@ body.menu-open {
     width: 100%;
   }
 }
+
+.demo-banner {
+  margin-bottom: 24px;
+  padding: 12px 16px;
+  background: rgba(254, 243, 0, 0.08);
+  border: 1px solid rgba(254, 243, 0, 0.2);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.5;
+  text-align: left;
+}
+
+.demo-banner strong {
+  color: var(--neon-yellow);
+}

@@ -8,6 +8,9 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       <header class="me-page__header">
         <h1 class="me-page__title">Мои брони</h1>
         <p class="me-page__email">Аккаунт: <strong id="me-email"></strong></p>
+        <div class="demo-banner" id="me-demo-banner" hidden style="margin-top:16px;max-width:600px">
+          ⚙️ <strong>Demo-режим</strong>: брони сохранены локально в этом браузере. При очистке cookies/localStorage они пропадут.
+        </div>
       </header>
 
       <div class="me-loading" id="me-loading">
