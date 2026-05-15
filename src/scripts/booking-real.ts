@@ -87,6 +87,7 @@ async function handleBookingClick(slug: string): Promise<void> {
     const fd = new FormData(form);
     const hours = Number(fd.get('hours') || 1);
     const newBooking: NewBooking = {
+      user_id: user.id,
       club_slug: club.slug,
       club_name: club.name,
       city_id: club.city,

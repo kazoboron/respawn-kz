@@ -13,7 +13,7 @@ export interface Booking {
   created_at: string;
 }
 
-export type NewBooking = Omit<Booking, 'id' | 'user_id' | 'status' | 'created_at'>;
+export type NewBooking = Omit<Booking, 'id' | 'status' | 'created_at'>;
 
 export const STATUS_LABELS: Record<Booking['status'], string> = {
   pending: 'Ожидает подтверждения',
