@@ -3,7 +3,7 @@ import { setupModal } from './modal';
 import { setupMobileMenu } from './menu';
 import { setupHeaderScroll } from './header-scroll';
 import { setupSearchForm, setupTimeSelect, setupDateDefault } from './search';
-import { setupBookingButtons } from './booking';
+import { setupBookingButtons } from './booking-real';
 import { setupGlitch } from './glitch';
 import { setupClubApplication } from './club-application';
 import { setupCatalogFilters } from './filters';
