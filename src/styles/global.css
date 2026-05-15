@@ -2082,3 +2082,112 @@ body.menu-open {
   align-items: center;
   gap: 8px;
 }
+
+/* ============================================
+   AUTH pages (/login, /me empty state)
+   ============================================ */
+.auth-page {
+  padding: 140px 0 80px;
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.auth-card {
+  max-width: 480px;
+  width: 100%;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 40px;
+  box-shadow: var(--glow-cyan);
+}
+
+.auth-card__title {
+  font-size: 32px;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.auth-card__subtitle {
+  color: var(--text-secondary);
+  font-size: 15px;
+  margin-bottom: 32px;
+  text-align: center;
+  line-height: 1.6;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.auth-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.auth-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  padding-left: 14px;
+}
+
+.auth-input {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  font-size: 15px;
+  color: var(--text-primary);
+  font-family: inherit;
+  transition: border-color var(--t-fast);
+}
+
+.auth-input:hover,
+.auth-input:focus {
+  border-color: var(--border-hover);
+  outline: none;
+}
+
+.auth-submit {
+  margin-top: 8px;
+}
+
+.auth-success {
+  margin-top: 24px;
+  padding: 16px;
+  background: rgba(0, 240, 255, 0.08);
+  border: 1px solid rgba(0, 240, 255, 0.2);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.auth-success strong {
+  color: var(--neon-cyan);
+  font-family: "JetBrains Mono", monospace;
+}
+
+.auth-error {
+  margin-top: 16px;
+  padding: 12px 16px;
+  background: rgba(255, 46, 154, 0.08);
+  border: 1px solid rgba(255, 46, 154, 0.2);
+  border-radius: var(--radius-md);
+  color: var(--neon-magenta);
+  font-size: 14px;
+}
+
+.auth-footnote {
+  margin-top: 24px;
+  font-size: 13px;
+  color: var(--text-muted);
+  text-align: center;
+}

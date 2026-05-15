@@ -8,6 +8,7 @@ import { setupGlitch } from './glitch';
 import { setupClubApplication } from './club-application';
 import { setupCatalogFilters } from './filters';
 import { setupAuthButton } from './auth';
+import { setupLoginPage } from './login-page';
 
 function init(): void {
   setupHeaderScroll();
@@ -30,6 +31,9 @@ function init(): void {
   if (document.getElementById('catalog-grid')) {
     setupCatalogFilters();
     setupGeolocation();
+  }
+  if (document.getElementById('login-form')) {
+    setupLoginPage();
   }
 }
 
