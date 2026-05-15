@@ -1,0 +1,22 @@
+---
+interface Props {
+  stats?: Array<{ value: string; label: string }>;
+}
+
+const defaultStats = [
+  { value: '12 000+', label: 'игроков' },
+  { value: '80+', label: 'клубов' },
+  { value: '10', label: 'городов' },
+];
+
+const { stats = defaultStats } = Astro.props;
+---
+
+<div class="hero__stats">
+  {stats.map((s) => (
+    <div class="stat">
+      <span class="stat__value">{s.value}</span>
+      <span class="stat__label">{s.label}</span>
+    </div>
+  ))}
+</div>

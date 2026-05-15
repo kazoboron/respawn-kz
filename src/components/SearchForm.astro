@@ -1,0 +1,32 @@
+---
+import { CITIES } from '../data/cities';
+
+interface Props {
+  variant?: 'hero' | 'compact';
+}
+
+const { variant = 'hero' } = Astro.props;
+---
+
+<form class:list={['search', `search--${variant}`]} id="search-form">
+  <label class="search__field">
+    <span class="search__label">
+      Город
+      <button type="button" class="geo-btn" id="geo-btn" title="Определить мой город">📍 Мой город</button>
+    </span>
+    <select name="city" id="city-select" class="search__input">
+      <option value="">Все города</option>
+      {CITIES.map((c) => <option value={c.id}>{c.label}</option>)}
+    </select>
+    <span class="geo-status" id="geo-status" hidden></span>
+  </label>
+  <label class="search__field">
+    <span class="search__label">Дата</span>
+    <input type="date" name="date" class="search__input" />
+  </label>
+  <label class="search__field">
+    <span class="search__label">Время</span>
+    <select name="time" class="search__input" id="time-select"></select>
+  </label>
+  <button type="submit" class="btn btn--primary search__submit">Найти клуб</button>
+</form>
