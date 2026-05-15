@@ -1,0 +1,20 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Входим… — respawn.kz">
+  <section class="auth-page" id="auth-callback-root">
+    <div class="container">
+      <div class="auth-card" style="text-align:center">
+        <div id="callback-loading">
+          <h1 class="auth-card__title">Входим…</h1>
+          <p class="auth-card__subtitle">Подожди секунду, проверяем твою ссылку.</p>
+        </div>
+        <div class="auth-error" id="callback-error" hidden style="margin-top:0"></div>
+        <p class="auth-footnote">
+          Не сработало? <a href="/login/" style="color:var(--neon-cyan)">Попробовать снова</a>
+        </p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

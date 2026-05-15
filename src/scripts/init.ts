@@ -9,6 +9,7 @@ import { setupClubApplication } from './club-application';
 import { setupCatalogFilters } from './filters';
 import { setupAuthButton } from './auth';
 import { setupLoginPage } from './login-page';
+import { setupAuthCallback } from './auth-callback';
 
 function init(): void {
   setupHeaderScroll();
@@ -34,6 +35,9 @@ function init(): void {
   }
   if (document.getElementById('login-form')) {
     setupLoginPage();
+  }
+  if (document.getElementById('auth-callback-root')) {
+    setupAuthCallback();
   }
 }
 
