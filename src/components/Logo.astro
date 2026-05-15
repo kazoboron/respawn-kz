@@ -88,28 +88,21 @@ const dim = sizes[size];
   }
 
   .logo-text {
-    font-family: 'Audiowide', 'JetBrains Mono', monospace;
+    font-family: var(--font-display);
     font-size: var(--text-size);
-    letter-spacing: 0.02em;
-    font-weight: 700;
-    font-style: italic;
+    letter-spacing: -0.025em;
+    font-weight: 800;
     display: inline-flex;
     align-items: baseline;
   }
 
   .logo-text__main {
-    background: linear-gradient(135deg, #60a5fa 0%, #6366f1 60%, #a855f7 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: transparent;
-    text-shadow: 0 0 24px rgba(99, 102, 241, 0.3);
+    color: var(--text-primary);
   }
 
   .logo-text__accent {
-    color: #ec4899;
-    font-size: 0.65em;
+    color: var(--accent);
+    font-weight: 600;
     margin-left: 1px;
-    text-shadow: 0 0 12px rgba(236, 72, 153, 0.5);
   }
 </style>
