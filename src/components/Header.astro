@@ -1,0 +1,37 @@
+---
+interface Props {
+  activeRoute?: 'index' | 'clubs' | 'for-clubs' | 'about';
+}
+
+const { activeRoute } = Astro.props;
+
+const navItems = [
+  { href: '/clubs/', label: 'Клубы', key: 'clubs' },
+  { href: '/#how', label: 'Как это работает', key: 'index' },
+  { href: '/#benefits', label: 'Преимущества', key: 'index' },
+  { href: '/for-clubs/', label: 'Для клубов', key: 'for-clubs' },
+  { href: '/about/', label: 'О нас', key: 'about' },
+];
+---
+
+<header class="header" id="header">
+  <div class="container header__inner">
+    <a href="/" class="logo">RESPAWN<span class="logo__accent">.kz</span></a>
+    <nav class="nav" id="nav">
+      {navItems.map((item) => (
+        <a
+          href={item.href}
+          class:list={['nav__link', { 'nav__link--active': activeRoute === item.key }]}
+        >
+          {item.label}
+        </a>
+      ))}
+    </nav>
+    <div class="header__actions">
+      <button class="btn btn--ghost" type="button">Войти</button>
+      <button class="hamburger" id="hamburger" aria-label="Меню" type="button">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>

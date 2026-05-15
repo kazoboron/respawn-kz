@@ -1301,3 +1301,10 @@ body.menu-open {
     align-items: center;
   }
 }
+
+.nav__link--active {
+  color: var(--neon-cyan);
+}
+.nav__link--active::after {
+  width: 100%;
+}
