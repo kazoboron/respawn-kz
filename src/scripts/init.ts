@@ -10,6 +10,7 @@ import { setupCatalogFilters } from './filters';
 import { setupAuthButton } from './auth';
 import { setupLoginPage } from './login-page';
 import { setupAuthCallback } from './auth-callback';
+import { setupMePage } from './me-page';
 
 function init(): void {
   setupHeaderScroll();
@@ -38,6 +39,9 @@ function init(): void {
   }
   if (document.getElementById('auth-callback-root')) {
     setupAuthCallback();
+  }
+  if (document.getElementById('me-root')) {
+    setupMePage();
   }
 }
 

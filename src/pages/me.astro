@@ -1,0 +1,25 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Личный кабинет — respawn.kz">
+  <section class="me-page" id="me-root">
+    <div class="container">
+      <header class="me-page__header">
+        <h1 class="me-page__title">Мои брони</h1>
+        <p class="me-page__email">Аккаунт: <strong id="me-email"></strong></p>
+      </header>
+
+      <div class="me-loading" id="me-loading">
+        <p style="text-align:center;color:var(--text-muted)">Загружаем брони…</p>
+      </div>
+
+      <div class="me-bookings__list" id="me-bookings" hidden></div>
+
+      <div class="me-empty" id="me-empty" hidden>
+        <p>У тебя пока нет броней.</p>
+        <a href="/clubs/" class="btn btn--primary" style="margin-top:16px">К каталогу клубов</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
