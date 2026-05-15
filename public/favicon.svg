@@ -1,4 +1,20 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <rect width="32" height="32" rx="6" fill="#0a0a0f"/>
-  <text x="16" y="22" font-family="JetBrains Mono, monospace" font-size="18" font-weight="700" text-anchor="middle" fill="#00f0ff" style="filter: drop-shadow(0 0 4px #00f0ff)">R</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="64" y2="64">
+      <stop offset="0%" stop-color="#3b82f6" />
+      <stop offset="60%" stop-color="#6366f1" />
+      <stop offset="100%" stop-color="#a855f7" />
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="12" fill="#0a0a0f" />
+  <path d="M32 8 C20.5 8 12 16.5 12 27 C12 39 30 56 32 56 C34 56 52 39 52 27 C52 16.5 43.5 8 32 8 Z" fill="url(#g)" />
+  <g transform="translate(20 23)" fill="#ffffff">
+    <path d="M4 3 H20 C22.5 3 24 4.5 24 7 V13 C24 15.5 22.5 17 20 17 H17.5 L15.5 13.5 H8.5 L6.5 17 H4 C1.5 17 0 15.5 0 13 V7 C0 4.5 1.5 3 4 3 Z" />
+    <rect x="4.5" y="8.5" width="5" height="2" fill="#3b5fdf" rx="0.4" />
+    <rect x="6" y="7" width="2" height="5" fill="#3b5fdf" rx="0.4" />
+    <circle cx="17" cy="8" r="1.1" fill="#3b5fdf" />
+    <circle cx="20" cy="10" r="1.1" fill="#3b5fdf" />
+    <circle cx="17" cy="12" r="1.1" fill="#3b5fdf" />
+    <circle cx="14.5" cy="10" r="1.1" fill="#3b5fdf" />
+  </g>
 </svg>

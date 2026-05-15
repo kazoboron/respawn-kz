@@ -1,4 +1,6 @@
 ---
+import Logo from './Logo.astro';
+
 interface Props {
   activeRoute?: 'index' | 'clubs' | 'for-clubs' | 'about';
 }
@@ -16,7 +18,7 @@ const navItems = [
 
 <header class="header" id="header">
   <div class="container header__inner">
-    <a href="/" class="logo">RESPAWN<span class="logo__accent">.kz</span></a>
+    <a href="/" class="header__logo-link"><Logo size="md" /></a>
     <nav class="nav" id="nav">
       {navItems.map((item) => (
         <a

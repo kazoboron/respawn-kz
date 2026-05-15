@@ -317,10 +317,34 @@ body.menu-open .hamburger span:nth-child(3) {
   display: flex;
   align-items: center;
   overflow: hidden;
+  position: relative;
+  isolation: isolate;
   background:
-    radial-gradient(ellipse 80% 50% at 20% 30%, rgba(0, 240, 255, 0.12), transparent 60%),
-    radial-gradient(ellipse 60% 40% at 80% 70%, rgba(255, 46, 154, 0.10), transparent 60%),
+    radial-gradient(ellipse 80% 50% at 20% 30%, rgba(99, 102, 241, 0.18), transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 70%, rgba(168, 85, 247, 0.14), transparent 60%),
     var(--bg-base);
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url('/img/club-hero.jpg');
+  background-size: cover;
+  background-position: center;
+  opacity: 0.22;
+  z-index: -1;
+  mask-image: radial-gradient(ellipse 110% 90% at 50% 40%, black 20%, transparent 95%);
+  -webkit-mask-image: radial-gradient(ellipse 110% 90% at 50% 40%, black 20%, transparent 95%);
+}
+
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 0%, transparent 60%, var(--bg-base) 100%);
+  z-index: -1;
+  pointer-events: none;
 }
 
 .hero__grid {
@@ -2383,4 +2407,19 @@ body.menu-open {
 
 .demo-banner strong {
   color: var(--neon-yellow);
+}
+
+/* ============================================
+   Logo placement adjustments (new SVG logo)
+   ============================================ */
+.header__logo-link {
+  display: inline-flex;
+  transition: opacity var(--t-fast);
+}
+.header__logo-link:hover {
+  opacity: 0.85;
+}
+
+.footer__logo {
+  margin-bottom: 16px;
 }
