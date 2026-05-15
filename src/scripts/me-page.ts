@@ -14,7 +14,7 @@ function formatDate(date: string): string {
 function renderBookingCard(b: Booking): string {
   const cityLabel = CITY_LABELS[b.city_id] ?? b.city_id;
   const canCancel = b.status === 'pending';
-  const statusClass = `me-booking__status me-booking__status--${b.status}`;
+  const statusClass = `pill pill--${b.status}`;
   return `
     <article class="me-booking" data-booking-id="${b.id}">
       <div class="me-booking__main">
@@ -30,7 +30,7 @@ function renderBookingCard(b: Booking): string {
       <div class="me-booking__side">
         <div class="me-booking__price">${formatPrice(b.total_price)} ₸</div>
         <span class="${statusClass}">${STATUS_LABELS[b.status]}</span>
-        ${canCancel ? `<button class="btn btn--ghost me-booking__cancel" data-cancel="${b.id}">Отменить</button>` : ''}
+        ${canCancel ? `<button class="btn btn--ghost btn--sm" data-cancel="${b.id}">Отменить</button>` : ''}
       </div>
     </article>
   `;
@@ -109,8 +109,8 @@ export async function setupMePage(): Promise<void> {
     }
 
     const card = btn.closest('[data-booking-id]') as HTMLElement;
-    const statusEl = card.querySelector('.me-booking__status') as HTMLElement;
-    statusEl.className = 'me-booking__status me-booking__status--cancelled';
+    const statusEl = card.querySelector('.pill') as HTMLElement;
+    statusEl.className = 'pill pill--cancelled';
     statusEl.textContent = STATUS_LABELS.cancelled;
     btn.remove();
   });

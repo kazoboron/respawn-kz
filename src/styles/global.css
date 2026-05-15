@@ -820,19 +820,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   letter-spacing: -0.01em;
 }
 
-.club-card__rating {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  background: rgba(254, 243, 0, 0.1);
-  color: var(--neon-yellow);
-  padding: 4px 10px;
-  border-radius: 100px;
-  font-family: "JetBrains Mono", monospace;
-  font-size: 13px;
-  font-weight: 500;
-  white-space: nowrap;
-}
+/* .club-card__rating → replaced by .pill.pill--rating (design system) */
 
 .club-card__meta {
   color: var(--text-secondary);
@@ -852,16 +840,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   gap: 6px;
 }
 
-.club-card__tag {
-  font-family: "JetBrains Mono", monospace;
-  font-size: 11px;
-  padding: 4px 10px;
-  border-radius: 6px;
-  background: rgba(0, 240, 255, 0.08);
-  color: var(--neon-cyan);
-  border: 1px solid rgba(0, 240, 255, 0.15);
-  letter-spacing: 0.02em;
-}
+/* .club-card__tag → replaced by .tag (design system) */
 
 .club-card__footer {
   display: flex;
@@ -894,11 +873,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   font-size: 12px;
 }
 
-.club-card__btn {
-  padding: 8px 16px;
-  font-size: 13px;
-  border-radius: var(--radius-sm);
-}
+/* .club-card__btn → replaced by .btn--sm (design system) */
 
 .club-card__reviews {
   color: var(--text-muted);
@@ -2435,37 +2410,8 @@ body.menu-open {
   color: var(--neon-cyan);
 }
 
-.me-booking__status {
-  font-size: 11px;
-  padding: 4px 10px;
-  border-radius: 100px;
-  font-family: "JetBrains Mono", monospace;
-  letter-spacing: 0.02em;
-  white-space: nowrap;
-}
-
-.me-booking__status--pending {
-  background: rgba(254, 243, 0, 0.1);
-  color: var(--neon-yellow);
-  border: 1px solid rgba(254, 243, 0, 0.2);
-}
-
-.me-booking__status--confirmed {
-  background: rgba(0, 240, 255, 0.1);
-  color: var(--neon-cyan);
-  border: 1px solid rgba(0, 240, 255, 0.2);
-}
-
-.me-booking__status--cancelled {
-  background: rgba(255, 46, 154, 0.06);
-  color: var(--neon-magenta);
-  border: 1px solid rgba(255, 46, 154, 0.15);
-}
-
-.me-booking__cancel {
-  padding: 6px 14px;
-  font-size: 12px;
-}
+/* .me-booking__status[--*] → replaced by .pill.pill--pending/confirmed/cancelled (design system) */
+/* .me-booking__cancel → replaced by .btn--sm (design system) */
 
 .me-empty {
   text-align: center;

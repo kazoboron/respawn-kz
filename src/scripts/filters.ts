@@ -78,7 +78,7 @@ function renderCard(club: Club): string {
       <div class="club-card__body">
         <div class="club-card__header">
           <h3 class="club-card__name"><a href="/clubs/${club.slug}/">${club.name}</a></h3>
-          <span class="club-card__rating">★ ${club.rating}</span>
+          <span class="pill pill--rating">★ ${club.rating}</span>
         </div>
         <div class="club-card__meta">
           <span>${cityLabel}</span>
@@ -88,13 +88,13 @@ function renderCard(club: Club): string {
           <span class="club-card__reviews">${club.reviews} отзывов</span>
         </div>
         <div class="club-card__tags">
-          ${club.tags.map((t) => `<span class="club-card__tag">${t}</span>`).join('')}
+          ${club.tags.map((t) => `<span class="tag">${t}</span>`).join('')}
         </div>
         <div class="club-card__footer">
           <div class="club-card__price">
             <span class="club-card__price-from">от</span><span class="club-card__price-value">${formatPrice(club.price)} ₸</span><span class="club-card__price-unit"> /час</span>
           </div>
-          <button class="btn btn--primary club-card__btn" data-book="${club.slug}">Забронировать</button>
+          <button class="btn btn--primary btn--sm" data-book="${club.slug}">Забронировать</button>
         </div>
       </div>
     </article>

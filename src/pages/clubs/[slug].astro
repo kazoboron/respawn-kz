@@ -76,10 +76,10 @@ const jsonLd = {
           <span class="club-card__meta-sep">·</span>
           <span>{club.district}</span>
           <span class="club-card__meta-sep">·</span>
-          <span class="club-card__rating">★ {club.rating} ({club.reviews} отзывов)</span>
+          <span class="pill pill--rating">★ {club.rating} ({club.reviews} отзывов)</span>
         </div>
         <div class="club-page__tags">
-          {club.tags.map((t) => <span class="club-card__tag">{t}</span>)}
+          {club.tags.map((t) => <span class="tag">{t}</span>)}
         </div>
       </header>
 
