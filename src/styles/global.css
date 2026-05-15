@@ -2076,3 +2076,9 @@ body.menu-open {
     grid-template-columns: 1fr;
   }
 }
+
+.header__auth {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}

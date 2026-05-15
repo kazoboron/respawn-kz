@@ -7,12 +7,14 @@ import { setupBookingButtons } from './booking';
 import { setupGlitch } from './glitch';
 import { setupClubApplication } from './club-application';
 import { setupCatalogFilters } from './filters';
+import { setupAuthButton } from './auth';
 
 function init(): void {
   setupHeaderScroll();
   setupMobileMenu();
   setupModal();
   setupBookingButtons();
+  setupAuthButton();
   if (document.getElementById('search-form')) {
     setupTimeSelect();
     setupDateDefault();
