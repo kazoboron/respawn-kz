@@ -1,14 +1,58 @@
 ---
-// Temporary hello world — replaced in Task 18
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SearchForm from '../components/SearchForm.astro';
+import HeroStats from '../components/HeroStats.astro';
+import HowItWorks from '../components/HowItWorks.astro';
+import ClubCard from '../components/ClubCard.astro';
+import Benefits from '../components/Benefits.astro';
+import FAQ from '../components/FAQ.astro';
+import { CLUBS } from '../data/clubs';
+import { LANDING_FAQ } from '../data/content';
+
+const topClubs = CLUBS.slice(0, 6);
 ---
-<!DOCTYPE html>
-<html lang="ru">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>respawn.kz — coming soon</title>
-  </head>
-  <body style="background:#0a0a0f;color:#f0f0ff;font-family:sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0">
-    <h1 style="color:#00f0ff">respawn.kz Astro setup ✓</h1>
-  </body>
-</html>
+
+<BaseLayout
+  title="respawn.kz — Бронируй компьютерные клубы в Казахстане"
+  activeRoute="index"
+>
+  <section class="hero" id="hero">
+    <div class="hero__grid" aria-hidden="true"></div>
+    <div class="hero__scanline" aria-hidden="true"></div>
+    <div class="container hero__inner">
+      <h1 class="hero__title">
+        Забронируй компьютерный клуб <br />
+        в Казахстане за <span class="glitch" data-text="30 секунд">30 секунд</span>
+      </h1>
+      <p class="hero__subtitle">
+        Лучшие клубы страны в одном месте. Выбирай слот, оплачивай онлайн, приходи играть.
+      </p>
+      <SearchForm variant="hero" />
+      <HeroStats />
+    </div>
+  </section>
+
+  <HowItWorks />
+
+  <section class="clubs" id="clubs">
+    <div class="container">
+      <h2 class="section__title">Топ клубы в Казахстане</h2>
+      <p class="section__subtitle">Проверенные клубы с лучшим рейтингом</p>
+      <div class="clubs__grid">
+        {topClubs.map((club) => <ClubCard club={club} />)}
+      </div>
+    </div>
+  </section>
+
+  <Benefits />
+
+  <FAQ items={LANDING_FAQ} />
+
+  <section class="cta" id="for-clubs-cta">
+    <div class="container cta__inner">
+      <h2 class="cta__title">Готов играть?</h2>
+      <p class="cta__subtitle">Найди свой клуб и забронируй слот прямо сейчас</p>
+      <a href="#hero" class="btn btn--primary btn--large">Найти клуб</a>
+    </div>
+  </section>
+</BaseLayout>
