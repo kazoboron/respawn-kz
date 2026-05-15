@@ -1380,3 +1380,115 @@ body.menu-open {
   line-height: 1.7;
   font-size: 15px;
 }
+
+/* ============================================
+   PAGE-HERO (общий для подстраниц)
+   ============================================ */
+.page-hero {
+  padding: 140px 0 56px;
+  text-align: center;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(0, 240, 255, 0.10), transparent 70%),
+    var(--bg-base);
+  position: relative;
+}
+
+.page-hero__title {
+  font-size: clamp(32px, 5vw, 52px);
+  margin-bottom: 16px;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.page-hero__subtitle {
+  font-size: clamp(15px, 1.8vw, 18px);
+  color: var(--text-secondary);
+  max-width: 720px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* ============================================
+   ABOUT — mission + audience + contacts
+   ============================================ */
+.mission__text {
+  max-width: 760px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  color: var(--text-secondary);
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+.audience__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.audience__col {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+}
+
+.audience__title {
+  font-size: 22px;
+  margin-bottom: 12px;
+}
+
+.audience__col p {
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+  line-height: 1.6;
+}
+
+.contacts__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.contacts__item {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: border-color var(--t-base), transform var(--t-base);
+}
+
+.contacts__item:hover {
+  border-color: var(--border-hover);
+  transform: translateY(-2px);
+}
+
+.contacts__label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+}
+
+.contacts__value {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 16px;
+  color: var(--neon-cyan);
+}
+
+@media (max-width: 768px) {
+  .audience__grid,
+  .contacts__grid {
+    grid-template-columns: 1fr;
+  }
+}

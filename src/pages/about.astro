@@ -1,0 +1,72 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import HeroStats from '../components/HeroStats.astro';
+import { ABOUT_MISSION } from '../data/content';
+---
+
+<BaseLayout
+  title="О проекте — respawn.kz"
+  description="respawn.kz объединяет компьютерные клубы Казахстана. Узнай о нашей миссии и команде."
+  activeRoute="about"
+>
+  <section class="page-hero">
+    <div class="container">
+      <h1 class="page-hero__title">Объединяем компьютерные клубы Казахстана</h1>
+      <p class="page-hero__subtitle">
+        Удобный поиск, прозрачные цены, моментальная бронь — для игроков. Поток клиентов, аналитика, онлайн-оплаты — для клубов.
+      </p>
+    </div>
+  </section>
+
+  <section class="mission">
+    <div class="container">
+      <h2 class="section__title">Наша миссия</h2>
+      <div class="mission__text">
+        {ABOUT_MISSION.map((p) => <p>{p}</p>)}
+      </div>
+    </div>
+  </section>
+
+  <section class="about-stats">
+    <div class="container">
+      <HeroStats />
+    </div>
+  </section>
+
+  <section class="audience">
+    <div class="container">
+      <div class="audience__grid">
+        <div class="audience__col">
+          <h3 class="audience__title">Для игроков</h3>
+          <p>Найди клуб в своём городе, выбери слот, оплати — и приходи играть. Никаких звонков, никаких очередей.</p>
+          <a href="/" class="btn btn--primary">Найти клуб</a>
+        </div>
+        <div class="audience__col">
+          <h3 class="audience__title">Для клубов</h3>
+          <p>Подключись к платформе и получай поток онлайн-броней. Без абонплаты, комиссия только с реальных заказов.</p>
+          <a href="/for-clubs/" class="btn btn--ghost">Стать партнёром</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="contacts">
+    <div class="container">
+      <h2 class="section__title">Контакты</h2>
+      <div class="contacts__grid">
+        <a href="mailto:hello@respawn.kz" class="contacts__item">
+          <span class="contacts__label">Email</span>
+          <span class="contacts__value">hello@respawn.kz</span>
+        </a>
+        <a href="tel:+77001234567" class="contacts__item">
+          <span class="contacts__label">Телефон</span>
+          <span class="contacts__value">+7 (700) 123-45-67</span>
+        </a>
+        <a href="https://t.me/respawn_kz" class="contacts__item">
+          <span class="contacts__label">Telegram</span>
+          <span class="contacts__value">@respawn_kz</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
