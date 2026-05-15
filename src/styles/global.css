@@ -910,9 +910,24 @@ input[type="date"]::-webkit-calendar-picker-indicator {
    CTA (final)
    ============================================ */
 .cta {
+  position: relative;
+  isolation: isolate;
   background:
-    radial-gradient(ellipse 60% 80% at 50% 50%, rgba(0, 240, 255, 0.15), transparent 70%),
+    radial-gradient(ellipse 60% 80% at 50% 50%, rgba(99, 102, 241, 0.18), transparent 70%),
     var(--bg-base);
+}
+
+.cta::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url('/img/club-rows.jpg');
+  background-size: cover;
+  background-position: center;
+  opacity: 0.18;
+  z-index: -1;
+  mask-image: radial-gradient(ellipse 80% 70% at 50% 50%, black 10%, transparent 80%);
+  -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 50%, black 10%, transparent 80%);
 }
 
 .cta__inner {
