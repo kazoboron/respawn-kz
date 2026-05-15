@@ -1,0 +1,722 @@
+/* ============================================================
+   respawn.kz — Deck template
+   Inspired by violet/magenta cyberpunk reference, rooted in
+   respawn.kz tokens (cyan primary, dark base).
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Audiowide&family=Orbitron:wght@500;700;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+:root {
+  /* Brand */
+  --bg-base: #07060c;          /* deeper than landing — cinematic */
+  --bg-deep: #0a0814;
+  --bg-violet: #14082a;
+  --text: #f0eaff;
+  --text-soft: #b8b0d8;
+  --text-muted: #7a7298;
+
+  /* Neons */
+  --cyan: #00f0ff;
+  --magenta: #ff2e9a;
+  --yellow: #fef300;
+  --violet: #a855f7;
+  --indigo: #6366f1;
+  --blue: #3b82f6;
+
+  /* Glows */
+  --glow-cyan: 0 0 24px rgba(0, 240, 255, 0.45), 0 0 80px rgba(0, 240, 255, 0.12);
+  --glow-magenta: 0 0 24px rgba(255, 46, 154, 0.5), 0 0 80px rgba(255, 46, 154, 0.18);
+  --glow-violet: 0 0 24px rgba(168, 85, 247, 0.5), 0 0 80px rgba(168, 85, 247, 0.18);
+
+  --font-display: 'Orbitron', 'Audiowide', system-ui, sans-serif;
+  --font-brand: 'Audiowide', 'Orbitron', monospace;
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body { background: #000; height: 100%; color: var(--text); font-family: var(--font-sans); }
+
+deck-stage { background: #000; }
+
+/* ────────────────────────────────────────────────────────────
+   Slide base
+   ──────────────────────────────────────────────────────────── */
+section.slide {
+  position: relative;
+  width: 1920px;
+  height: 1080px;
+  overflow: hidden;
+  color: var(--text);
+  font-family: var(--font-sans);
+  background:
+    radial-gradient(ellipse 70% 50% at 20% 25%, rgba(99, 102, 241, 0.22), transparent 60%),
+    radial-gradient(ellipse 60% 50% at 80% 75%, rgba(168, 85, 247, 0.20), transparent 60%),
+    radial-gradient(ellipse 50% 40% at 50% 95%, rgba(255, 46, 154, 0.18), transparent 65%),
+    linear-gradient(180deg, #0a0814 0%, #07060c 100%);
+}
+
+/* Persistent grain / texture across every slide */
+section.slide::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(0, 240, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 240, 255, 0.04) 1px, transparent 1px);
+  background-size: 80px 80px;
+  mask-image: radial-gradient(ellipse 90% 90% at 50% 50%, black 30%, transparent 85%);
+  -webkit-mask-image: radial-gradient(ellipse 90% 90% at 50% 50%, black 30%, transparent 85%);
+  opacity: 0.6;
+  z-index: 1;
+}
+
+/* Scanline — only on the active slide so it doesn't waste cycles offscreen */
+section.slide[data-deck-active]::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(180deg, transparent 0%, rgba(0, 240, 255, 0.05) 50%, transparent 100%);
+  background-size: 100% 8px;
+  animation: scanline 8s linear infinite;
+  opacity: 0.5; mix-blend-mode: screen;
+  z-index: 2;
+}
+
+@keyframes scanline {
+  0% { background-position: 0 -100%; }
+  100% { background-position: 0 100%; }
+}
+
+.slide__inner {
+  position: relative; z-index: 10;
+  width: 100%; height: 100%;
+  padding: 96px 120px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ────────────────────────────────────────────────────────────
+   Shared atoms
+   ──────────────────────────────────────────────────────────── */
+.kicker {
+  display: inline-flex; align-items: center; gap: 14px;
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  text-shadow: 0 0 16px rgba(0, 240, 255, 0.6);
+}
+.kicker::before {
+  content: ""; width: 56px; height: 2px;
+  background: linear-gradient(90deg, var(--cyan), transparent);
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.7);
+}
+
+.display {
+  font-family: var(--font-display);
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  line-height: 0.92;
+}
+
+.brand {
+  font-family: var(--font-brand);
+  font-style: italic;
+  letter-spacing: 0.02em;
+  font-weight: 700;
+}
+
+.brand-grad {
+  background: linear-gradient(135deg, #60a5fa 0%, #a855f7 60%, #ec4899 100%);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent; color: transparent;
+}
+
+.mono { font-family: var(--font-mono); }
+
+.tag {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--font-mono); font-size: 18px;
+  padding: 8px 16px; border-radius: 100px;
+  background: rgba(0, 240, 255, 0.08);
+  color: var(--cyan);
+  border: 1px solid rgba(0, 240, 255, 0.25);
+  letter-spacing: 0.05em;
+}
+
+.btn-primary {
+  display: inline-flex; align-items: center; gap: 14px;
+  padding: 26px 56px;
+  background: var(--cyan); color: #000414;
+  font-family: var(--font-sans); font-weight: 700;
+  font-size: 28px; letter-spacing: 0.02em;
+  border-radius: 100px;
+  box-shadow: var(--glow-cyan);
+  text-transform: uppercase;
+}
+.btn-primary::after { content: "→"; font-size: 32px; }
+
+/* Slide number tag — bottom left */
+.slide-num {
+  position: absolute; left: 96px; bottom: 64px;
+  font-family: var(--font-mono); font-size: 14px;
+  color: var(--text-muted); letter-spacing: 0.3em;
+  z-index: 12;
+}
+.slide-num strong { color: var(--cyan); font-weight: 500; }
+
+/* Logo lockup top-right */
+.logo-mini {
+  position: absolute; top: 56px; right: 96px;
+  z-index: 12;
+  font-family: var(--font-brand);
+  font-style: italic; font-weight: 700;
+  font-size: 22px; letter-spacing: 0.02em;
+  display: inline-flex; align-items: center; gap: 10px;
+}
+.logo-mini svg { width: 28px; height: 28px; filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.6)); }
+.logo-mini__main { background: linear-gradient(135deg, #60a5fa 0%, #6366f1 60%, #a855f7 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; }
+.logo-mini__accent { color: #ec4899; font-size: 0.7em; }
+
+/* ────────────────────────────────────────────────────────────
+   Background motifs (geometric overlays)
+   ──────────────────────────────────────────────────────────── */
+
+/* Floating "planet" — soft glowing sphere */
+.planet {
+  position: absolute; border-radius: 50%;
+  background:
+    radial-gradient(circle at 30% 30%, rgba(255,255,255,0.35) 0%, rgba(168,85,247,0.6) 25%, rgba(99,102,241,0.4) 55%, transparent 75%);
+  filter: blur(0.5px);
+  box-shadow: 0 0 60px rgba(168, 85, 247, 0.5), inset 0 0 30px rgba(255, 46, 154, 0.4);
+  z-index: 3;
+}
+
+/* Saturn-style ring */
+.planet--ring::after {
+  content: ""; position: absolute; left: -25%; right: -25%; top: 40%; height: 18%;
+  border-radius: 50%;
+  border: 2px solid rgba(168, 85, 247, 0.5);
+  background: linear-gradient(90deg, transparent, rgba(168,85,247,0.15), transparent);
+  transform: rotateX(75deg);
+  box-shadow: 0 0 30px rgba(168, 85, 247, 0.4);
+}
+
+/* Triangle shard */
+.triangle {
+  position: absolute; width: 0; height: 0;
+  border-left: var(--sz, 280px) solid transparent;
+  border-right: var(--sz, 280px) solid transparent;
+  border-bottom: calc(var(--sz, 280px) * 1.6) solid rgba(168, 85, 247, 0.07);
+  filter: drop-shadow(0 0 24px rgba(168, 85, 247, 0.4));
+  z-index: 2;
+}
+
+/* Spark / star dot */
+.spark {
+  position: absolute; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--cyan); box-shadow: 0 0 18px var(--cyan), 0 0 4px white;
+  z-index: 4;
+}
+
+/* ────────────────────────────────────────────────────────────
+   Animations — gated by JS-toggled .is-entering class
+   so content stays visible if animations don't progress.
+   ──────────────────────────────────────────────────────────── */
+
+/* Default state: visible. */
+[data-anim] { opacity: 1; }
+
+/* Entry animations run only on slide change. */
+section.slide.is-entering [data-anim="fade-up"] {
+  animation: fadeUp 900ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  animation-delay: var(--d, 0ms);
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(40px); filter: blur(8px); }
+  to   { opacity: 1; transform: translateY(0);     filter: blur(0); }
+}
+
+section.slide.is-entering [data-anim="fade-in"] {
+  animation: fadeIn 700ms ease backwards; animation-delay: var(--d, 0ms);
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* Cursor reveal — letterforms wipe in via clip-path */
+section.slide.is-entering [data-anim="wipe"] {
+  animation: wipe 1200ms cubic-bezier(0.65, 0, 0.35, 1) backwards;
+  animation-delay: var(--d, 0ms);
+}
+@keyframes wipe {
+  from { clip-path: inset(0 100% 0 0); }
+  to   { clip-path: inset(0 0 0 0); }
+}
+
+/* Planet idle drift */
+section.slide[data-deck-active] .planet {
+  animation: drift 14s ease-in-out infinite;
+}
+@keyframes drift {
+  0%, 100% { transform: translate(0, 0); }
+  33% { transform: translate(20px, -16px); }
+  66% { transform: translate(-12px, 24px); }
+}
+
+/* Triangle spin (slow, hypnotic) */
+section.slide[data-deck-active] .triangle--spin {
+  animation: spin 60s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Glitch — animated chromatic offset, runs on active slide */
+.glitch {
+  position: relative; display: inline-block; color: var(--text);
+}
+.glitch::before, .glitch::after {
+  content: attr(data-text); position: absolute; inset: 0; pointer-events: none;
+}
+.glitch::before { color: var(--magenta); transform: translate(-3px, 0); mix-blend-mode: screen; clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%); }
+.glitch::after  { color: var(--cyan);    transform: translate(3px, 0);  mix-blend-mode: screen; clip-path: polygon(0 55%, 100% 55%, 100% 100%, 0 100%); }
+section.slide[data-deck-active] .glitch { animation: glitchFlicker 2.4s steps(1) infinite; }
+section.slide[data-deck-active] .glitch::before { animation: gl1 2.4s steps(1) infinite; }
+section.slide[data-deck-active] .glitch::after  { animation: gl2 2.4s steps(1) infinite; }
+@keyframes glitchFlicker {
+  0%, 92%, 100% { opacity: 1; }
+  93% { opacity: 0.85; }
+  94% { opacity: 1; }
+  96% { opacity: 0.7; }
+  97% { opacity: 1; }
+}
+@keyframes gl1 {
+  0%, 92%, 100% { transform: translate(-3px, 0); clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%); }
+  93% { transform: translate(-8px, 1px); clip-path: polygon(0 0, 100% 0, 100% 35%, 0 35%); }
+  96% { transform: translate(-2px, -1px); clip-path: polygon(0 12%, 100% 12%, 100% 28%, 0 28%); }
+}
+@keyframes gl2 {
+  0%, 92%, 100% { transform: translate(3px, 0); clip-path: polygon(0 55%, 100% 55%, 100% 100%, 0 100%); }
+  93% { transform: translate(8px, -1px); clip-path: polygon(0 60%, 100% 60%, 100% 90%, 0 90%); }
+  96% { transform: translate(2px, 1px); clip-path: polygon(0 70%, 100% 70%, 100% 100%, 0 100%); }
+}
+
+/* Pulse halo (for accent dots) */
+section.slide[data-deck-active] .pulse {
+  animation: pulse 2.8s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.4); opacity: 0.6; }
+}
+
+/* Number counter — used for the big stat slide. */
+section.slide.is-entering [data-anim="count"] {
+  animation: countShine 1800ms ease-out backwards;
+}
+@keyframes countShine {
+  0% { opacity: 0; transform: scale(0.85); filter: blur(20px); }
+  60% { opacity: 1; filter: blur(0); }
+  100% { transform: scale(1); }
+}
+
+/* Spinning wireframe globe */
+.globe {
+  position: relative; width: 720px; height: 720px; border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(168,85,247,0.18), transparent 60%);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  box-shadow: 0 0 80px rgba(168, 85, 247, 0.35), inset 0 0 80px rgba(99, 102, 241, 0.2);
+}
+.globe::before, .globe::after {
+  content: ""; position: absolute; inset: 0; border-radius: 50%;
+  border: 1px solid rgba(0, 240, 255, 0.4);
+}
+.globe::before { transform: rotateX(0deg); border-color: rgba(0, 240, 255, 0.3); }
+.globe::after { transform: rotateX(0deg); border-color: rgba(255, 46, 154, 0.3); }
+.globe__meridian {
+  position: absolute; inset: 0; border-radius: 50%;
+  border: 1px solid rgba(0, 240, 255, 0.18);
+}
+section.slide.is-entering .globe { animation: globeIn 1.4s cubic-bezier(.2,.8,.2,1) backwards; }
+section.slide[data-deck-active] .globe__meridian { animation: spin 28s linear infinite; }
+@keyframes globeIn {
+  from { opacity: 0; transform: scale(0.7) rotate(-30deg); }
+  to   { opacity: 1; transform: scale(1) rotate(0); }
+}
+
+/* Bar chart bars — default state is full-height; animation only on entry */
+.bar { transform-origin: bottom; }
+section.slide.is-entering .bar { animation: barRise 1300ms cubic-bezier(.2,.8,.2,1) backwards; }
+@keyframes barRise {
+  from { transform: scaleY(0); }
+  to   { transform: scaleY(1); }
+}
+
+/* Infinity loop draw */
+.infinity-path {
+  filter: drop-shadow(0 0 20px rgba(255, 46, 154, 0.6)) drop-shadow(0 0 4px rgba(255, 46, 154, 0.8));
+}
+section.slide.is-entering .infinity-path {
+  stroke-dasharray: 1100;
+  stroke-dashoffset: 1100;
+  animation: drawPath 2.6s cubic-bezier(.2,.8,.2,1) forwards, glowPulse 3s ease-in-out 2.6s infinite;
+}
+@keyframes drawPath { to { stroke-dashoffset: 0; } }
+@keyframes glowPulse {
+  0%, 100% { filter: drop-shadow(0 0 20px rgba(255, 46, 154, 0.6)) drop-shadow(0 0 4px rgba(255, 46, 154, 0.8)); }
+  50% { filter: drop-shadow(0 0 40px rgba(255, 46, 154, 0.9)) drop-shadow(0 0 8px white); }
+}
+
+/* Cyber arch tunnel */
+.arch {
+  position: absolute; left: 50%; top: 55%; transform: translateX(-50%);
+  width: 80%; aspect-ratio: 1.4;
+  border: 3px solid var(--magenta);
+  border-bottom: none;
+  border-radius: 50% 50% 0 0;
+  box-shadow:
+    0 0 20px rgba(255, 46, 154, 0.6),
+    0 0 60px rgba(255, 46, 154, 0.3),
+    inset 0 0 40px rgba(255, 46, 154, 0.2);
+}
+.arch--inner {
+  width: 60%; top: 60%;
+  border-color: rgba(255, 46, 154, 0.7);
+}
+.arch--deepest {
+  width: 38%; top: 65%;
+  border-color: rgba(255, 46, 154, 0.4);
+}
+section.slide.is-entering .arch {
+  animation: archIn 1.6s cubic-bezier(.2,.8,.2,1) backwards;
+}
+section.slide.is-entering .arch--inner { animation-delay: 200ms; }
+section.slide.is-entering .arch--deepest { animation-delay: 400ms; }
+@keyframes archIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(40px) scale(0.92); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+}
+
+/* Floor grid (cyber arch slide) */
+.floor-grid {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 35%;
+  background:
+    linear-gradient(transparent, rgba(255, 46, 154, 0.6) 95%, var(--magenta)),
+    repeating-linear-gradient(90deg,
+      transparent 0, transparent 119px,
+      rgba(255, 46, 154, 0.5) 119px, rgba(255, 46, 154, 0.5) 120px),
+    repeating-linear-gradient(0deg,
+      transparent 0, transparent 39px,
+      rgba(255, 46, 154, 0.5) 39px, rgba(255, 46, 154, 0.5) 40px);
+  transform: perspective(700px) rotateX(64deg);
+  transform-origin: bottom center;
+  mask-image: linear-gradient(transparent, black 30%);
+  -webkit-mask-image: linear-gradient(transparent, black 30%);
+  opacity: 0.7;
+}
+
+/* ────────────────────────────────────────────────────────────
+   Per-slide layouts
+   ──────────────────────────────────────────────────────────── */
+
+/* Slide 01 — Title */
+.s-title .display {
+  font-size: 168px;
+  line-height: 0.92;
+}
+.s-title .subtitle {
+  font-family: var(--font-mono);
+  font-size: 24px;
+  letter-spacing: 0.4em;
+  color: var(--text-soft);
+  text-transform: uppercase;
+}
+.s-title__layout {
+  flex: 1; display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  align-items: center; gap: 80px;
+}
+.s-title__media {
+  position: relative; aspect-ratio: 1; max-height: 720px;
+  display: flex; align-items: center; justify-content: center;
+}
+.s-title__media image-slot {
+  width: 100%; height: 100%;
+  border-radius: 28px;
+  box-shadow: 0 0 60px rgba(168, 85, 247, 0.4), 0 0 120px rgba(255, 46, 154, 0.2);
+  color: rgba(240, 234, 255, 0.55);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.s-title__media image-slot::part(frame) {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.10), rgba(255, 46, 154, 0.10));
+}
+.s-title__media::before {
+  content: ""; position: absolute; inset: -20px;
+  border-radius: 30px;
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  pointer-events: none;
+}
+
+/* Slide 02 — Section divider */
+.s-section { justify-content: center; align-items: center; text-align: center; }
+.s-section .display { font-size: 320px; line-height: 1; letter-spacing: 0.02em; }
+.s-section .display .digit {
+  background: linear-gradient(180deg, #f0eaff 0%, #a855f7 60%, #ff2e9a 100%);
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+.s-section .label {
+  font-family: var(--font-display); font-weight: 700;
+  font-size: 56px; letter-spacing: 0.35em;
+  margin-top: 24px;
+  text-shadow: 0 0 30px rgba(0, 240, 255, 0.4);
+}
+
+/* Slide 03 — Big stat */
+.s-stat { justify-content: center; align-items: center; text-align: center; }
+.s-stat .number {
+  font-family: var(--font-display); font-weight: 900;
+  font-size: 540px; line-height: 0.85; letter-spacing: -0.03em;
+  background: linear-gradient(180deg, #ffffff 0%, #a855f7 50%, #ff2e9a 100%);
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 60px rgba(168, 85, 247, 0.5));
+}
+.s-stat .number::after {
+  content: "+"; color: var(--cyan); -webkit-text-fill-color: var(--cyan);
+  background: none;
+  filter: drop-shadow(0 0 30px rgba(0, 240, 255, 0.8));
+}
+.s-stat .caption {
+  font-family: var(--font-display); font-weight: 700;
+  font-size: 64px; letter-spacing: 0.3em;
+  margin-top: 24px;
+}
+.s-stat .sub {
+  font-family: var(--font-mono); font-size: 22px;
+  color: var(--text-soft);
+  letter-spacing: 0.2em; text-transform: uppercase;
+  margin-top: 32px;
+  max-width: 900px;
+}
+
+/* Slide 04 — Three steps */
+.s-steps .head { margin-bottom: 80px; }
+.s-steps__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 48px; flex: 1; }
+.step-card {
+  position: relative;
+  background: linear-gradient(180deg, rgba(20, 8, 42, 0.7), rgba(20, 8, 42, 0.3));
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  border-radius: 28px;
+  padding: 56px 40px;
+  display: flex; flex-direction: column; gap: 32px;
+  backdrop-filter: blur(10px);
+}
+.step-card::before {
+  content: ""; position: absolute; inset: -1px;
+  border-radius: 28px;
+  background: linear-gradient(180deg, rgba(168, 85, 247, 0.4), transparent 60%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  padding: 1px;
+  pointer-events: none;
+}
+.step-card__num {
+  font-family: var(--font-display); font-weight: 900;
+  font-size: 140px; line-height: 1;
+  background: linear-gradient(180deg, var(--magenta) 0%, var(--violet) 100%);
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 20px rgba(255, 46, 154, 0.4));
+}
+.step-card__title {
+  font-family: var(--font-display); font-weight: 700;
+  font-size: 44px; letter-spacing: 0.1em; text-transform: uppercase;
+}
+.step-card__desc {
+  font-family: var(--font-sans); font-size: 22px;
+  line-height: 1.5; color: var(--text-soft);
+}
+.step-card__halo {
+  position: absolute; bottom: -120px; left: 50%; transform: translateX(-50%);
+  width: 300px; height: 300px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.25), transparent 60%);
+  filter: blur(20px); pointer-events: none;
+}
+
+/* Slide 05 — Two-column */
+.s-twocol__layout {
+  flex: 1; display: grid;
+  grid-template-columns: 1fr 1fr; gap: 80px;
+  align-items: center;
+}
+.s-twocol .display { font-size: 140px; }
+.s-twocol .display .accent { color: var(--cyan); filter: drop-shadow(0 0 24px rgba(0,240,255,0.6)); }
+.s-twocol .body {
+  font-size: 26px; line-height: 1.55; color: var(--text-soft);
+  margin-top: 32px; max-width: 660px;
+}
+.s-twocol__chips { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 40px; }
+.s-twocol__media {
+  position: relative; aspect-ratio: 4/5;
+  border-radius: 28px; overflow: hidden;
+  box-shadow: 0 0 60px rgba(255, 46, 154, 0.3), 0 0 120px rgba(168, 85, 247, 0.25);
+}
+.s-twocol__media image-slot {
+  width: 100%; height: 100%;
+  color: rgba(240, 234, 255, 0.55);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.s-twocol__media image-slot::part(frame) {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.10), rgba(0, 240, 255, 0.10));
+}
+.s-twocol__media::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  border: 2px solid rgba(255, 46, 154, 0.5);
+  border-radius: 28px;
+  box-shadow: inset 0 -120px 80px -80px rgba(20, 8, 42, 0.9);
+}
+
+/* Slide 06 — Quote */
+.s-quote { justify-content: center; }
+.s-quote .quote {
+  font-family: var(--font-display); font-weight: 500; font-style: italic;
+  font-size: 96px; line-height: 1.15; letter-spacing: 0;
+  max-width: 1500px; margin: 0 auto;
+}
+.s-quote .quote .open, .s-quote .quote .close { color: var(--magenta); font-size: 1.4em; line-height: 0; vertical-align: -0.2em; filter: drop-shadow(0 0 16px rgba(255, 46, 154, 0.6)); }
+.s-quote .attribution {
+  display: flex; align-items: center; gap: 24px;
+  margin-top: 64px; text-align: left;
+}
+.s-quote .attribution__name { font-family: var(--font-display); font-weight: 700; font-size: 32px; letter-spacing: 0.1em; }
+.s-quote .attribution__role { font-family: var(--font-mono); font-size: 18px; color: var(--text-muted); letter-spacing: 0.2em; text-transform: uppercase; }
+.s-quote .attribution image-slot {
+  width: 100px; height: 100px; border-radius: 50%;
+  box-shadow: var(--glow-magenta);
+  color: rgba(240, 234, 255, 0.6);
+  font-family: var(--font-mono); font-size: 11px;
+}
+.s-quote .attribution image-slot::part(frame) {
+  background: linear-gradient(135deg, rgba(255, 46, 154, 0.18), rgba(168, 85, 247, 0.12));
+}
+.s-quote .arc-bg {
+  position: absolute; left: -10%; right: -10%; top: -10%; bottom: -10%;
+  background: radial-gradient(ellipse 60% 50% at 50% 50%, rgba(255, 46, 154, 0.18), transparent 65%);
+  pointer-events: none;
+}
+
+/* Slide 07 — Infinity loop */
+.s-infinity { justify-content: center; align-items: center; }
+.s-infinity__title {
+  position: absolute; left: 120px; top: 50%; transform: translateY(-50%);
+  z-index: 11;
+}
+.s-infinity__title .display { font-size: 130px; }
+.s-infinity__title .sub {
+  font-family: var(--font-mono); font-size: 26px; color: var(--text-soft);
+  letter-spacing: 0.2em; text-transform: uppercase; margin-top: 28px; max-width: 540px; line-height: 1.5;
+}
+.s-infinity__loop {
+  position: absolute; right: 80px; top: 50%; transform: translateY(-50%);
+  width: 880px; height: 540px;
+}
+
+/* Slide 08 — Cyber arch */
+.s-arch { padding: 0; align-items: center; }
+.s-arch .copy {
+  position: relative; z-index: 11;
+  margin-top: 120px; text-align: center;
+}
+.s-arch .display { font-size: 200px; }
+.s-arch .display .a1 { color: var(--text); }
+.s-arch .display .a2 { color: var(--magenta); filter: drop-shadow(0 0 30px rgba(255, 46, 154, 0.7)); }
+.s-arch .sub {
+  font-family: var(--font-mono); font-size: 24px; letter-spacing: 0.3em;
+  color: var(--text-soft); text-transform: uppercase; margin-top: 28px;
+}
+.s-arch .floor-grid { z-index: 1; }
+.s-arch .arch { z-index: 2; }
+
+/* Slide 09 — Progress / bar chart */
+.s-progress .head { margin-bottom: 56px; }
+.s-progress__chart {
+  flex: 1; display: grid;
+  grid-template-columns: repeat(6, 1fr); gap: 40px; align-items: end;
+  padding: 0 40px 80px;
+  position: relative;
+  height: 560px;
+}
+.s-progress__chart::before {
+  content: ""; position: absolute; left: 0; right: 0; bottom: 80px;
+  border-bottom: 1px dashed rgba(168, 85, 247, 0.3);
+}
+.bar-wrap { display: flex; flex-direction: column; align-items: center; gap: 18px; justify-content: flex-end; height: 100%; }
+.bar-wrap__label { font-family: var(--font-mono); font-size: 22px; font-weight: 700; color: var(--cyan); }
+.bar-wrap__sub { font-family: var(--font-mono); font-size: 16px; color: var(--text-muted); letter-spacing: 0.2em; text-transform: uppercase; }
+.bar {
+  width: 100%;
+  background: linear-gradient(180deg, var(--magenta) 0%, var(--violet) 60%, transparent 100%);
+  border-radius: 4px 4px 0 0;
+  box-shadow: 0 0 30px rgba(255, 46, 154, 0.4);
+  position: relative;
+  transform-origin: bottom;
+}
+.bar::after {
+  content: ""; position: absolute; left: 0; right: 0; top: 0; height: 3px;
+  background: white; box-shadow: 0 0 16px white;
+}
+
+/* Slide 10 — Globe / cities */
+.s-globe__layout { flex: 1; display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 40px; }
+.s-globe .copy { padding-right: 60px; }
+.s-globe .display { font-size: 140px; }
+.s-globe .display .num { background: linear-gradient(135deg, #00f0ff 0%, #a855f7 70%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+.s-globe .body { font-family: var(--font-sans); font-size: 26px; line-height: 1.55; color: var(--text-soft); margin-top: 32px; max-width: 580px; }
+.s-globe__cities {
+  margin-top: 48px;
+  display: flex; flex-wrap: wrap; gap: 12px;
+}
+.s-globe__cities span {
+  font-family: var(--font-mono); font-size: 18px;
+  padding: 8px 18px; border-radius: 100px;
+  border: 1px solid rgba(0, 240, 255, 0.25);
+  background: rgba(0, 240, 255, 0.06);
+  color: var(--cyan); letter-spacing: 0.05em;
+}
+.s-globe__visual { display: flex; align-items: center; justify-content: center; position: relative; }
+.s-globe__dots {
+  position: absolute; inset: 0; pointer-events: none;
+}
+.city-dot {
+  position: absolute; width: 18px; height: 18px; border-radius: 50%;
+  background: var(--cyan);
+  box-shadow: 0 0 24px var(--cyan), 0 0 6px white;
+}
+.city-dot::after {
+  content: ""; position: absolute; inset: -8px; border-radius: 50%;
+  border: 2px solid var(--cyan);
+  animation: pulse 2.8s ease-in-out infinite;
+}
+
+/* Slide 11 — Closing CTA */
+.s-cta { justify-content: center; align-items: center; text-align: center; }
+.s-cta .display { font-size: 220px; line-height: 0.92; }
+.s-cta .display .accent {
+  background: linear-gradient(135deg, #00f0ff 0%, #a855f7 60%, #ff2e9a 100%);
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 40px rgba(168, 85, 247, 0.6));
+}
+.s-cta .sub {
+  font-family: var(--font-mono); font-size: 28px; letter-spacing: 0.3em;
+  color: var(--text-soft); text-transform: uppercase; margin-top: 32px;
+}
+.s-cta .btn-primary { margin-top: 72px; font-size: 32px; padding: 32px 80px; }
+.s-cta .url {
+  margin-top: 48px;
+  font-family: var(--font-mono); font-size: 22px; color: var(--text-muted);
+  letter-spacing: 0.3em; text-transform: uppercase;
+}
+.s-cta .url strong { color: var(--cyan); }

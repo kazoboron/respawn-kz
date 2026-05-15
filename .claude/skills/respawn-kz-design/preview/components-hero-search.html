@@ -1,0 +1,24 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="_card.css"></head>
+<body style="width:700px">
+  <div class="demo-stage" style="padding:24px">
+    <form style="display:grid;grid-template-columns:1.2fr 1fr 1fr auto;gap:12px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,.5), inset 0 0 0 1px rgba(255,255,255,.02)">
+        <label class="field">
+          <span class="field__label" style="display:flex;justify-content:space-between;align-items:center">
+            Город
+            <button type="button" style="font-family:var(--font-mono);font-size:10px;letter-spacing:.05em;text-transform:none;color:var(--neon-cyan);padding:2px 8px;border:1px solid rgba(0,240,255,.2);border-radius:100px;background:rgba(0,240,255,.06)">📍 Мой город</button>
+          </span>
+          <select class="field__input"><option>Алматы</option></select>
+        </label>
+        <label class="field">
+          <span class="field__label">Дата</span>
+          <input class="field__input" type="text" value="16.05.2026" readonly>
+        </label>
+        <label class="field">
+          <span class="field__label">Время</span>
+          <select class="field__input"><option>20:00</option></select>
+        </label>
+        <button class="btn btn--primary" style="align-self:end;height:46px">Найти клуб</button>
+    </form>
+  </div>
+</body></html>

@@ -3,44 +3,107 @@
    ============================================ */
 
 /* ---------- Design tokens ---------- */
+/* Source of truth: .claude/skills/respawn-kz-design/colors_and_type.css */
 :root {
-  /* Backgrounds */
+  /* ─── COLOR — BASE ───────────────────────────────────────── */
   --bg-base: #0a0a0f;
   --bg-surface: #14141c;
   --bg-elevated: #1c1c28;
 
-  /* Text */
   --text-primary: #f0f0ff;
   --text-secondary: #a0a0b8;
   --text-muted: #60607a;
 
-  /* Neon accents */
+  /* Neon — signature */
   --neon-cyan: #00f0ff;
   --neon-magenta: #ff2e9a;
   --neon-yellow: #fef300;
+  --neon-orange: #ff6a00;
+  --neon-purple: #8b00ff;
+  --neon-blue: #0066ff;
+  --neon-indigo: #6366f1;
+  --neon-violet: #a855f7;
+  --neon-pink: #ec4899;
+
+  /* Ink on cyan fill */
+  --ink-on-cyan: #001014;
+
+  /* ─── COLOR — SEMANTIC ───────────────────────────────────── */
+  --accent: var(--neon-cyan);
+  --accent-glow: rgba(0, 240, 255, 0.4);
+  --danger: var(--neon-magenta);
+  --warning: var(--neon-yellow);
+  --success: var(--neon-cyan);
 
   /* Borders */
   --border: rgba(0, 240, 255, 0.15);
   --border-hover: rgba(0, 240, 255, 0.4);
   --border-soft: rgba(255, 255, 255, 0.06);
 
-  /* Glow */
+  /* Shadows / glow */
   --glow-cyan: 0 0 24px rgba(0, 240, 255, 0.4);
   --glow-magenta: 0 0 24px rgba(255, 46, 154, 0.4);
+  --glow-card: 0 12px 40px rgba(0, 240, 255, 0.15), 0 0 24px rgba(0, 240, 255, 0.1);
+  --shadow-deep: 0 8px 32px rgba(0, 0, 0, 0.5);
+  --shadow-modal: 0 20px 60px rgba(0, 0, 0, 0.5);
 
-  /* Radii */
+  /* ─── RADIUS ─────────────────────────────────────────────── */
   --radius-sm: 6px;
   --radius-md: 12px;
   --radius-lg: 20px;
+  --radius-pill: 100px;
 
-  /* Container */
+  /* ─── SPACING ────────────────────────────────────────────── */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 32px;
+  --space-8: 40px;
+  --space-9: 48px;
+  --space-10: 64px;
+  --space-11: 96px;
+
+  /* ─── LAYOUT ─────────────────────────────────────────────── */
   --container-max: 1200px;
   --container-pad: 20px;
 
-  /* Transitions */
+  /* ─── MOTION ─────────────────────────────────────────────── */
   --t-fast: 150ms ease;
   --t-base: 250ms ease;
   --t-slow: 400ms ease;
+  --ease-out-back: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  /* ─── TYPOGRAPHY — FAMILIES ──────────────────────────────── */
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-display: "Audiowide", "JetBrains Mono", monospace;
+
+  /* ─── TYPOGRAPHY — SEMANTIC SIZES ────────────────────────── */
+  --fs-hero: clamp(36px, 6vw, 64px);
+  --fs-page-hero: clamp(32px, 5vw, 52px);
+  --fs-section: clamp(28px, 4vw, 40px);
+  --fs-h3: 22px;
+  --fs-h4: 20px;
+  --fs-body-lg: 18px;
+  --fs-body: 16px;
+  --fs-body-sm: 15px;
+  --fs-meta: 14px;
+  --fs-mono: 13px;
+  --fs-eyebrow: 11px;
+
+  /* ─── SIGNATURE GRADIENTS ────────────────────────────────── */
+  --grad-logo: linear-gradient(135deg, #60a5fa 0%, #6366f1 60%, #a855f7 100%);
+  --grad-hero-radial-1: radial-gradient(ellipse 80% 50% at 20% 30%, rgba(99, 102, 241, 0.18), transparent 60%);
+  --grad-hero-radial-2: radial-gradient(ellipse 60% 40% at 80% 70%, rgba(168, 85, 247, 0.14), transparent 60%);
+  --grad-cyan-blue: linear-gradient(135deg, #00f0ff, #0066ff);
+  --grad-purple-pink: linear-gradient(135deg, #8b00ff, #ff2e9a);
+  --grad-pink-purple: linear-gradient(135deg, #ff2e9a, #8b00ff);
+  --grad-yellow-orange: linear-gradient(135deg, #fef300, #ff6a00);
+  --grad-cyan-pink: linear-gradient(135deg, #00f0ff, #ff2e9a);
+  --grad-pink-yellow: linear-gradient(135deg, #ff2e9a, #fef300);
 }
 
 /* ---------- Reset ---------- */
@@ -2659,4 +2722,76 @@ textarea:focus-visible,
     width: 100%;
     justify-content: flex-end;
   }
+}
+
+/* ============================================
+   DESIGN SYSTEM — GENERIC UTILITY CLASSES
+   (from .claude/skills/respawn-kz-design/components.css)
+   Use these for new pages/components.
+   Existing component-specific classes (.club-card__tag, etc) still work.
+   ============================================ */
+
+/* ===== Tag (cyan, mono, small) ===== */
+.tag {
+  font-family: var(--font-mono);
+  font-size: var(--fs-eyebrow);
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  background: rgba(0, 240, 255, 0.08);
+  color: var(--neon-cyan);
+  border: 1px solid rgba(0, 240, 255, 0.15);
+  letter-spacing: 0.02em;
+  display: inline-block;
+}
+
+/* ===== Pill (status badges) ===== */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono);
+  font-weight: 500;
+  white-space: nowrap;
+}
+.pill--rating {
+  background: rgba(254, 243, 0, 0.1);
+  color: var(--neon-yellow);
+}
+.pill--pending {
+  background: rgba(254, 243, 0, 0.1);
+  color: var(--neon-yellow);
+  border: 1px solid rgba(254, 243, 0, 0.2);
+}
+.pill--confirmed {
+  background: rgba(0, 240, 255, 0.1);
+  color: var(--neon-cyan);
+  border: 1px solid rgba(0, 240, 255, 0.2);
+}
+.pill--cancelled {
+  background: rgba(255, 46, 154, 0.06);
+  color: var(--neon-magenta);
+  border: 1px solid rgba(255, 46, 154, 0.15);
+}
+
+/* ===== Card (generic) ===== */
+.card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  transition: border-color var(--t-base), transform var(--t-base), box-shadow var(--t-base);
+}
+.card:hover {
+  border-color: var(--border-hover);
+  transform: translateY(-4px);
+}
+.card--hero {
+  box-shadow: var(--glow-cyan);
+  border-color: var(--border);
+}
+.card--hero:hover {
+  transform: none;
 }

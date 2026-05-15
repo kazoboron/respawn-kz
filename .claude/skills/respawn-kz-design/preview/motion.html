@@ -1,0 +1,38 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="_card.css">
+<style>
+@keyframes slide-150 { 0%,100% { transform: translateX(0) } 50% { transform: translateX(180px) } }
+@keyframes slide-250 { 0%,100% { transform: translateX(0) } 50% { transform: translateX(180px) } }
+@keyframes slide-400 { 0%,100% { transform: translateX(0) } 50% { transform: translateX(180px) } }
+.dot-150 { animation: slide-150 1.5s ease infinite }
+.dot-250 { animation: slide-250 2.5s ease infinite }
+.dot-400 { animation: slide-400 4s   ease infinite }
+</style>
+</head>
+<body style="width:700px">
+  <div class="col" style="gap:14px">
+    <div style="display:grid;grid-template-columns:120px 1fr 100px;gap:16px;align-items:center">
+      <div class="token-row__name">--t-fast</div>
+      <div style="position:relative;height:18px;background:var(--bg-surface);border-radius:9px;border:1px solid var(--border-soft);overflow:hidden">
+        <div class="dot-150" style="width:14px;height:14px;background:var(--neon-cyan);border-radius:50%;margin:2px;box-shadow:0 0 12px rgba(0,240,255,.6)"></div>
+      </div>
+      <div class="token-row__hex">150ms ease</div>
+
+      <div class="token-row__name">--t-base</div>
+      <div style="position:relative;height:18px;background:var(--bg-surface);border-radius:9px;border:1px solid var(--border-soft);overflow:hidden">
+        <div class="dot-250" style="width:14px;height:14px;background:var(--neon-cyan);border-radius:50%;margin:2px;box-shadow:0 0 12px rgba(0,240,255,.6)"></div>
+      </div>
+      <div class="token-row__hex">250ms ease</div>
+
+      <div class="token-row__name">--t-slow</div>
+      <div style="position:relative;height:18px;background:var(--bg-surface);border-radius:9px;border:1px solid var(--border-soft);overflow:hidden">
+        <div class="dot-400" style="width:14px;height:14px;background:var(--neon-cyan);border-radius:50%;margin:2px;box-shadow:0 0 12px rgba(0,240,255,.6)"></div>
+      </div>
+      <div class="token-row__hex">400ms ease</div>
+    </div>
+    <div style="font-size:11px;color:var(--text-muted);line-height:1.6;margin-top:6px">
+      One exception — modal pop-in uses <code style="color:var(--neon-cyan)">cubic-bezier(0.2, 0.8, 0.2, 1)</code> (slight overshoot).
+      Cards lift by translateY -4/-6px on hover; buttons lift -2px. No press-scale.
+    </div>
+  </div>
+</body></html>

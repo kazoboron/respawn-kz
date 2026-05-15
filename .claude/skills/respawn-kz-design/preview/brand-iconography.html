@@ -1,0 +1,55 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="_card.css"></head>
+<body style="width:700px">
+  <div class="demo-stage">
+    <div class="eyebrow" style="margin-bottom:12px">Hand-drawn inline SVG · no icon library</div>
+    <div style="display:flex;gap:24px;align-items:center;justify-content:space-around;flex-wrap:wrap">
+      <!-- Step icons (64-grid, 2.5 stroke, cyan) -->
+      <div style="text-align:center;color:var(--neon-cyan)">
+        <svg width="48" height="48" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M32 8 C22 8 14 16 14 26 C14 38 32 56 32 56 C32 56 50 38 50 26 C50 16 42 8 32 8 Z"/><circle cx="32" cy="26" r="6"/>
+        </svg>
+        <div class="token-row__hex" style="margin-top:6px;text-align:center">pin</div>
+      </div>
+      <div style="text-align:center;color:var(--neon-cyan)">
+        <svg width="48" height="48" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="10" y="14" width="44" height="42" rx="4"/><path d="M10 24 H54"/><path d="M22 8 V20 M42 8 V20"/><path d="M22 36 H30 M22 44 H42"/>
+        </svg>
+        <div class="token-row__hex" style="margin-top:6px;text-align:center">calendar</div>
+      </div>
+      <div style="text-align:center;color:var(--neon-cyan)">
+        <svg width="48" height="48" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="8" y="22" width="48" height="28" rx="14"/>
+          <circle cx="20" cy="36" r="3" fill="currentColor"/>
+          <circle cx="44" cy="32" r="2" fill="currentColor"/>
+          <circle cx="48" cy="40" r="2" fill="currentColor"/>
+          <path d="M16 30 V42 M12 36 H20"/>
+        </svg>
+        <div class="token-row__hex" style="margin-top:6px;text-align:center">gamepad</div>
+      </div>
+      <div style="text-align:center;color:var(--neon-cyan)">
+        <svg width="48" height="48" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2 L4 6 V14 C4 20 14 26 14 26 C14 26 24 20 24 14 V6 Z"/><path d="M9 14 L13 18 L19 11"/>
+        </svg>
+        <div class="token-row__hex" style="margin-top:6px;text-align:center">shield-check</div>
+      </div>
+      <div style="text-align:center;color:var(--neon-cyan)">
+        <svg width="48" height="48" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="6" width="24" height="16" rx="3"/><path d="M2 11 H26"/><path d="M6 17 H10 M14 17 H18"/>
+        </svg>
+        <div class="token-row__hex" style="margin-top:6px;text-align:center">card</div>
+      </div>
+      <div style="text-align:center;color:var(--neon-cyan)">
+        <svg width="48" height="48" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="14" cy="14" r="11"/>
+          <path d="M14 7 L16 12 L22 12 L17 15 L19 21 L14 17 L9 21 L11 15 L6 12 L12 12 Z" fill="currentColor" stroke="none"/>
+        </svg>
+        <div class="token-row__hex" style="margin-top:6px;text-align:center">star/medal</div>
+      </div>
+    </div>
+    <div style="margin-top:16px;font-size:11px;color:var(--text-muted);line-height:1.6">
+      Stroke: 2.5px on 64-grid, 2px on 28-grid · round caps + joins · <code style="color:var(--neon-cyan)">stroke: currentColor</code> · fills only for status dots & medals.<br>
+      Unicode bullets: <span style="color:var(--neon-cyan)">▸</span> lists · <span style="color:var(--neon-yellow)">★</span> ratings · <span style="color:var(--text-muted)">·</span> meta sep.
+    </div>
+  </div>
+</body></html>

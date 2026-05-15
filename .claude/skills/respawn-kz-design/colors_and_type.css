@@ -1,0 +1,180 @@
+/* ============================================================
+   respawn.kz — Design Tokens
+   Source: src/styles/global.css (kazoboron/respawn-kz)
+   ============================================================ */
+
+/* ---- Webfonts (Google Fonts; same as production) ----------- */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Audiowide&display=swap');
+
+:root {
+  /* ─── COLOR — BASE ───────────────────────────────────────── */
+  /* Backgrounds — near-black, slightly cool */
+  --bg-base:      #0a0a0f;   /* page */
+  --bg-surface:   #14141c;   /* cards, header-scrolled, modal panel */
+  --bg-elevated:  #1c1c28;   /* inputs, social pills, info chips */
+
+  /* Foreground text */
+  --text-primary:    #f0f0ff;
+  --text-secondary:  #a0a0b8;
+  --text-muted:      #60607a;
+
+  /* Neon accents — the brand's signature */
+  --neon-cyan:     #00f0ff;  /* primary CTA, links, focus, "good" */
+  --neon-magenta:  #ff2e9a;  /* errors, cancelled status, secondary accent */
+  --neon-yellow:   #fef300;  /* warnings, ratings, pending status */
+  --neon-orange:   #ff6a00;  /* used in gradient palettes only */
+  --neon-purple:   #8b00ff;  /* used in gradient palettes only */
+  --neon-blue:     #0066ff;  /* used in gradient palettes only */
+  --neon-indigo:   #6366f1;  /* logo gradient */
+  --neon-violet:   #a855f7;  /* logo gradient */
+  --neon-pink:     #ec4899;  /* logo ".kz" accent */
+
+  /* On-cyan ink (for buttons sitting on cyan fill) */
+  --ink-on-cyan:   #001014;
+
+  /* ─── COLOR — SEMANTIC ───────────────────────────────────── */
+  --accent:           var(--neon-cyan);
+  --accent-glow:      rgba(0, 240, 255, 0.4);
+  --danger:           var(--neon-magenta);
+  --warning:          var(--neon-yellow);
+  --success:          var(--neon-cyan);
+
+  /* Borders / strokes */
+  --border:        rgba(0, 240, 255, 0.15);   /* cyan-tinted, default */
+  --border-hover:  rgba(0, 240, 255, 0.40);   /* on hover */
+  --border-soft:   rgba(255, 255, 255, 0.06); /* card hairline */
+
+  /* Glow shadows — the signature neon halo */
+  --glow-cyan:     0 0 24px rgba(0, 240, 255, 0.4);
+  --glow-magenta:  0 0 24px rgba(255, 46, 154, 0.4);
+  --glow-card:     0 12px 40px rgba(0, 240, 255, 0.15), 0 0 24px rgba(0, 240, 255, 0.1);
+  --shadow-deep:   0 8px 32px rgba(0, 0, 0, 0.5);
+  --shadow-modal:  0 20px 60px rgba(0, 0, 0, 0.5);
+
+  /* ─── RADIUS ─────────────────────────────────────────────── */
+  --radius-sm:  6px;   /* chips, tags, code pills */
+  --radius-md:  12px;  /* inputs, buttons, modals-small */
+  --radius-lg:  20px;  /* cards, hero search, modal panel */
+  --radius-pill: 100px; /* status pills, rating pill */
+
+  /* ─── SPACING (rhythm; not an explicit token set in source) ─ */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 32px;
+  --space-8: 40px;
+  --space-9: 48px;
+  --space-10: 64px;
+  --space-11: 96px;  /* default section padding */
+
+  /* ─── LAYOUT ─────────────────────────────────────────────── */
+  --container-max: 1200px;
+  --container-pad: 20px;
+
+  /* ─── MOTION ─────────────────────────────────────────────── */
+  --t-fast: 150ms ease;
+  --t-base: 250ms ease;
+  --t-slow: 400ms ease;
+  --ease-out-back: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  /* ─── TYPOGRAPHY — FAMILIES ──────────────────────────────── */
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-display: "Audiowide", "JetBrains Mono", monospace;  /* logo / hero only */
+
+  /* ─── TYPOGRAPHY — SIZES (semantic) ──────────────────────── */
+  --fs-hero:        clamp(36px, 6vw, 64px);   /* hero title */
+  --fs-page-hero:   clamp(32px, 5vw, 52px);   /* sub-page hero */
+  --fs-section:     clamp(28px, 4vw, 40px);   /* h2 section title */
+  --fs-h3:          22px;                     /* card / panel title */
+  --fs-h4:          20px;                     /* step / club name */
+  --fs-body-lg:     18px;                     /* lead paragraph, section subtitle */
+  --fs-body:        16px;                     /* default body */
+  --fs-body-sm:     15px;                     /* meta, button text */
+  --fs-meta:        14px;                     /* footer, helper */
+  --fs-mono:        13px;                     /* mono ui, tags, status */
+  --fs-eyebrow:     11px;                     /* uppercase labels */
+
+  /* ─── SIGNATURE GRADIENTS (for hero radials + card media) ─── */
+  --grad-logo:        linear-gradient(135deg, #60a5fa 0%, #6366f1 60%, #a855f7 100%);
+  --grad-hero-radial-1: radial-gradient(ellipse 80% 50% at 20% 30%, rgba(99, 102, 241, 0.18), transparent 60%);
+  --grad-hero-radial-2: radial-gradient(ellipse 60% 40% at 80% 70%, rgba(168, 85, 247, 0.14), transparent 60%);
+  --grad-cyan-blue:   linear-gradient(135deg, #00f0ff, #0066ff);
+  --grad-purple-pink: linear-gradient(135deg, #8b00ff, #ff2e9a);
+  --grad-pink-purple: linear-gradient(135deg, #ff2e9a, #8b00ff);
+  --grad-yellow-orange: linear-gradient(135deg, #fef300, #ff6a00);
+  --grad-cyan-pink:   linear-gradient(135deg, #00f0ff, #ff2e9a);
+  --grad-pink-yellow: linear-gradient(135deg, #ff2e9a, #fef300);
+}
+
+/* ============================================================
+   Base typography — applied as elemental defaults
+   ============================================================ */
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  font-family: var(--font-sans);
+  font-size: var(--fs-body);
+  line-height: 1.6;
+  color: var(--text-primary);
+  background: var(--bg-base);
+}
+
+h1, h2, h3, h4 {
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+h1 { font-size: var(--fs-hero); }
+h2 { font-size: var(--fs-section); }
+h3 { font-size: var(--fs-h3); }
+h4 { font-size: var(--fs-h4); }
+
+p { color: var(--text-secondary); line-height: 1.6; }
+
+code, kbd, samp,
+.mono { font-family: var(--font-mono); }
+
+/* Uppercase eyebrow used for input labels, footer titles, etc */
+.eyebrow {
+  font-size: var(--fs-eyebrow);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* ============================================================
+   Glitch type — hero accent on key words
+   ============================================================ */
+.glitch {
+  position: relative;
+  color: var(--neon-cyan);
+  display: inline-block;
+}
+.glitch::before,
+.glitch::after {
+  content: attr(data-text);
+  position: absolute; inset: 0;
+  pointer-events: none;
+}
+.glitch::before {
+  color: var(--neon-magenta);
+  transform: translate(-2px, 0);
+  mix-blend-mode: screen;
+  clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
+  opacity: 0.8;
+}
+.glitch::after {
+  color: var(--neon-yellow);
+  transform: translate(2px, 0);
+  mix-blend-mode: screen;
+  clip-path: polygon(0 55%, 100% 55%, 100% 100%, 0 100%);
+  opacity: 0.7;
+}

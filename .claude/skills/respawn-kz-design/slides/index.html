@@ -1,0 +1,604 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>respawn.kz — Deck Template</title>
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<link rel="stylesheet" href="deck.css">
+
+<script type="application/json" id="speaker-notes">
+[
+  "Открывающий слайд. Глитч-эффект на «PLAY», planet и сканлайн дают тон — это про игру, погружение, скорость.",
+  "Перед каждой секцией используется такой разделитель: огромная двухцветная цифра + лейбл. Меняйте номер и лейбл — 02 PRODUCT, 03 NUMBERS, 04 ROADMAP и т.д.",
+  "Большая статистика. Замените число, подпись и сноску — структура остаётся. Хорошо работает для метрик роста, выручки, активной аудитории.",
+  "Три шага / три фичи / три ценности. У каждого блока — крупный номер, заголовок и описание. Размещайте по три ключевых идеи на слайде.",
+  "Текст + изображение. Слева — нарратив, справа — image-slot (перетащите файл). Подходит для секции «о продукте», портрета сотрудника, фото клуба.",
+  "Цитата от игрока, партнёра или СМИ. Большие магентовые кавычки. Подпись внизу с круглым image-slot и должностью.",
+  "Метафора «безлимита» — анимированная инфинити-петля. Хорошо для разделов про подписку, замкнутый цикл, лояльность.",
+  "Cyber Space — кинематографичная заставка с тоннелем неоновых арок. Подходит для секции про продукт, технологию, иммерсивный опыт.",
+  "Бар-чарт с анимированным появлением. Используется для трекшна, выручки по месяцам, динамики метрик. Замените числа в bar-wrap__label.",
+  "География. Анимированный wireframe-глобус + список городов. Подходит для разделов про охват, экспансию, рынок.",
+  "Закрывающий слайд — CTA на действие. Большая кнопка ведёт в продукт. Внизу — короткий URL."
+]
+</script>
+
+<style>
+  /* Tweaks panel — minimal floating control. Hidden until host toggles edit-mode. */
+  #tweaks-panel {
+    position: fixed; top: 20px; right: 20px; z-index: 2147483600;
+    background: rgba(20, 8, 42, 0.85);
+    border: 1px solid rgba(168, 85, 247, 0.5);
+    border-radius: 14px;
+    padding: 16px 18px;
+    backdrop-filter: blur(12px);
+    color: #f0eaff; font-family: 'Inter', sans-serif; font-size: 13px;
+    display: none;
+    box-shadow: 0 12px 40px rgba(0,0,0,.5), 0 0 24px rgba(168, 85, 247, 0.25);
+    min-width: 240px;
+  }
+  #tweaks-panel.is-open { display: block; }
+  #tweaks-panel h4 { font-family: 'JetBrains Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: .2em; color: #a0a0b8; font-weight: 500; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+  #tweaks-panel .close-x { color: #a0a0b8; cursor: pointer; font-size: 16px; background: none; border: none; padding: 0; }
+  #tweaks-panel .close-x:hover { color: #00f0ff; }
+  #tweaks-panel .group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+  #tweaks-panel .group:last-child { margin-bottom: 0; }
+  #tweaks-panel .group-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: .15em; color: #7a7298; }
+  #tweaks-panel .seg { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; background: rgba(0,0,0,.4); border-radius: 8px; padding: 4px; }
+  #tweaks-panel .seg button { padding: 8px 6px; background: transparent; color: #b8b0d8; border: none; border-radius: 6px; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 150ms ease; }
+  #tweaks-panel .seg button:hover { color: #f0eaff; }
+  #tweaks-panel .seg button.is-active { background: rgba(0,240,255,.18); color: #00f0ff; box-shadow: 0 0 12px rgba(0,240,255,.3); }
+
+  /* Background style variants — switched by body class. Default = "Dark base" (already set). */
+  body[data-bg="hero-photo"] section.slide {
+    background:
+      radial-gradient(ellipse 70% 50% at 20% 25%, rgba(99, 102, 241, 0.18), transparent 60%),
+      radial-gradient(ellipse 60% 50% at 80% 75%, rgba(168, 85, 247, 0.16), transparent 60%),
+      linear-gradient(180deg, rgba(7,6,12,.85), rgba(7,6,12,.95)),
+      url('../assets/club-rows.webp') center/cover;
+  }
+  body[data-bg="cyber-grid"] section.slide::before {
+    background-image:
+      linear-gradient(rgba(0, 240, 255, 0.12) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 240, 255, 0.12) 1px, transparent 1px);
+    background-size: 40px 40px;
+    opacity: 1;
+    mask-image: linear-gradient(180deg, transparent 0%, black 30%, black 70%, transparent 100%);
+    -webkit-mask-image: linear-gradient(180deg, transparent 0%, black 30%, black 70%, transparent 100%);
+  }
+  body[data-bg="cyber-grid"] section.slide {
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 100%, rgba(0, 240, 255, 0.14), transparent 70%),
+      radial-gradient(ellipse 70% 50% at 50% 0%, rgba(168, 85, 247, 0.18), transparent 65%),
+      linear-gradient(180deg, #07060c 0%, #050410 100%);
+  }
+
+  /* Accent palette variants */
+  body[data-accent="cyan-first"] {
+    /* default — no override */
+  }
+  body[data-accent="violet-first"] section.slide {
+    background:
+      radial-gradient(ellipse 70% 50% at 20% 25%, rgba(168, 85, 247, 0.32), transparent 60%),
+      radial-gradient(ellipse 60% 50% at 80% 75%, rgba(255, 46, 154, 0.28), transparent 60%),
+      radial-gradient(ellipse 50% 40% at 50% 95%, rgba(99, 102, 241, 0.20), transparent 65%),
+      linear-gradient(180deg, #150828 0%, #0a0414 100%);
+  }
+  body[data-accent="violet-first"] .kicker { color: var(--magenta); text-shadow: 0 0 16px rgba(255, 46, 154, 0.6); }
+  body[data-accent="violet-first"] .kicker::before { background: linear-gradient(90deg, var(--magenta), transparent); box-shadow: 0 0 12px rgba(255, 46, 154, 0.7); }
+
+  body[data-accent="split"] section.slide {
+    background:
+      radial-gradient(ellipse 60% 80% at 0% 50%, rgba(0, 240, 255, 0.28), transparent 55%),
+      radial-gradient(ellipse 60% 80% at 100% 50%, rgba(255, 46, 154, 0.28), transparent 55%),
+      radial-gradient(ellipse 80% 30% at 50% 0%, rgba(168, 85, 247, 0.18), transparent 60%),
+      linear-gradient(180deg, #07060c 0%, #07060c 100%);
+  }
+</style>
+</head>
+<body data-bg="dark" data-accent="cyan-first">
+
+<deck-stage width="1920" height="1080">
+
+  <!-- ═══════════════════════════════════════════════════════════
+       SLIDE 01 — TITLE
+       ═══════════════════════════════════════════════════════════ -->
+  <section class="slide s-title" data-label="01 Title">
+    <div class="logo-mini" data-anim="fade-in" style="--d:0ms">
+      <svg viewBox="0 0 64 64" fill="none"><defs><linearGradient id="lt1" x1="0" y1="0" x2="64" y2="64"><stop offset="0%" stop-color="#3b82f6"/><stop offset="60%" stop-color="#6366f1"/><stop offset="100%" stop-color="#a855f7"/></linearGradient></defs><path d="M32 4 C18.7 4 8 14.5 8 27.5 C8 42 27 58 30.5 60.5 C31.4 61.2 32.6 61.2 33.5 60.5 C37 58 56 42 56 27.5 C56 14.5 45.3 4 32 4 Z" fill="url(#lt1)"/><g transform="translate(18 22)" fill="#fff"><path d="M5 4 H23 C26 4 28 6 28 9 V15 C28 18 26 20 23 20 H20 L17.5 16 H10.5 L8 20 H5 C2 20 0 18 0 15 V9 C0 6 2 4 5 4 Z"/></g></svg>
+      <span><span class="logo-mini__main">RESPAWN</span><span class="logo-mini__accent">.kz</span></span>
+    </div>
+
+    <div class="planet planet--ring" style="top: 90px; right: 280px; width: 180px; height: 180px;"></div>
+    <div class="spark pulse" style="top: 220px; left: 18%;"></div>
+    <div class="spark pulse" style="top: 70%; right: 12%; animation-delay: 1s;"></div>
+    <div class="spark pulse" style="bottom: 18%; left: 8%; animation-delay: 1.6s;"></div>
+    <div class="triangle triangle--spin" style="--sz: 220px; bottom: 5%; right: 8%; transform-origin: 50% 30%;"></div>
+
+    <div class="slide__inner s-title__layout">
+      <div>
+        <span class="kicker" data-anim="fade-up" style="--d:120ms">respawn.kz · presents</span>
+        <h1 class="display" data-anim="fade-up" style="--d:260ms; margin-top: 28px;">
+          STEP<br>
+          INTO THE <span class="glitch" data-text="GAME">GAME</span>
+        </h1>
+        <p class="subtitle" data-anim="fade-up" style="--d:600ms; margin-top: 56px;">
+          Респаун, перезапуск, играй заново
+        </p>
+        <div data-anim="fade-up" style="--d:800ms; margin-top: 56px; display: flex; gap: 14px; flex-wrap: wrap;">
+          <span class="tag">КАЗАХСТАН · 2026</span>
+          <span class="tag">80+ КЛУБОВ</span>
+          <span class="tag">10 ГОРОДОВ</span>
+        </div>
+      </div>
+      <div class="s-title__media" data-anim="fade-up" style="--d:420ms">
+        <image-slot id="title-hero" shape="rounded" radius="28px" placeholder="VR / cyber portrait — drop image"></image-slot>
+      </div>
+    </div>
+
+    <div class="slide-num"><strong>01</strong> &nbsp;/&nbsp; 11</div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       SLIDE 02 — SECTION DIVIDER
+       ═══════════════════════════════════════════════════════════ -->
+  <section class="slide s-section" data-label="02 Section">
+    <div class="logo-mini">
+      <svg viewBox="0 0 64 64" fill="none"><defs><linearGradient id="lt2" x1="0" y1="0" x2="64" y2="64"><stop offset="0%" stop-color="#3b82f6"/><stop offset="60%" stop-color="#6366f1"/><stop offset="100%" stop-color="#a855f7"/></linearGradient></defs><path d="M32 4 C18.7 4 8 14.5 8 27.5 C8 42 27 58 30.5 60.5 C31.4 61.2 32.6 61.2 33.5 60.5 C37 58 56 42 56 27.5 C56 14.5 45.3 4 32 4 Z" fill="url(#lt2)"/></svg>
+      <span><span class="logo-mini__main">RESPAWN</span><span class="logo-mini__accent">.kz</span></span>
+    </div>
+
+    <div class="planet" style="top: 18%; left: 12%; width: 260px; height: 260px;"></div>
+    <div class="triangle triangle--spin" style="--sz: 380px; top: 40%; right: -8%;"></div>
+    <div class="spark pulse" style="top: 30%; right: 22%;"></div>
+
+    <div class="slide__inner s-section">
+      <span class="kicker" data-anim="fade-up" style="--d:120ms">CHAPTER ONE</span>
+      <h2 class="display" data-anim="fade-up" style="--d:320ms; margin-top: 48px;">
+        <span class="digit">01</span>
+      </h2>
+      <p class="label" data-anim="fade-up" style="--d:600ms">VISION</p>
+      <p style="margin-top: 40px; font-family: var(--font-mono); font-size: 22px; color: var(--text-muted); letter-spacing: 0.3em; text-transform: uppercase;" data-anim="fade-up" style="--d:800ms">
+        Куда мы идём
+      </p>
+    </div>
+
+    <div class="slide-num"><strong>02</strong> &nbsp;/&nbsp; 11</div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       SLIDE 03 — BIG STAT
+       ═══════════════════════════════════════════════════════════ -->
+  <section class="slide s-stat" data-label="03 Big stat">
+    <div class="logo-mini">
+      <svg viewBox="0 0 64 64" fill="none"><defs><linearGradient id="lt3" x1="0" y1="0" x2="64" y2="64"><stop offset="0%" stop-color="#3b82f6"/><stop offset="60%" stop-color="#6366f1"/><stop offset="100%" stop-color="#a855f7"/></linearGradient></defs><path d="M32 4 C18.7 4 8 14.5 8 27.5 C8 42 27 58 30.5 60.5 C31.4 61.2 32.6 61.2 33.5 60.5 C37 58 56 42 56 27.5 C56 14.5 45.3 4 32 4 Z" fill="url(#lt3)"/></svg>
+      <span><span class="logo-mini__main">RESPAWN</span><span class="logo-mini__accent">.kz</span></span>
+    </div>
+
+    <div class="planet" style="bottom: 12%; right: 8%; width: 200px; height: 200px;"></div>
+    <div class="spark pulse" style="top: 20%; left: 14%;"></div>
+    <div class="spark pulse" style="top: 26%; right: 18%; animation-delay: .9s;"></div>
+
+    <div class="slide__inner s-stat">
+      <span class="kicker" data-anim="fade-up" style="--d:120ms">К концу года</span>
+      <h2 class="number" data-anim="count" style="--d:300ms; margin-top: 48px;">50 000</h2>
+      <p class="caption" data-anim="fade-up" style="--d:1000ms">АКТИВНЫХ ИГРОКОВ</p>
+      <p class="sub" data-anim="fade-up" style="--d:1200ms">
+        Стартовали в 2026. Цель к декабрю — 100 клубов-партнёров и пятьдесят тысяч человек, которые бронируют через нас как через привычку.
+      </p>
+    </div>
+
+    <div class="slide-num"><strong>03</strong> &nbsp;/&nbsp; 11</div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       SLIDE 04 — THREE STEPS
+       ═══════════════════════════════════════════════════════════ -->
+  <section class="slide s-steps" data-label="04 Three steps">
+    <div class="logo-mini">
+      <svg viewBox="0 0 64 64" fill="none"><defs><linearGradient id="lt4" x1="0" y1="0" x2="64" y2="64"><stop offset="0%" stop-color="#3b82f6"/><stop offset="60%" stop-color="#6366f1"/><stop offset="100%" stop-color="#a855f7"/></linearGradient></defs><path d="M32 4 C18.7 4 8 14.5 8 27.5 C8 42 27 58 30.5 60.5 C31.4 61.2 32.6 61.2 33.5 60.5 C37 58 56 42 56 27.5 C56 14.5 45.3 4 32 4 Z" fill="url(#lt4)"/></svg>
+      <span><span class="logo-mini__main">RESPAWN</span><span class="logo-mini__accent">.kz</span></span>
+    </div>
+
+    <div class="triangle" style="--sz: 320px; top: -120px; left: -120px; opacity: 0.5;"></div>
+
+    <div class="slide__inner">
+      <div class="head" data-anim="fade-up" style="--d:80ms">
+        <span class="kicker">Как это работает</span>
+        <h2 class="display" style="font-size: 110px; margin-top: 28px;">Три шага<br>до игры</h2>
+      </div>
+
+      <div class="s-steps__grid">
+        <div class="step-card" data-anim="fade-up" style="--d:300ms">
+          <div class="step-card__halo"></div>
+          <div class="step-card__num">01</div>
+          <h3 class="step-card__title">Выбери клуб</h3>
+          <p class="step-card__desc">Фильтруй по району, цене и оборудованию. Сравнивай рейтинги и реальные отзывы.</p>
+        </div>
+        <div class="step-card" data-anim="fade-up" style="--d:500ms">
+          <div class="step-card__halo" style="background: radial-gradient(circle, rgba(255,46,154,0.25), transparent 60%);"></div>
+          <div class="step-card__num">02</div>
+          <h3 class="step-card__title">Забронируй слот</h3>
+          <p class="step-card__desc">Выбери дату, время и количество часов. Оплачивай картой — Visa, Mastercard, Kaspi.</p>
+        </div>
+        <div class="step-card" data-anim="fade-up" style="--d:700ms">
+          <div class="step-card__halo" style="background: radial-gradient(circle, rgba(0,240,255,0.25), transparent 60%);"></div>
+          <div class="step-card__num">03</div>
+          <h3 class="step-card__title">Приходи и играй</h3>
+          <p class="step-card__desc">Покажи QR на ресепшене — место уже готово. Без очередей и звонков.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide-num"><strong>04</strong> &nbsp;/&nbsp; 11</div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       SLIDE 05 — TWO COLUMN with image
+       ═══════════════════════════════════════════════════════════ -->
+  <section class="slide s-twocol" data-label="05 Two-column">
+    <div class="logo-mini">
+      <svg viewBox="0 0 64 64" fill="none"><defs><linearGradient id="lt5" x1="0" y1="0" x2="64" y2="64"><stop offset="0%" stop-color="#3b82f6"/><stop offset="60%" stop-color="#6366f1"/><stop offset="100%" stop-color="#a855f7"/></linearGradient></defs><path d="M32 4 C18.7 4 8 14.5 8 27.5 C8 42 27 58 30.5 60.5 C31.4 61.2 32.6 61.2 33.5 60.5 C37 58 56 42 56 27.5 C56 14.5 45.3 4 32 4 Z" fill="url(#lt5)"/></svg>
+      <span><span class="logo-mini__main">RESPAWN</span><span class="logo-mini__accent">.kz</span></span>
+    </div>
+
+    <div class="spark pulse" style="top: 18%; right: 50%;"></div>
+
+    <div class="slide__inner s-twocol__layout">
+      <div>
+        <span class="kicker" data-anim="fade-up" style="--d:120ms">PRODUCT · 02</span>
+        <h2 class="display" data-anim="fade-up" style="--d:280ms; margin-top: 28px;">
+          ВИРТУАЛЬНАЯ<br><span class="accent">РЕАЛЬНОСТЬ</span>
+        </h2>
+        <p class="body" data-anim="fade-up" style="--d:520ms">
+          Не звонишь, не уговариваешь админа, не приходишь зря. Открываешь приложение, видишь свободные машины в клубе у дома, оплачиваешь картой — и место уже твоё. Это занимает 30 секунд.
+        </p>
+        <div class="s-twocol__chips" data-anim="fade-up" style="--d:720ms">
+          <span class="tag">RTX 4080</span>
+          <span class="tag">240Hz</span>
+          <span class="tag">VR / Meta Quest 3</span>
+          <span class="tag">Razer · Logitech</span>
+        </div>
+      </div>
+      <div class="s-twocol__media" data-anim="fade-up" style="--d:400ms">
+        <image-slot id="twocol-media" shape="rounded" radius="28px" placeholder="Photo of a club setup / gamer / VR headset"></image-slot>
+      </div>
+    </div>
+
+    <div class="slide-num"><strong>05</strong> &nbsp;/&nbsp; 11</div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       SLIDE 06 — QUOTE
+       ═══════════════════════════════════════════════════════════ -->
+  <section class="slide s-quote" data-label="06 Quote">
+    <div class="arc-bg"></div>
+    <div class="logo-mini">
+      <svg viewBox="0 0 64 64" fill="none"><defs><linearGradient id="lt6" x1="0" y1="0" x2="64" y2="64"><stop offset="0%" stop-color="#3b82f6"/><stop offset="60%" stop-color="#6366f1"/><stop offset="100%" stop-color="#a855f7"/></linearGradient></defs><path d="M32 4 C18.7 4 8 14.5 8 27.5 C8 42 27 58 30.5 60.5 C31.4 61.2 32.6 61.2 33.5 60.5 C37 58 56 42 56 27.5 C56 14.5 45.3 4 32 4 Z" fill="url(#lt6)"/></svg>
+      <span><span class="logo-mini__main">RESPAWN</span><span class="logo-mini__accent">.kz</span></span>
+    </div>
+
+    <div class="planet" style="top: 18%; right: 12%; width: 160px; height: 160px;"></div>
+    <div class="planet" style="bottom: 14%; left: 8%; width: 120px; height: 120px; opacity: 0.7;"></div>
+
+    <div class="slide__inner s-quote">
+      <div data-anim="fade-up" style="--d:120ms">
+        <span class="kicker">VOICES · 03</span>
+      </div>
+      <p class="quote" data-anim="fade-up" style="--d:280ms; margin-top: 56px;">
+        <span class="open">«</span>Раньше я звонил по пяти клубам, чтобы найти свободную RTX. Теперь беру слот за 30 секунд, и оплачиваю Kaspi.<span class="close">»</span>
+      </p>
+      <div class="attribution" data-anim="fade-up" style="--d:700ms">
+        <image-slot id="quote-avatar" shape="circle" placeholder="player avatar"></image-slot>
+        <div>
+          <div class="attribution__name">АЛИХАН Б.</div>
+          <div class="attribution__role">PRO PLAYER · АЛМАТЫ</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide-num"><strong>06</strong> &nbsp;/&nbsp; 11</div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       SLIDE 07 — INFINITY
+       ═══════════════════════════════════════════════════════════ -->
+  <section class="slide s-infinity" data-label="07 Infinity loop">
+    <div class="logo-mini">
+      <svg viewBox="0 0 64 64" fill="none"><defs><linearGradient id="lt7" x1="0" y1="0" x2="64" y2="64"><stop offset="0%" stop-color="#3b82f6"/><stop offset="60%" stop-color="#6366f1"/><stop offset="100%" stop-color="#a855f7"/></linearGradient></defs><path d="M32 4 C18.7 4 8 14.5 8 27.5 C8 42 27 58 30.5 60.5 C31.4 61.2 32.6 61.2 33.5 60.5 C37 58 56 42 56 27.5 C56 14.5 45.3 4 32 4 Z" fill="url(#lt7)"/></svg>
+      <span><span class="logo-mini__main">RESPAWN</span><span class="logo-mini__accent">.kz</span></span>
+    </div>
+
+    <div class="s-infinity__title">
+      <span class="kicker" data-anim="fade-up" style="--d:120ms">LOYALTY · 04</span>
+      <h2 class="display" data-anim="fade-up" style="--d:280ms; margin-top: 32px;">
+        БЕЗ<br>ЛИМИТА
+      </h2>
+      <p class="sub" data-anim="fade-up" style="--d:520ms">
+        5% кэшбека часами за каждое посещение. Бонусы не сгорают — играй сколько захочешь.
+      </p>
+    </div>
+
+    <div class="s-infinity__loop">
+      <svg viewBox="0 0 880 540" width="100%" height="100%" fill="none">
+        <defs>
+          <linearGradient id="inf-grad" x1="0" y1="0" x2="880" y2="0">
+            <stop offset="0%" stop-color="#00f0ff"/>
+            <stop offset="50%" stop-color="#a855f7"/>
+            <stop offset="100%" stop-color="#ff2e9a"/>
+          </linearGradient>
+        </defs>
+        <!-- Infinity path -->
+        <path class="infinity-path"
+          d="M 220 270 C 220 130, 380 130, 440 270 C 500 410, 660 410, 660 270 C 660 130, 500 130, 440 270 C 380 410, 220 410, 220 270 Z"
+          stroke="url(#inf-grad)"
+          stroke-width="18"
+          stroke-linecap="round"
+          fill="none"
+        />
+      </svg>
+    </div>
+
+    <div class="slide-num"><strong>07</strong> &nbsp;/&nbsp; 11</div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       SLIDE 08 — CYBER ARCH
+       ═══════════════════════════════════════════════════════════ -->
+  <section class="slide s-arch" data-label="08 Cyber space">
+    <div class="logo-mini">
+      <svg viewBox="0 0 64 64" fill="none"><defs><linearGradient id="lt8" x1="0" y1="0" x2="64" y2="64"><stop offset="0%" stop-color="#3b82f6"/><stop offset="60%" stop-color="#6366f1"/><stop offset="100%" stop-color="#a855f7"/></linearGradient></defs><path d="M32 4 C18.7 4 8 14.5 8 27.5 C8 42 27 58 30.5 60.5 C31.4 61.2 32.6 61.2 33.5 60.5 C37 58 56 42 56 27.5 C56 14.5 45.3 4 32 4 Z" fill="url(#lt8)"/></svg>
+      <span><span class="logo-mini__main">RESPAWN</span><span class="logo-mini__accent">.kz</span></span>
+    </div>
+
+    <div class="arch arch--deepest"></div>
+    <div class="arch arch--inner"></div>
+    <div class="arch"></div>
+    <div class="floor-grid"></div>
+    <div class="planet" style="top: 12%; left: 16%; width: 90px; height: 90px;"></div>
+
+    <div class="slide__inner s-arch">
+      <div class="copy">
+        <span class="kicker" data-anim="fade-up" style="--d:600ms">EXPERIENCE · 05</span>
+        <h2 class="display" data-anim="fade-up" style="--d:780ms; margin-top: 28px;">
+          <span class="a1">CYBER</span> <span class="a2">SPACE</span>
+        </h2>
+        <p class="sub" data-anim="fade-up" style="--d:1000ms">Каждый клуб — отдельная вселенная</p>
+      </div>
+    </div>
+
+    <div class="slide-num"><strong>08</strong> &nbsp;/&nbsp; 11</div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       SLIDE 09 — PROGRESS / BAR CHART
+       ═══════════════════════════════════════════════════════════ -->
+  <section class="slide s-progress" data-label="09 Progress">
+    <div class="logo-mini">
+      <svg viewBox="0 0 64 64" fill="none"><defs><linearGradient id="lt9" x1="0" y1="0" x2="64" y2="64"><stop offset="0%" stop-color="#3b82f6"/><stop offset="60%" stop-color="#6366f1"/><stop offset="100%" stop-color="#a855f7"/></linearGradient></defs><path d="M32 4 C18.7 4 8 14.5 8 27.5 C8 42 27 58 30.5 60.5 C31.4 61.2 32.6 61.2 33.5 60.5 C37 58 56 42 56 27.5 C56 14.5 45.3 4 32 4 Z" fill="url(#lt9)"/></svg>
+      <span><span class="logo-mini__main">RESPAWN</span><span class="logo-mini__accent">.kz</span></span>
+    </div>
+
+    <div class="slide__inner">
+      <div class="head" data-anim="fade-up" style="--d:80ms">
+        <span class="kicker">TRACTION · 06</span>
+        <h2 class="display" style="font-size: 110px; margin-top: 28px;">Рост по&nbsp;месяцам</h2>
+        <p style="font-family: var(--font-mono); font-size: 22px; color: var(--text-soft); margin-top: 24px; letter-spacing: 0.1em;">Выручка платформы, тыс. ₸</p>
+      </div>
+
+      <div class="s-progress__chart">
+        <div class="bar-wrap">
+          <span class="bar-wrap__label">29 728</span>
+          <div class="bar" style="height: 24%; --d:300ms; animation-delay: 300ms;"></div>
+          <span class="bar-wrap__sub">июнь</span>
+        </div>
+        <div class="bar-wrap">
+          <span class="bar-wrap__label">35 054</span>
+          <div class="bar" style="height: 32%; animation-delay: 420ms;"></div>
+          <span class="bar-wrap__sub">июль</span>
+        </div>
+        <div class="bar-wrap">
+          <span class="bar-wrap__label">55 406</span>
+          <div class="bar" style="height: 48%; animation-delay: 540ms;"></div>
+          <span class="bar-wrap__sub">август</span>
+        </div>
+        <div class="bar-wrap">
+          <span class="bar-wrap__label">89 430</span>
+          <div class="bar" style="height: 70%; animation-delay: 660ms;"></div>
+          <span class="bar-wrap__sub">сентябрь</span>
+        </div>
+        <div class="bar-wrap">
+          <span class="bar-wrap__label">98 583</span>
+          <div class="bar" style="height: 82%; animation-delay: 780ms;"></div>
+          <span class="bar-wrap__sub">октябрь</span>
+        </div>
+        <div class="bar-wrap">
+          <span class="bar-wrap__label">125 758</span>
+          <div class="bar" style="height: 100%; animation-delay: 900ms;"></div>
+          <span class="bar-wrap__sub">ноябрь</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide-num"><strong>09</strong> &nbsp;/&nbsp; 11</div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       SLIDE 10 — GLOBE / GEOGRAPHY
+       ═══════════════════════════════════════════════════════════ -->
+  <section class="slide s-globe" data-label="10 Geography">
+    <div class="logo-mini">
+      <svg viewBox="0 0 64 64" fill="none"><defs><linearGradient id="lt10" x1="0" y1="0" x2="64" y2="64"><stop offset="0%" stop-color="#3b82f6"/><stop offset="60%" stop-color="#6366f1"/><stop offset="100%" stop-color="#a855f7"/></linearGradient></defs><path d="M32 4 C18.7 4 8 14.5 8 27.5 C8 42 27 58 30.5 60.5 C31.4 61.2 32.6 61.2 33.5 60.5 C37 58 56 42 56 27.5 C56 14.5 45.3 4 32 4 Z" fill="url(#lt10)"/></svg>
+      <span><span class="logo-mini__main">RESPAWN</span><span class="logo-mini__accent">.kz</span></span>
+    </div>
+
+    <div class="slide__inner s-globe__layout">
+      <div class="copy">
+        <span class="kicker" data-anim="fade-up" style="--d:120ms">REACH · 07</span>
+        <h2 class="display" data-anim="fade-up" style="--d:280ms; margin-top: 28px;">
+          <span class="num">10</span><br>ГОРОДОВ
+        </h2>
+        <p class="body" data-anim="fade-up" style="--d:500ms">
+          Алматы, Астана, Шымкент, Караганда, Актобе, Тараз, Павлодар, Усть-Каменогорск, Семей, Атырау — десять крупнейших городов Казахстана. К концу года добавим ещё пять.
+        </p>
+        <div class="s-globe__cities" data-anim="fade-up" style="--d:720ms">
+          <span>ALMATY</span><span>ASTANA</span><span>SHYMKENT</span><span>KARAGANDA</span><span>AKTOBE</span><span>TARAZ</span><span>PAVLODAR</span><span>OSKEMEN</span><span>SEMEY</span><span>ATYRAU</span>
+        </div>
+      </div>
+      <div class="s-globe__visual">
+        <div class="globe">
+          <div class="globe__meridian" style="border-top-color: rgba(0,240,255,.5); border-bottom-color: rgba(0,240,255,.5);"></div>
+          <div class="globe__meridian" style="transform: rotateY(60deg); border-left-color: rgba(255,46,154,.4); border-right-color: rgba(255,46,154,.4);"></div>
+          <div class="globe__meridian" style="transform: rotateY(120deg); border-left-color: rgba(168,85,247,.4); border-right-color: rgba(168,85,247,.4);"></div>
+          <div class="city-dot" style="top: 32%; left: 38%;"></div>
+          <div class="city-dot" style="top: 40%; left: 58%;"></div>
+          <div class="city-dot" style="top: 56%; left: 45%;"></div>
+          <div class="city-dot" style="top: 26%; left: 52%;"></div>
+          <div class="city-dot" style="top: 64%; left: 32%;"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide-num"><strong>10</strong> &nbsp;/&nbsp; 11</div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       SLIDE 11 — CLOSING CTA
+       ═══════════════════════════════════════════════════════════ -->
+  <section class="slide s-cta" data-label="11 Closing CTA">
+    <div class="logo-mini">
+      <svg viewBox="0 0 64 64" fill="none"><defs><linearGradient id="lt11" x1="0" y1="0" x2="64" y2="64"><stop offset="0%" stop-color="#3b82f6"/><stop offset="60%" stop-color="#6366f1"/><stop offset="100%" stop-color="#a855f7"/></linearGradient></defs><path d="M32 4 C18.7 4 8 14.5 8 27.5 C8 42 27 58 30.5 60.5 C31.4 61.2 32.6 61.2 33.5 60.5 C37 58 56 42 56 27.5 C56 14.5 45.3 4 32 4 Z" fill="url(#lt11)"/></svg>
+      <span><span class="logo-mini__main">RESPAWN</span><span class="logo-mini__accent">.kz</span></span>
+    </div>
+
+    <div class="planet planet--ring" style="top: 14%; right: 14%; width: 220px; height: 220px;"></div>
+    <div class="planet" style="bottom: 16%; left: 10%; width: 140px; height: 140px; opacity: 0.8;"></div>
+    <div class="spark pulse" style="top: 22%; left: 22%;"></div>
+    <div class="spark pulse" style="bottom: 28%; right: 18%; animation-delay: 1.1s;"></div>
+
+    <div class="slide__inner s-cta">
+      <span class="kicker" data-anim="fade-up" style="--d:120ms">END · OF · DECK</span>
+      <h2 class="display" data-anim="fade-up" style="--d:280ms; margin-top: 48px;">
+        ГОТОВ<br><span class="accent">ИГРАТЬ?</span>
+      </h2>
+      <p class="sub" data-anim="fade-up" style="--d:600ms">PRESS · ANY · KEY · TO · RESPAWN</p>
+      <a class="btn-primary" data-anim="fade-up" style="--d:900ms" href="https://respawn.kz">Найти клуб</a>
+      <p class="url" data-anim="fade-in" style="--d:1300ms"><strong>respawn.kz</strong> &nbsp;·&nbsp; @respawn_kz_support</p>
+    </div>
+
+    <div class="slide-num"><strong>11</strong> &nbsp;/&nbsp; 11</div>
+  </section>
+
+</deck-stage>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     Tweaks panel — wired to host toolbar via __edit_mode_* protocol
+     ═══════════════════════════════════════════════════════════ -->
+<div id="tweaks-panel" aria-label="Tweaks">
+  <h4>
+    Tweaks
+    <button class="close-x" id="tweaks-close" aria-label="Close">✕</button>
+  </h4>
+  <div class="group">
+    <span class="group-label">Background</span>
+    <div class="seg" data-key="bg">
+      <button data-val="dark">Dark base</button>
+      <button data-val="hero-photo">Hero photo</button>
+      <button data-val="cyber-grid">Cyber grid</button>
+    </div>
+  </div>
+  <div class="group">
+    <span class="group-label">Accent palette</span>
+    <div class="seg" data-key="accent">
+      <button data-val="cyan-first">Cyan-first</button>
+      <button data-val="violet-first">Violet-first</button>
+      <button data-val="split">CRT split</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  // ── Tweaks state (the JSON block below is what the host persists) ──
+  const TWEAKS = /*EDITMODE-BEGIN*/{
+    "bg": "dark",
+    "accent": "cyan-first"
+  }/*EDITMODE-END*/;
+
+  function apply() {
+    document.body.dataset.bg = TWEAKS.bg;
+    document.body.dataset.accent = TWEAKS.accent;
+    // Reflect selected state in buttons
+    document.querySelectorAll('#tweaks-panel .seg').forEach(seg => {
+      const k = seg.dataset.key;
+      seg.querySelectorAll('button').forEach(b => {
+        b.classList.toggle('is-active', b.dataset.val === TWEAKS[k]);
+      });
+    });
+  }
+  apply();
+
+  const panel = document.getElementById('tweaks-panel');
+
+  // Register message listener BEFORE announcing availability
+  window.addEventListener('message', (e) => {
+    if (!e.data || typeof e.data !== 'object') return;
+    if (e.data.type === '__activate_edit_mode') panel.classList.add('is-open');
+    if (e.data.type === '__deactivate_edit_mode') panel.classList.remove('is-open');
+  });
+  // Announce
+  try { window.parent.postMessage({ type: '__edit_mode_available' }, '*'); } catch (e) {}
+
+  // Wire close button
+  document.getElementById('tweaks-close').addEventListener('click', () => {
+    panel.classList.remove('is-open');
+    try { window.parent.postMessage({ type: '__edit_mode_dismissed' }, '*'); } catch (e) {}
+  });
+
+  // Wire segmented controls
+  document.querySelectorAll('#tweaks-panel .seg').forEach(seg => {
+    seg.addEventListener('click', (e) => {
+      const btn = e.target.closest('button[data-val]');
+      if (!btn) return;
+      const k = seg.dataset.key;
+      TWEAKS[k] = btn.dataset.val;
+      apply();
+      try {
+        window.parent.postMessage({ type: '__edit_mode_set_keys', edits: { [k]: btn.dataset.val } }, '*');
+      } catch (err) {}
+    });
+  });
+})();
+</script>
+
+<script src="image-slot.js"></script>
+<script src="deck-stage.js"></script>
+
+<script>
+// Toggle .is-entering on the active slide so CSS entry animations fire.
+// Default state for [data-anim] is opacity:1 — animations only animate FROM
+// a hidden state via `backwards` fill mode. If JS fails, content still shows.
+(function () {
+  const ds = document.querySelector('deck-stage');
+  if (!ds) return;
+
+  let timer = null;
+  const enter = (slide) => {
+    if (!slide) return;
+    document.querySelectorAll('section.slide.is-entering').forEach(s => s.classList.remove('is-entering'));
+    // Force reflow so animations restart even if class was just removed.
+    void slide.offsetWidth;
+    slide.classList.add('is-entering');
+    clearTimeout(timer);
+    timer = setTimeout(() => slide.classList.remove('is-entering'), 3500);
+  };
+
+  ds.addEventListener('slidechange', (e) => enter(e.detail.slide));
+  // Kick off initial slide.
+  const initial = document.querySelector('section.slide[data-deck-active]') || document.querySelector('section.slide');
+  enter(initial);
+})();
+</script>
+</body>
+</html>
