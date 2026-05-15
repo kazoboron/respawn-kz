@@ -11,6 +11,7 @@ import { setupAuthButton } from './auth';
 import { setupLoginPage } from './login-page';
 import { setupAuthCallback } from './auth-callback';
 import { setupMePage } from './me-page';
+import { setupCookieBanner } from './cookie-banner';
 
 function init(): void {
   setupHeaderScroll();
@@ -43,6 +44,8 @@ function init(): void {
   if (document.getElementById('me-root')) {
     setupMePage();
   }
+  // Cookie consent — on every page, shows once if not yet answered
+  setupCookieBanner();
 }
 
 if (document.readyState === 'loading') {
