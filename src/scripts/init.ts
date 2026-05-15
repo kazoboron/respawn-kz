@@ -6,6 +6,7 @@ import { setupSearchForm, setupTimeSelect, setupDateDefault } from './search';
 import { setupBookingButtons } from './booking';
 import { setupGlitch } from './glitch';
 import { setupClubApplication } from './club-application';
+import { setupCatalogFilters } from './filters';
 
 function init(): void {
   setupHeaderScroll();
@@ -23,6 +24,10 @@ function init(): void {
   }
   if (document.getElementById('club-application-form')) {
     setupClubApplication();
+  }
+  if (document.getElementById('catalog-grid')) {
+    setupCatalogFilters();
+    setupGeolocation();
   }
 }
 
