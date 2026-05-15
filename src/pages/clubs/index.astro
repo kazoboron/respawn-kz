@@ -1,0 +1,76 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { CITIES } from '../../data/cities';
+import { CLUBS } from '../../data/clubs';
+---
+
+<BaseLayout
+  title="Все клубы Казахстана — respawn.kz"
+  description="Каталог компьютерных клубов в 10 городах Казахстана. Фильтры по городу, цене и оборудованию."
+  activeRoute="clubs"
+>
+  <section class="catalog">
+    <div class="container">
+      <nav class="breadcrumb">
+        <a href="/">Главная</a>
+        <span class="breadcrumb__sep">/</span>
+        <span class="breadcrumb__current">Клубы</span>
+      </nav>
+
+      <header class="catalog__header">
+        <h1 class="catalog__title">Клубы Казахстана</h1>
+        <p class="catalog__subtitle">Найдено <strong id="catalog-count">{CLUBS.length}</strong> клубов</p>
+      </header>
+
+      <div class="catalog__filters" id="catalog-filters">
+        <label class="filter">
+          <span class="filter__label">
+            Город
+            <button type="button" class="geo-btn" id="geo-btn">📍 Мой город</button>
+          </span>
+          <select id="city-select" class="filter__input">
+            <option value="">Все города</option>
+            {CITIES.map((c) => <option value={c.id}>{c.label}</option>)}
+          </select>
+          <span class="geo-status" id="geo-status" hidden></span>
+        </label>
+
+        <div class="filter">
+          <span class="filter__label">Цена</span>
+          <div class="filter__chips">
+            <button type="button" class="chip" data-price-tier="low">до 800 ₸</button>
+            <button type="button" class="chip" data-price-tier="mid">800–1200 ₸</button>
+            <button type="button" class="chip" data-price-tier="high">1200+ ₸</button>
+          </div>
+        </div>
+
+        <div class="filter">
+          <span class="filter__label">Оборудование</span>
+          <div class="filter__tags">
+            <label class="tag-check"><input type="checkbox" data-tag="PC" /><span>PC</span></label>
+            <label class="tag-check"><input type="checkbox" data-tag="PS5" /><span>PS5</span></label>
+            <label class="tag-check"><input type="checkbox" data-tag="VR" /><span>VR</span></label>
+            <label class="tag-check"><input type="checkbox" data-tag="Sim Racing" /><span>Sim Racing</span></label>
+          </div>
+        </div>
+
+        <label class="filter">
+          <span class="filter__label">Сортировка</span>
+          <select id="sort-select" class="filter__input">
+            <option value="rating">По рейтингу</option>
+            <option value="price-asc">Цена ↑</option>
+            <option value="price-desc">Цена ↓</option>
+          </select>
+        </label>
+
+        <button type="button" class="btn btn--ghost catalog__reset" id="catalog-reset" hidden>Сбросить фильтры</button>
+      </div>
+
+      <div class="clubs__grid" id="catalog-grid"></div>
+
+      <div class="catalog__empty" id="catalog-empty" hidden>
+        <p>Ничего не нашлось — попробуй сбросить фильтры</p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
