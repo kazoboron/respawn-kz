@@ -329,7 +329,7 @@ body.menu-open .hamburger span:nth-child(3) {
   content: "";
   position: absolute;
   inset: 0;
-  background-image: url('/img/club-hero.jpg');
+  background-image: url('/img/club-hero.webp');
   background-size: cover;
   background-position: center;
   opacity: 0.22;
@@ -921,7 +921,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   content: "";
   position: absolute;
   inset: 0;
-  background-image: url('/img/club-rows.jpg');
+  background-image: url('/img/club-rows.webp');
   background-size: cover;
   background-position: center;
   opacity: 0.18;
@@ -1903,7 +1903,7 @@ body.menu-open {
   left: 0;
   right: 0;
   height: 400px;
-  background-image: url('/img/club-rows.jpg');
+  background-image: url('/img/club-rows.webp');
   background-size: cover;
   background-position: center;
   opacity: 0.15;
