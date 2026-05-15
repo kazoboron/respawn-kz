@@ -1,0 +1,127 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ClubCard from '../../components/ClubCard.astro';
+import { CLUBS, getSimilarClubs, type Club } from '../../data/clubs';
+import { CITY_LABELS } from '../../data/cities';
+
+export function getStaticPaths() {
+  return CLUBS.map((club) => ({
+    params: { slug: club.slug },
+    props: { club },
+  }));
+}
+
+interface Props {
+  club: Club;
+}
+
+const { club } = Astro.props;
+const cityLabel = CITY_LABELS[club.city] ?? club.city;
+const similar = getSimilarClubs(club.slug, 3);
+
+function formatPrice(value: number): string {
+  return value.toLocaleString('ru-RU');
+}
+---
+
+<BaseLayout
+  title={`${club.name} — ${cityLabel} — respawn.kz`}
+  description={`${club.name}, ${cityLabel}, ${club.district}. От ${formatPrice(club.price)} ₸/час. ${club.tags.join(', ')}.`}
+  activeRoute="clubs"
+>
+  <section class="club-page">
+    <div class="container">
+      <nav class="breadcrumb">
+        <a href="/">Главная</a>
+        <span class="breadcrumb__sep">/</span>
+        <a href="/clubs/">Клубы</a>
+        <span class="breadcrumb__sep">/</span>
+        <span class="breadcrumb__current">{club.name}</span>
+      </nav>
+
+      <header class="club-page__hero">
+        <h1 class="club-page__name">{club.name}</h1>
+        <div class="club-page__meta">
+          <span>{cityLabel}</span>
+          <span class="club-card__meta-sep">·</span>
+          <span>{club.district}</span>
+          <span class="club-card__meta-sep">·</span>
+          <span class="club-card__rating">★ {club.rating} ({club.reviews} отзывов)</span>
+        </div>
+        <div class="club-page__tags">
+          {club.tags.map((t) => <span class="club-card__tag">{t}</span>)}
+        </div>
+      </header>
+
+      <div class="club-page__gallery">
+        {club.galleryGradients.map((g, i) => (
+          <div class="gallery-item" style={`background: ${g};`}>
+            <span class="gallery-item__num">{i + 1}</span>
+          </div>
+        ))}
+      </div>
+
+      <div class="club-page__layout">
+        <div class="club-page__main">
+          <section class="club-section">
+            <h2 class="club-section__title">О клубе</h2>
+            <p class="club-section__text">{club.description}</p>
+          </section>
+
+          <section class="club-section">
+            <h2 class="club-section__title">Что у нас есть</h2>
+            <ul class="equipment-list">
+              {club.equipment.map((e) => <li>{e}</li>)}
+            </ul>
+          </section>
+
+          <section class="club-section">
+            <h2 class="club-section__title">Часы работы и адрес</h2>
+            <div class="info-grid">
+              <div>
+                <div class="info-label">Часы работы</div>
+                <div class="info-value">{club.hours}</div>
+              </div>
+              <div>
+                <div class="info-label">Адрес</div>
+                <div class="info-value">{club.address}</div>
+              </div>
+              <div>
+                <div class="info-label">Телефон</div>
+                <div class="info-value"><a href={`tel:${club.phone.replace(/[^+\d]/g, '')}`}>{club.phone}</a></div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <aside class="club-page__sidebar">
+          <div class="pricing-card">
+            <div class="pricing-card__amount">
+              <span class="pricing-card__from">от</span>
+              <span class="pricing-card__value">{formatPrice(club.price)} ₸</span>
+              <span class="pricing-card__unit">/час</span>
+            </div>
+            <button class="btn btn--primary btn--large pricing-card__btn" data-book={club.slug}>
+              Забронировать слот
+            </button>
+            <div class="pricing-card__pay">
+              <span class="pricing-card__pay-label">Принимаем:</span>
+              <span class="pricing-card__pay-icons">
+                <span class="pay-icon">VISA</span>
+                <span class="pay-icon">MC</span>
+                <span class="pay-icon">Kaspi</span>
+              </span>
+            </div>
+          </div>
+        </aside>
+      </div>
+
+      <section class="similar">
+        <h2 class="section__title">Похожие клубы</h2>
+        <div class="clubs__grid">
+          {similar.map((c) => <ClubCard club={c} />)}
+        </div>
+      </section>
+    </div>
+  </section>
+</BaseLayout>
