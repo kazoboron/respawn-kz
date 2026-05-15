@@ -3,16 +3,25 @@ import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 const url = import.meta.env.PUBLIC_SUPABASE_URL;
 const key = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
 
-if (!url || !key) {
-  // В dev — кидаем понятную ошибку. В prod — будет сборка-ошибка через build.
-  console.error('[supabase] Missing PUBLIC_SUPABASE_URL or PUBLIC_SUPABASE_ANON_KEY in .env. See .env.example.');
-  throw new Error('Supabase credentials missing — check .env');
+export const supabaseConfigured = !!(url && key);
+
+if (!supabaseConfigured) {
+  console.warn(
+    '[supabase] Missing PUBLIC_SUPABASE_URL or PUBLIC_SUPABASE_ANON_KEY in .env. ' +
+    'Auth/booking features will not work. See .env.example.'
+  );
 }
 
-export const supabase: SupabaseClient = createClient(url, key, {
-  auth: {
-    persistSession: true,
-    autoRefreshToken: true,
-    detectSessionInUrl: true,
-  },
-});
+// Используем placeholder если env отсутствует — клиент создастся, но запросы провалятся.
+// Это позволяет странам без auth работать в dev, и явно сигнализирует если auth/booking вызвали.
+export const supabase: SupabaseClient = createClient(
+  url || 'https://placeholder.supabase.co',
+  key || 'placeholder-anon-key',
+  {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true,
+    },
+  }
+);

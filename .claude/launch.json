@@ -3,8 +3,8 @@
   "configurations": [
     {
       "name": "respawn-kz",
-      "runtimeExecutable": "C:\\Users\\Lenovo\\node\\node-v22.11.0-win-x64\\npm.cmd",
-      "runtimeArgs": ["run", "dev"],
+      "runtimeExecutable": "C:\\Users\\Lenovo\\node\\node-v22.11.0-win-x64\\node.exe",
+      "runtimeArgs": ["node_modules/astro/astro.js", "dev", "--port", "4321"],
       "port": 4321
     }
   ]
