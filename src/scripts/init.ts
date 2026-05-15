@@ -5,6 +5,7 @@ import { setupHeaderScroll } from './header-scroll';
 import { setupSearchForm, setupTimeSelect, setupDateDefault } from './search';
 import { setupBookingButtons } from './booking';
 import { setupGlitch } from './glitch';
+import { setupClubApplication } from './club-application';
 
 function init(): void {
   setupHeaderScroll();
@@ -19,6 +20,9 @@ function init(): void {
   }
   if (document.querySelector('.glitch')) {
     setupGlitch();
+  }
+  if (document.getElementById('club-application-form')) {
+    setupClubApplication();
   }
 }
 

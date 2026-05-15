@@ -1,0 +1,103 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { CITIES } from '../data/cities';
+import { FOR_CLUBS_BENEFITS, FOR_CLUBS_STEPS } from '../data/content';
+---
+
+<BaseLayout
+  title="Для клубов — respawn.kz"
+  description="Подключи компьютерный клуб к платформе respawn.kz. Без абонплаты, комиссия только с реальных броней."
+  activeRoute="for-clubs"
+>
+  <section class="page-hero">
+    <div class="container">
+      <h1 class="page-hero__title">Стань партнёром respawn.kz</h1>
+      <p class="page-hero__subtitle">
+        Получай больше клиентов, принимай онлайн-оплаты, видь аналитику в реальном времени.
+      </p>
+      <a href="#application" class="btn btn--primary btn--large" style="margin-top:24px">Подать заявку</a>
+    </div>
+  </section>
+
+  <section class="club-benefits">
+    <div class="container">
+      <h2 class="section__title">Что вы получаете</h2>
+      <div class="club-benefits__grid">
+        {FOR_CLUBS_BENEFITS.map((b) => (
+          <div class="club-benefit">
+            <div class="club-benefit__icon">{b.icon}</div>
+            <h3 class="club-benefit__title">{b.title}</h3>
+            <p class="club-benefit__desc">{b.desc}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="how" id="how-clubs">
+    <div class="container">
+      <h2 class="section__title">Как подключиться</h2>
+      <div class="how__steps">
+        {FOR_CLUBS_STEPS.map((s) => (
+          <div class="step">
+            <div class="step__num">{s.num}</div>
+            <h3 class="step__title">{s.title}</h3>
+            <p class="step__desc">{s.desc}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="pricing">
+    <div class="container">
+      <h2 class="section__title">Тариф</h2>
+      <div class="pricing__card">
+        <div class="pricing__big">
+          <span class="pricing__amount">7%</span>
+          <span class="pricing__unit">комиссия с брони</span>
+        </div>
+        <ul class="pricing__list">
+          <li>✓ Без абонплаты</li>
+          <li>✓ Без расходов на подключение</li>
+          <li>✓ Обучение и поддержка — бесплатно</li>
+          <li>✓ Вывод денег на счёт ИП/ТОО еженедельно</li>
+          <li>✓ Все чеки — фискальные</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="application" id="application">
+    <div class="container">
+      <h2 class="section__title">Подать заявку</h2>
+      <p class="section__subtitle">Заполни форму — менеджер свяжется в течение рабочего дня</p>
+      <form class="application__form" id="club-application-form">
+        <label class="application__field">
+          <span class="application__label">Название клуба</span>
+          <input type="text" name="club-name" class="application__input" required />
+        </label>
+        <label class="application__field">
+          <span class="application__label">Город</span>
+          <select name="city" class="application__input" required>
+            <option value="">Выбери город</option>
+            {CITIES.map((c) => <option value={c.id}>{c.label}</option>)}
+          </select>
+        </label>
+        <label class="application__field">
+          <span class="application__label">Имя контакта</span>
+          <input type="text" name="contact-name" class="application__input" required />
+        </label>
+        <label class="application__field">
+          <span class="application__label">Телефон или email</span>
+          <input type="text" name="contact" class="application__input" placeholder="+7 (___) ___-__-__" required />
+        </label>
+        <label class="application__field application__field--wide">
+          <span class="application__label">Сообщение (опционально)</span>
+          <textarea name="message" class="application__input application__textarea" rows="4"></textarea>
+        </label>
+        <button type="submit" class="btn btn--primary btn--large application__submit">Отправить заявку</button>
+      </form>
+    </div>
+  </section>
+</BaseLayout>
