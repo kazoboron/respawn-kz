@@ -9,10 +9,15 @@ desktop.ini
 *.swp
 *.swo
 
-# Build / deps (на будущее)
+# Node / Astro
 node_modules/
 dist/
-.cache/
+.astro/
 
 # Logs
 *.log
+npm-debug.log*
+
+# Local env
+.env
+.env.local
