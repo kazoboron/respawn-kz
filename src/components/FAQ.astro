@@ -1,0 +1,27 @@
+---
+import type { FAQItem } from '../data/content';
+
+interface Props {
+  items: FAQItem[];
+  title?: string;
+}
+
+const { items, title = 'Частые вопросы' } = Astro.props;
+---
+
+<section class="faq" id="faq">
+  <div class="container">
+    <h2 class="section__title">{title}</h2>
+    <div class="faq__list">
+      {items.map((item) => (
+        <details class="faq__item" name="faq-group">
+          <summary class="faq__question">
+            <span>{item.q}</span>
+            <span class="faq__icon">+</span>
+          </summary>
+          <div class="faq__answer">{item.a}</div>
+        </details>
+      ))}
+    </div>
+  </div>
+</section>
