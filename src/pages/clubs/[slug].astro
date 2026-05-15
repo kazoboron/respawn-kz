@@ -22,6 +22,34 @@ const similar = getSimilarClubs(club.slug, 3);
 function formatPrice(value: number): string {
   return value.toLocaleString('ru-RU');
 }
+
+// Schema.org LocalBusiness JSON-LD
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'GameServer',
+  '@id': `https://respawn.kz/clubs/${club.slug}/`,
+  name: club.name,
+  description: club.description,
+  image: `https://respawn.kz${club.galleryGradients[0]?.startsWith('http') ? '' : '/img/club-hero.jpg'}`,
+  url: `https://respawn.kz/clubs/${club.slug}/`,
+  telephone: club.phone,
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: club.address,
+    addressLocality: cityLabel,
+    addressRegion: cityLabel,
+    addressCountry: 'KZ',
+  },
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: club.rating,
+    reviewCount: club.reviews,
+    bestRating: 5,
+    worstRating: 1,
+  },
+  priceRange: `от ${formatPrice(club.price)} ₸/час`,
+  openingHours: club.hours === 'Круглосуточно' ? 'Mo-Su 00:00-23:59' : club.hours,
+};
 ---
 
 <BaseLayout
@@ -29,6 +57,8 @@ function formatPrice(value: number): string {
   description={`${club.name}, ${cityLabel}, ${club.district}. От ${formatPrice(club.price)} ₸/час. ${club.tags.join(', ')}.`}
   activeRoute="clubs"
 >
+  <script type="application/ld+json" slot="head" set:html={JSON.stringify(jsonLd)} />
+
   <section class="club-page">
     <div class="container">
       <nav class="breadcrumb">

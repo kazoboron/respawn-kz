@@ -10,6 +10,7 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@astrojs/sitemap": "^3.2.0",
     "@supabase/supabase-js": "^2.105.4",
     "astro": "^4.16.19"
   },

@@ -2456,3 +2456,72 @@ body.menu-open {
 .footer__logo {
   margin-bottom: 16px;
 }
+
+/* ============================================
+   A11y improvements
+   ============================================ */
+
+/* Visible focus on all interactive */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--neon-cyan);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Skip-to-content link for keyboard users */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 8px;
+  background: var(--bg-elevated);
+  color: var(--neon-cyan);
+  padding: 8px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--neon-cyan);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  z-index: 1000;
+  transition: top var(--t-base);
+}
+.skip-link:focus {
+  top: 8px;
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .hero__scanline {
+    animation: none;
+    opacity: 0.1;
+  }
+  .glitch.is-glitching::before,
+  .glitch.is-glitching::after {
+    animation: none;
+  }
+}
+
+/* Screen reader only */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}

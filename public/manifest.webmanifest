@@ -1,0 +1,35 @@
+{
+  "name": "respawn.kz — Бронирование компьютерных клубов",
+  "short_name": "respawn.kz",
+  "description": "Найди компьютерный клуб в Казахстане и забронируй слот онлайн",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0a0a0f",
+  "theme_color": "#0a0a0f",
+  "lang": "ru",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["games", "entertainment", "lifestyle"],
+  "shortcuts": [
+    {
+      "name": "Каталог клубов",
+      "short_name": "Клубы",
+      "url": "/clubs/",
+      "icons": [{ "src": "/favicon.svg", "sizes": "any" }]
+    },
+    {
+      "name": "Мои брони",
+      "short_name": "Кабинет",
+      "url": "/me/",
+      "icons": [{ "src": "/favicon.svg", "sizes": "any" }]
+    }
+  ]
+}

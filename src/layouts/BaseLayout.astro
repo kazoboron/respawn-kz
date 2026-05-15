@@ -30,6 +30,8 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site ?? 'https://respawn.
     <meta name="description" content={description} />
     <link rel="canonical" href={canonicalUrl} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
 
     <!-- Open Graph / Telegram / WhatsApp / Facebook -->
     <meta property="og:type" content="website" />
@@ -48,6 +50,8 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site ?? 'https://respawn.
 
     <meta name="theme-color" content="#0a0a0f" />
 
+    <slot name="head" />
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -57,8 +61,9 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site ?? 'https://respawn.
     <title>{title}</title>
   </head>
   <body>
+    <a href="#main-content" class="skip-link">Перейти к контенту</a>
     <Header activeRoute={activeRoute} />
-    <main>
+    <main id="main-content" tabindex="-1">
       <slot />
     </main>
     <Footer />

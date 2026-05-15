@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /auth/
+Disallow: /me/
+Disallow: /api/
+
+Sitemap: https://respawn.kz/sitemap-index.xml
