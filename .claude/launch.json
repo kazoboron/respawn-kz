@@ -2,10 +2,10 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "almaty-gg",
-      "runtimeExecutable": "python",
-      "runtimeArgs": ["-m", "http.server", "5173"],
-      "port": 5173
+      "name": "respawn-kz",
+      "runtimeExecutable": "C:\\Users\\Lenovo\\node\\node-v22.11.0-win-x64\\npm.cmd",
+      "runtimeArgs": ["run", "dev"],
+      "port": 4321
     }
   ]
 }
