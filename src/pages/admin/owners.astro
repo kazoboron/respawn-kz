@@ -1,0 +1,57 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import DashboardNav from '../../components/DashboardNav.astro';
+import { CLUBS } from '../../data/clubs';
+import { CITY_LABELS } from '../../data/cities';
+---
+
+<BaseLayout title="Владельцы — Админка — respawn.kz">
+  <section class="dashboard-page" id="admin-owners-root">
+    <div class="container">
+      <header class="dashboard-page__header">
+        <h1 class="dashboard-page__title">Владельцы клубов</h1>
+        <p class="dashboard-page__subtitle">
+          Привязка user_id (UUID из auth.users) к слугу клуба. Найти UID можно
+          в <a href="/admin/users/">Пользователях</a> или в Supabase Dashboard.
+        </p>
+      </header>
+
+      <DashboardNav variant="admin" active="/admin/owners/" />
+
+      <div class="dashboard-loading" id="owners-loading">
+        <p style="text-align:center;color:var(--text-muted)">Загружаем…</p>
+      </div>
+
+      <div class="owners-list" id="owners-list" hidden>
+        {CLUBS.map((club) => (
+          <article class="owner-card" data-club-slug={club.slug}>
+            <div class="owner-card__header">
+              <div>
+                <h3 class="owner-card__title">{club.name}</h3>
+                <div class="owner-card__meta">{CITY_LABELS[club.city] ?? club.city} · {club.address}</div>
+              </div>
+              <code class="owner-card__slug">{club.slug}</code>
+            </div>
+
+            <div class="owner-card__current" data-current-for={club.slug}>
+              <span style="color:var(--text-muted)">Загружаем владельцев…</span>
+            </div>
+
+            <div class="owner-card__form">
+              <input
+                type="text"
+                class="auth-input"
+                data-uid-input={club.slug}
+                placeholder="UUID пользователя из auth.users"
+                style="font-family:var(--font-mono,monospace);font-size:13px"
+              />
+              <button type="button" class="btn btn--primary btn--sm" data-grant={club.slug}>
+                Привязать
+              </button>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+</BaseLayout>
