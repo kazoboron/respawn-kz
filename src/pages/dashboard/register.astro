@@ -1,0 +1,119 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { CITIES } from '../../data/cities';
+---
+
+<BaseLayout
+  title="Зарегистрировать клуб — respawn.kz"
+  description="Подайте заявку на регистрацию вашего компьютерного клуба в каталоге respawn.kz"
+>
+  <section class="dashboard-page" id="register-root">
+    <div class="container">
+      <nav class="breadcrumb">
+        <a href="/">Главная</a>
+        <span class="breadcrumb__sep">/</span>
+        <a href="/for-clubs/">Для клубов</a>
+        <span class="breadcrumb__sep">/</span>
+        <span class="breadcrumb__current">Регистрация</span>
+      </nav>
+
+      <header class="dashboard-page__header">
+        <h1 class="dashboard-page__title">Зарегистрировать клуб</h1>
+        <p class="dashboard-page__subtitle">
+          Заявка попадает в очередь модерации. После одобрения суперадмин свяжется с тобой
+          и привяжет твой аккаунт к клубу.
+        </p>
+      </header>
+
+      <div class="dashboard-loading" id="register-loading">
+        <p style="text-align:center;color:var(--text-muted)">Загружаем форму…</p>
+      </div>
+
+      <div class="dashboard-existing" id="register-existing" hidden>
+        <!-- Если у юзера есть pending заявка — покажем её -->
+      </div>
+
+      <form id="register-form" class="dashboard-form" hidden>
+        <div class="dashboard-form__row">
+          <label class="auth-field">
+            <span class="auth-label">Имя контактного лица *</span>
+            <input type="text" name="applicant_name" class="auth-input" required maxlength="120" />
+          </label>
+          <label class="auth-field">
+            <span class="auth-label">Email *</span>
+            <input type="email" name="applicant_email" class="auth-input" required readonly />
+          </label>
+        </div>
+
+        <div class="dashboard-form__row">
+          <label class="auth-field">
+            <span class="auth-label">Телефон *</span>
+            <input type="tel" name="applicant_phone" class="auth-input" required
+                   placeholder="+7 (727) 123-45-67" pattern="[+\d\s()\-]{10,}" />
+          </label>
+          <label class="auth-field">
+            <span class="auth-label">Название клуба *</span>
+            <input type="text" name="club_name" class="auth-input" required maxlength="120" />
+          </label>
+        </div>
+
+        <div class="dashboard-form__row">
+          <label class="auth-field">
+            <span class="auth-label">Город *</span>
+            <select name="city" class="auth-input" required>
+              <option value="">Выбери город</option>
+              {CITIES.map((c) => <option value={c.id}>{c.label}</option>)}
+            </select>
+          </label>
+          <label class="auth-field">
+            <span class="auth-label">Район</span>
+            <input type="text" name="district" class="auth-input" maxlength="120"
+                   placeholder="Например: Алмалинский р-н" />
+          </label>
+        </div>
+
+        <label class="auth-field">
+          <span class="auth-label">Адрес *</span>
+          <input type="text" name="address" class="auth-input" required maxlength="200"
+                 placeholder="ул. Абая, 150" />
+        </label>
+
+        <div class="dashboard-form__row">
+          <label class="auth-field">
+            <span class="auth-label">Часы работы</span>
+            <input type="text" name="working_hours" class="auth-input" maxlength="80"
+                   placeholder="10:00–02:00 или Круглосуточно" />
+          </label>
+          <label class="auth-field">
+            <span class="auth-label">Фото (ссылка)</span>
+            <input type="url" name="photo_url" class="auth-input" maxlength="500"
+                   placeholder="Google Drive / Imgur / Яндекс.Диск" />
+          </label>
+        </div>
+
+        <label class="auth-field">
+          <span class="auth-label">Оборудование</span>
+          <textarea name="equipment_note" class="auth-input" rows="3" maxlength="500"
+                    placeholder="Кол-во PC, тип, периферия, VR…"></textarea>
+        </label>
+
+        <label class="auth-field">
+          <span class="auth-label">Краткое описание</span>
+          <textarea name="description" class="auth-input" rows="3" maxlength="500"
+                    placeholder="Что отличает твой клуб"></textarea>
+        </label>
+
+        <div class="auth-error" id="register-error" hidden></div>
+
+        <button type="submit" class="btn btn--primary btn--large dashboard-form__submit">
+          Отправить заявку
+        </button>
+      </form>
+
+      <div class="dashboard-success" id="register-success" hidden>
+        <h2>Заявка отправлена!</h2>
+        <p>Статус увидишь в <a href="/dashboard/applications/">Моих заявках</a>.</p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
