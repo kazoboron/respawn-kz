@@ -1,0 +1,40 @@
+---
+interface NavItem {
+  href: string;
+  label: string;
+  icon?: string;
+}
+
+interface Props {
+  variant: 'dashboard' | 'admin';
+  active?: string;
+}
+
+const { variant, active } = Astro.props;
+
+const items: NavItem[] = variant === 'dashboard'
+  ? [
+      { href: '/dashboard/', label: 'Обзор', icon: '◇' },
+      { href: '/dashboard/bookings/', label: 'Брони', icon: '◆' },
+      { href: '/dashboard/applications/', label: 'Мои заявки', icon: '◉' },
+      { href: '/dashboard/register/', label: 'Новый клуб', icon: '✚' },
+    ]
+  : [
+      { href: '/admin/', label: 'Обзор', icon: '★' },
+      { href: '/admin/applications/', label: 'Заявки', icon: '◉' },
+      { href: '/admin/owners/', label: 'Владельцы', icon: '◆' },
+      { href: '/admin/users/', label: 'Пользователи', icon: '◇' },
+    ];
+---
+
+<nav class="dash-nav" data-variant={variant}>
+  {items.map((item) => (
+    <a
+      href={item.href}
+      class:list={['dash-nav__link', { 'dash-nav__link--active': active === item.href }]}
+    >
+      {item.icon && <span class="dash-nav__icon">{item.icon}</span>}
+      <span>{item.label}</span>
+    </a>
+  ))}
+</nav>

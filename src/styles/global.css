@@ -2598,6 +2598,47 @@ body.menu-open {
   color: var(--neon-yellow);
 }
 
+/* DashboardNav */
+.dash-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px;
+  background: var(--glass-bg, rgba(255,255,255,0.03));
+  border: 1px solid var(--glass-border, rgba(255,255,255,0.08));
+  backdrop-filter: blur(20px);
+  border-radius: 100px;
+  margin-bottom: 32px;
+  max-width: max-content;
+}
+
+.dash-nav__link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 100px;
+  text-decoration: none;
+  color: var(--text-secondary);
+  font-weight: 500;
+  transition: background 0.2s, color 0.2s;
+}
+
+.dash-nav__link:hover {
+  background: rgba(255,255,255,0.05);
+  color: var(--text-primary, #fff);
+}
+
+.dash-nav__link--active {
+  background: linear-gradient(135deg, var(--c-violet-500, #8b5cf6), var(--c-pink-500, #ec4899));
+  color: #fff;
+}
+
+.dash-nav__icon {
+  font-size: 14px;
+  opacity: 0.7;
+}
+
 /* ============================================
    Logo placement adjustments (new SVG logo)
    ============================================ */
