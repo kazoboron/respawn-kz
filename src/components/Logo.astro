@@ -83,34 +83,31 @@ const dim = sizes[size];
   }
 
   .logo-mark {
-    filter: drop-shadow(0 0 14px rgba(168, 85, 247, 0.6));
+    filter: drop-shadow(0 4px 16px rgba(139, 92, 246, 0.45));
     flex-shrink: 0;
   }
 
   .logo-text {
-    font-family: 'Orbitron', 'JetBrains Mono', monospace;
+    font-family: 'Inter Tight', 'Inter', system-ui, sans-serif;
     font-size: var(--text-size);
-    letter-spacing: 0.06em;
-    font-weight: 900;
-    text-transform: uppercase;
+    letter-spacing: -0.02em;
+    font-weight: 700;
     display: inline-flex;
     align-items: baseline;
   }
 
   .logo-text__main {
-    background: linear-gradient(135deg, #a78bfa 0%, #c084fc 50%, #f472b6 100%);
+    color: var(--text-primary);
+  }
+
+  .logo-text__accent {
+    background: linear-gradient(135deg, #a78bfa 0%, #f472b6 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
     color: transparent;
-    filter: drop-shadow(0 0 12px rgba(168, 85, 247, 0.5));
-  }
-
-  .logo-text__accent {
-    color: #f472b6;
-    font-size: 0.7em;
-    margin-left: 2px;
-    text-shadow: 0 0 14px rgba(244, 114, 182, 0.7);
+    font-size: 0.95em;
+    margin-left: 1px;
     font-weight: 700;
   }
 </style>
