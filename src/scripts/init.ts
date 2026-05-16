@@ -13,6 +13,7 @@ import { setupAuthCallback } from './auth-callback';
 import { setupMePage } from './me-page';
 import { setupDashboardRegister } from './dashboard-register';
 import { setupDashboard } from './dashboard';
+import { setupDashboardBookings } from './dashboard-bookings';
 import { setupCookieBanner } from './cookie-banner';
 
 function init(): void {
@@ -51,6 +52,9 @@ function init(): void {
   }
   if (document.getElementById('dashboard-root')) {
     setupDashboard();
+  }
+  if (document.getElementById('bookings-root')) {
+    setupDashboardBookings();
   }
   // Cookie consent — on every page, shows once if not yet answered
   setupCookieBanner();

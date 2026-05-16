@@ -1,0 +1,51 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import DashboardNav from '../../components/DashboardNav.astro';
+---
+
+<BaseLayout title="Брони — Кабинет — respawn.kz">
+  <section class="dashboard-page" id="bookings-root">
+    <div class="container">
+      <header class="dashboard-page__header">
+        <h1 class="dashboard-page__title">Брони</h1>
+      </header>
+
+      <DashboardNav variant="dashboard" active="/dashboard/bookings/" />
+
+      <div class="dashboard-filters" id="bookings-filters" hidden>
+        <label class="filter">
+          <span class="filter__label">Клуб</span>
+          <select id="filter-club" class="filter__input">
+            <option value="">Все клубы</option>
+          </select>
+        </label>
+        <label class="filter">
+          <span class="filter__label">Статус</span>
+          <select id="filter-status" class="filter__input">
+            <option value="">Все статусы</option>
+            <option value="pending">Ожидает</option>
+            <option value="confirmed">Подтверждена</option>
+            <option value="completed">Завершена</option>
+            <option value="cancelled">Отменена</option>
+            <option value="no_show">Не пришёл</option>
+          </select>
+        </label>
+        <label class="filter">
+          <span class="filter__label">Дата от</span>
+          <input type="date" id="filter-date-from" class="filter__input" />
+        </label>
+        <button type="button" class="btn btn--ghost" id="filter-reset">Сбросить</button>
+      </div>
+
+      <div class="dashboard-loading" id="bookings-loading">
+        <p style="text-align:center;color:var(--text-muted)">Загружаем…</p>
+      </div>
+
+      <div class="bookings-list" id="bookings-list" hidden></div>
+
+      <div class="bookings-empty" id="bookings-empty" hidden>
+        <p>Бронирований не найдено</p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
