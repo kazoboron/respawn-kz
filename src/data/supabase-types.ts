@@ -1,3 +1,9 @@
+// =====================================================================
+// Booking
+// =====================================================================
+
+export type BookingStatus = 'pending' | 'confirmed' | 'completed' | 'cancelled' | 'no_show';
+
 export interface Booking {
   id: string;
   user_id: string;
@@ -9,14 +15,89 @@ export interface Booking {
   hours: number;
   price_per_hour: number;
   total_price: number;
-  status: 'pending' | 'confirmed' | 'cancelled';
+  status: BookingStatus;
+  status_changed_at: string;
+  status_changed_by: string | null;
   created_at: string;
 }
 
-export type NewBooking = Omit<Booking, 'id' | 'status' | 'created_at'>;
+export type NewBooking = Omit<Booking, 'id' | 'status' | 'status_changed_at' | 'status_changed_by' | 'created_at'>;
 
-export const STATUS_LABELS: Record<Booking['status'], string> = {
+export const STATUS_LABELS: Record<BookingStatus, string> = {
   pending: 'Ожидает подтверждения',
   confirmed: 'Подтверждена',
+  completed: 'Завершена',
   cancelled: 'Отменена',
+  no_show: 'Не пришёл',
 };
+
+export const STATUS_COLORS: Record<BookingStatus, string> = {
+  pending: 'pill--pending',
+  confirmed: 'pill--confirmed',
+  completed: 'pill--completed',
+  cancelled: 'pill--cancelled',
+  no_show: 'pill--no-show',
+};
+
+// Terminal statuses cannot be transitioned away from (enforced by DB trigger)
+export const TERMINAL_STATUSES: BookingStatus[] = ['cancelled', 'completed', 'no_show'];
+
+export function isTerminalStatus(s: BookingStatus): boolean {
+  return TERMINAL_STATUSES.includes(s);
+}
+
+// =====================================================================
+// Club application
+// =====================================================================
+
+export type ApplicationStatus = 'pending' | 'approved' | 'rejected';
+
+export interface ClubApplication {
+  id: string;
+  applicant_user_id: string | null;
+  applicant_name: string;
+  applicant_email: string;
+  applicant_phone: string | null;
+  club_name: string;
+  city: string;
+  district: string | null;
+  address: string;
+  working_hours: string | null;
+  equipment_note: string | null;
+  photo_url: string | null;
+  description: string | null;
+  status: ApplicationStatus;
+  reviewed_by: string | null;
+  reviewed_at: string | null;
+  review_note: string | null;
+  created_at: string;
+}
+
+export type NewClubApplication = Omit<
+  ClubApplication,
+  'id' | 'status' | 'reviewed_by' | 'reviewed_at' | 'review_note' | 'created_at'
+>;
+
+export const APPLICATION_STATUS_LABELS: Record<ApplicationStatus, string> = {
+  pending: 'Ожидает рассмотрения',
+  approved: 'Одобрена',
+  rejected: 'Отклонена',
+};
+
+// =====================================================================
+// Club admin / Super admin
+// =====================================================================
+
+export interface ClubAdmin {
+  id: string;
+  user_id: string;
+  club_slug: string;
+  created_at: string;
+  granted_by: string | null;
+}
+
+export interface SuperAdmin {
+  user_id: string;
+  added_at: string;
+  added_by: string | null;
+}
