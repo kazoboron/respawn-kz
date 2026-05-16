@@ -1,0 +1,27 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import DashboardNav from '../../components/DashboardNav.astro';
+---
+
+<BaseLayout title="Мои заявки — Кабинет — respawn.kz">
+  <section class="dashboard-page" id="my-apps-root">
+    <div class="container">
+      <header class="dashboard-page__header">
+        <h1 class="dashboard-page__title">Мои заявки</h1>
+      </header>
+
+      <DashboardNav variant="dashboard" active="/dashboard/applications/" />
+
+      <div class="dashboard-loading" id="my-apps-loading">
+        <p style="text-align:center;color:var(--text-muted)">Загружаем…</p>
+      </div>
+
+      <div class="apps-list" id="my-apps-list" hidden></div>
+
+      <div class="apps-empty" id="my-apps-empty" hidden>
+        <p>У тебя ещё нет поданных заявок.</p>
+        <a href="/dashboard/register/" class="btn btn--primary" style="margin-top:16px">Подать заявку</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

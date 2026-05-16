@@ -14,6 +14,7 @@ import { setupMePage } from './me-page';
 import { setupDashboardRegister } from './dashboard-register';
 import { setupDashboard } from './dashboard';
 import { setupDashboardBookings } from './dashboard-bookings';
+import { setupDashboardApplications } from './dashboard-applications';
 import { setupCookieBanner } from './cookie-banner';
 
 function init(): void {
@@ -55,6 +56,9 @@ function init(): void {
   }
   if (document.getElementById('bookings-root')) {
     setupDashboardBookings();
+  }
+  if (document.getElementById('my-apps-root')) {
+    setupDashboardApplications();
   }
   // Cookie consent — on every page, shows once if not yet answered
   setupCookieBanner();
