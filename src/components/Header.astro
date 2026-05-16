@@ -28,6 +28,9 @@ const navItems = [
           {item.label}
         </a>
       ))}
+      <!-- Role-aware nav slots, populated by setupAuthButton in auth.ts -->
+      <a href="/dashboard/" class="nav__link nav__link--cabinet" id="nav-cabinet" hidden>Кабинет</a>
+      <a href="/admin/" class="nav__link nav__link--admin" id="nav-admin" hidden>Админка</a>
     </nav>
     <div class="header__actions">
       <div class="header__auth" id="header-auth">

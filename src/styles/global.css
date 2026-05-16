@@ -432,6 +432,20 @@ section[id] {
   width: 100%;
 }
 
+.nav__link--cabinet,
+.nav__link--admin {
+  position: relative;
+  font-weight: 600;
+}
+.nav__link--cabinet::before {
+  content: '◆ ';
+  color: var(--c-violet-500, #8b5cf6);
+}
+.nav__link--admin::before {
+  content: '★ ';
+  color: var(--c-pink-500, #ec4899);
+}
+
 .header__actions {
   display: flex;
   align-items: center;

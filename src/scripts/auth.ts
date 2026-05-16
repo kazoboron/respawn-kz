@@ -1,5 +1,5 @@
 import { supabase } from '../lib/supabase';
-import { clearRolesCache } from '../lib/roles';
+import { clearRolesCache, getRoles } from '../lib/roles';
 
 export async function getCurrentUser() {
   const { data, error } = await supabase.auth.getUser();
@@ -24,8 +24,10 @@ export function setupAuthButton(): void {
         <button class="btn btn--ghost" type="button" id="logout-btn">Выйти</button>
       `;
       document.getElementById('logout-btn')?.addEventListener('click', signOut);
+      updateRoleNav();
     } else {
       root!.innerHTML = `<a href="/login/" class="btn btn--ghost">Войти</a>`;
+      hideRoleNav();
     }
   }
 
@@ -53,4 +55,29 @@ export function popReturnUrl(): string | null {
   } catch {
     return null;
   }
+}
+
+async function updateRoleNav(): Promise<void> {
+  const cabinetLink = document.getElementById('nav-cabinet');
+  const adminLink = document.getElementById('nav-admin');
+  if (!cabinetLink && !adminLink) return;
+
+  try {
+    const { isSuperAdmin, clubSlugs } = await getRoles();
+    if (cabinetLink) {
+      cabinetLink.hidden = clubSlugs.length === 0 && !isSuperAdmin;
+    }
+    if (adminLink) {
+      adminLink.hidden = !isSuperAdmin;
+    }
+  } catch (err) {
+    console.warn('[auth] failed to load roles for nav', err);
+  }
+}
+
+function hideRoleNav(): void {
+  const cabinetLink = document.getElementById('nav-cabinet');
+  const adminLink = document.getElementById('nav-admin');
+  if (cabinetLink) cabinetLink.hidden = true;
+  if (adminLink) adminLink.hidden = true;
 }
