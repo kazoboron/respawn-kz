@@ -3,70 +3,54 @@
    ============================================ */
 
 /* ---------- Design tokens ---------- */
-/* Direction: Premium Minimal Gaming — Linear/Vercel feel + dark mode */
+/* Source of truth: .claude/skills/respawn-kz-design/colors_and_type.css */
 :root {
   /* ─── COLOR — BASE ───────────────────────────────────────── */
   --bg-base: #0a0a0f;
-  --bg-surface: #131320;
-  --bg-elevated: #1c1c2e;
+  --bg-surface: #14141c;
+  --bg-elevated: #1c1c28;
 
-  --text-primary: #f4f4f8;
-  --text-secondary: #9ca3af;
-  --text-muted: #6b7280;
+  --text-primary: #f0f0ff;
+  --text-secondary: #a0a0b8;
+  --text-muted: #60607a;
 
-  /* Primary accent — violet (Linear-style) */
-  --accent: #8b5cf6;
-  --accent-light: #a78bfa;
-  --accent-dark: #6d28d9;
-  --accent-glow: rgba(139, 92, 246, 0.4);
-  --ink-on-accent: #ffffff;
-
-  /* Secondary accent — cyan (used for tags, confirmed status, code) */
-  --neon-cyan: #22d3ee;
-  --neon-magenta: #f43f5e;
-  --neon-yellow: #facc15;
-
-  /* Logo gradient stops (kept) */
-  --neon-blue: #3b82f6;
+  /* Neon — signature */
+  --neon-cyan: #00f0ff;
+  --neon-magenta: #ff2e9a;
+  --neon-yellow: #fef300;
+  --neon-orange: #ff6a00;
+  --neon-purple: #8b00ff;
+  --neon-blue: #0066ff;
   --neon-indigo: #6366f1;
   --neon-violet: #a855f7;
   --neon-pink: #ec4899;
-  /* Legacy gradient palette (still used by club card backgrounds) */
-  --neon-orange: #f97316;
-  --neon-purple: #7c3aed;
 
-  /* Legacy alias (existing code uses this) */
-  --ink-on-cyan: var(--ink-on-accent);
+  /* Ink on cyan fill */
+  --ink-on-cyan: #001014;
 
   /* ─── COLOR — SEMANTIC ───────────────────────────────────── */
+  --accent: var(--neon-cyan);
+  --accent-glow: rgba(0, 240, 255, 0.4);
   --danger: var(--neon-magenta);
   --warning: var(--neon-yellow);
   --success: var(--neon-cyan);
 
   /* Borders */
-  --border: rgba(139, 92, 246, 0.18);
-  --border-hover: rgba(139, 92, 246, 0.5);
+  --border: rgba(0, 240, 255, 0.15);
+  --border-hover: rgba(0, 240, 255, 0.4);
   --border-soft: rgba(255, 255, 255, 0.06);
 
-  /* Shadows — minimal, subtle, no neon glow */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.35);
-  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.4);
-  --shadow-xl: 0 20px 60px rgba(0, 0, 0, 0.55);
-  --shadow-accent: 0 8px 24px rgba(139, 92, 246, 0.18);
+  /* Shadows / glow */
+  --glow-cyan: 0 0 24px rgba(0, 240, 255, 0.4);
+  --glow-magenta: 0 0 24px rgba(255, 46, 154, 0.4);
+  --glow-card: 0 12px 40px rgba(0, 240, 255, 0.15), 0 0 24px rgba(0, 240, 255, 0.1);
+  --shadow-deep: 0 8px 32px rgba(0, 0, 0, 0.5);
+  --shadow-modal: 0 20px 60px rgba(0, 0, 0, 0.5);
 
-  /* Backwards-compat aliases (used in legacy CSS — point to new tokens) */
-  --glow-cyan: var(--shadow-accent);
-  --glow-magenta: 0 0 24px rgba(244, 63, 94, 0.3);
-  --glow-card: var(--shadow-lg);
-  --shadow-deep: var(--shadow-md);
-  --shadow-modal: var(--shadow-xl);
-
-  /* ─── RADIUS — sharper, Linear-style ─────────────────────── */
+  /* ─── RADIUS ─────────────────────────────────────────────── */
   --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 14px;
-  --radius-xl: 20px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
   --radius-pill: 100px;
 
   /* ─── SPACING ────────────────────────────────────────────── */
@@ -94,13 +78,13 @@
 
   /* ─── TYPOGRAPHY — FAMILIES ──────────────────────────────── */
   --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-display: "Inter Tight", "Inter", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-display: "Audiowide", "JetBrains Mono", monospace;
 
-  /* ─── TYPOGRAPHY — SEMANTIC SIZES (bigger headlines) ─────── */
-  --fs-hero: clamp(44px, 7vw, 80px);
-  --fs-page-hero: clamp(36px, 5.5vw, 60px);
-  --fs-section: clamp(28px, 4vw, 44px);
+  /* ─── TYPOGRAPHY — SEMANTIC SIZES ────────────────────────── */
+  --fs-hero: clamp(36px, 6vw, 64px);
+  --fs-page-hero: clamp(32px, 5vw, 52px);
+  --fs-section: clamp(28px, 4vw, 40px);
   --fs-h3: 22px;
   --fs-h4: 20px;
   --fs-body-lg: 18px;
@@ -110,17 +94,16 @@
   --fs-mono: 13px;
   --fs-eyebrow: 11px;
 
-  /* ─── SIGNATURE GRADIENTS — restrained, used sparingly ──── */
-  --grad-logo: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
-  --grad-hero-radial-1: radial-gradient(ellipse 60% 40% at 20% 20%, rgba(139, 92, 246, 0.14), transparent 60%);
-  --grad-hero-radial-2: radial-gradient(ellipse 60% 40% at 80% 80%, rgba(34, 211, 238, 0.08), transparent 60%);
-  --grad-violet: linear-gradient(135deg, #6366f1, #8b5cf6, #ec4899);
-  --grad-cyan-blue: linear-gradient(135deg, #22d3ee, #3b82f6);
-  --grad-purple-pink: linear-gradient(135deg, #8b5cf6, #ec4899);
-  --grad-pink-purple: linear-gradient(135deg, #ec4899, #8b5cf6);
-  --grad-yellow-orange: linear-gradient(135deg, #facc15, #f97316);
-  --grad-cyan-pink: linear-gradient(135deg, #22d3ee, #ec4899);
-  --grad-pink-yellow: linear-gradient(135deg, #ec4899, #facc15);
+  /* ─── SIGNATURE GRADIENTS ────────────────────────────────── */
+  --grad-logo: linear-gradient(135deg, #60a5fa 0%, #6366f1 60%, #a855f7 100%);
+  --grad-hero-radial-1: radial-gradient(ellipse 80% 50% at 20% 30%, rgba(99, 102, 241, 0.18), transparent 60%);
+  --grad-hero-radial-2: radial-gradient(ellipse 60% 40% at 80% 70%, rgba(168, 85, 247, 0.14), transparent 60%);
+  --grad-cyan-blue: linear-gradient(135deg, #00f0ff, #0066ff);
+  --grad-purple-pink: linear-gradient(135deg, #8b00ff, #ff2e9a);
+  --grad-pink-purple: linear-gradient(135deg, #ff2e9a, #8b00ff);
+  --grad-yellow-orange: linear-gradient(135deg, #fef300, #ff6a00);
+  --grad-cyan-pink: linear-gradient(135deg, #00f0ff, #ff2e9a);
+  --grad-pink-yellow: linear-gradient(135deg, #ff2e9a, #fef300);
 }
 
 /* ---------- Reset ---------- */
@@ -194,13 +177,10 @@ h1,
 h2,
 h3,
 h4 {
-  font-family: var(--font-display);
   font-weight: 700;
-  line-height: 1.05;
-  letter-spacing: -0.035em;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
 }
-
-h1 { font-weight: 800; }
 
 .section__title {
   font-size: clamp(28px, 4vw, 40px);
