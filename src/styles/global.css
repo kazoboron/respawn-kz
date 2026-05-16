@@ -3254,3 +3254,52 @@ textarea:focus-visible,
   border: 1px solid var(--glass-border, rgba(255,255,255,0.08));
   border-radius: 16px;
 }
+
+/* Admin shortcuts grid */
+.admin-shortcuts {
+  margin-top: 48px;
+}
+
+.admin-shortcuts h2 {
+  margin: 0 0 16px;
+  font-size: 22px;
+}
+
+.admin-shortcuts__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.admin-shortcut {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 24px;
+  background: var(--glass-bg, rgba(255,255,255,0.03));
+  border: 1px solid var(--glass-border, rgba(255,255,255,0.08));
+  border-radius: 16px;
+  text-decoration: none;
+  color: var(--text-primary, #fff);
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.admin-shortcut:hover {
+  border-color: var(--c-violet-500, #8b5cf6);
+  background: rgba(139, 92, 246, 0.06);
+}
+
+.admin-shortcut__icon {
+  font-size: 32px;
+  color: var(--c-violet-400, #a78bfa);
+  margin-bottom: 8px;
+}
+
+.admin-shortcut strong {
+  font-size: 18px;
+}
+
+.admin-shortcut span:last-child {
+  color: var(--text-secondary);
+  font-size: 14px;
+}

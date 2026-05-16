@@ -1,0 +1,91 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import DashboardNav from '../../components/DashboardNav.astro';
+---
+
+<BaseLayout title="Админка — respawn.kz">
+  <section class="dashboard-page" id="admin-root">
+    <div class="container">
+      <header class="dashboard-page__header">
+        <h1 class="dashboard-page__title">Админка</h1>
+        <p class="dashboard-page__subtitle">Управление платформой respawn.kz</p>
+      </header>
+
+      <DashboardNav variant="admin" active="/admin/" />
+
+      <div class="dashboard-loading" id="admin-loading">
+        <p style="text-align:center;color:var(--text-muted)">Загружаем…</p>
+      </div>
+
+      <div class="dashboard-stats" id="admin-stats" hidden>
+        <div class="stat-card">
+          <div class="stat-card__label">Заявки в очереди</div>
+          <div class="stat-card__value" id="admin-stat-pending">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__label">Всего одобрено</div>
+          <div class="stat-card__value" id="admin-stat-approved">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__label">Всего отклонено</div>
+          <div class="stat-card__value" id="admin-stat-rejected">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__label">Активных владельцев</div>
+          <div class="stat-card__value" id="admin-stat-admins">—</div>
+        </div>
+      </div>
+
+      <div class="admin-shortcuts" id="admin-shortcuts" hidden>
+        <h2>Быстрые действия</h2>
+        <div class="admin-shortcuts__grid">
+          <a href="/admin/applications/" class="admin-shortcut">
+            <span class="admin-shortcut__icon">◉</span>
+            <strong>Заявки</strong>
+            <span>Очередь регистраций клубов</span>
+          </a>
+          <a href="/admin/owners/" class="admin-shortcut">
+            <span class="admin-shortcut__icon">◆</span>
+            <strong>Владельцы</strong>
+            <span>Привязка email → club_slug</span>
+          </a>
+          <a href="/admin/users/" class="admin-shortcut">
+            <span class="admin-shortcut__icon">◇</span>
+            <strong>Пользователи</strong>
+            <span>Поиск и просмотр ролей</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  import { supabase } from '../../lib/supabase';
+  import { requireSuperAdmin } from '../../lib/route-guards';
+
+  async function setupAdminOverview() {
+    const root = document.getElementById('admin-root');
+    if (!root) return;
+
+    await requireSuperAdmin();
+
+    const [pending, approved, rejected, admins] = await Promise.all([
+      supabase.from('club_applications').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
+      supabase.from('club_applications').select('id', { count: 'exact', head: true }).eq('status', 'approved'),
+      supabase.from('club_applications').select('id', { count: 'exact', head: true }).eq('status', 'rejected'),
+      supabase.from('club_admins').select('id', { count: 'exact', head: true }),
+    ]);
+
+    document.getElementById('admin-stat-pending')!.textContent = String(pending.count ?? 0);
+    document.getElementById('admin-stat-approved')!.textContent = String(approved.count ?? 0);
+    document.getElementById('admin-stat-rejected')!.textContent = String(rejected.count ?? 0);
+    document.getElementById('admin-stat-admins')!.textContent = String(admins.count ?? 0);
+
+    document.getElementById('admin-loading')!.hidden = true;
+    document.getElementById('admin-stats')!.hidden = false;
+    document.getElementById('admin-shortcuts')!.hidden = false;
+  }
+
+  setupAdminOverview();
+</script>
