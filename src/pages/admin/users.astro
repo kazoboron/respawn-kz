@@ -1,0 +1,34 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import DashboardNav from '../../components/DashboardNav.astro';
+---
+
+<BaseLayout title="Пользователи — Админка — respawn.kz">
+  <section class="dashboard-page" id="admin-users-root">
+    <div class="container">
+      <header class="dashboard-page__header">
+        <h1 class="dashboard-page__title">Пользователи</h1>
+        <p class="dashboard-page__subtitle">
+          Поиск по email (через таблицу club_applications) или прямой ввод UUID.
+          Для пользователей, которые никогда не подавали заявку, UID нужно взять в Supabase Dashboard
+          (Authentication → Users → нажми на user → скопируй ID).
+        </p>
+      </header>
+
+      <DashboardNav variant="admin" active="/admin/users/" />
+
+      <div class="users-search">
+        <input
+          type="text"
+          id="users-query"
+          class="auth-input"
+          placeholder="Email или UUID"
+          autocomplete="off"
+        />
+        <button type="button" class="btn btn--primary" id="users-search-btn">Найти</button>
+      </div>
+
+      <div id="users-result" class="users-result"></div>
+    </div>
+  </section>
+</BaseLayout>

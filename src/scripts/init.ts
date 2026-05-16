@@ -18,6 +18,7 @@ import { setupDashboardApplications } from './dashboard-applications';
 import { setupCookieBanner } from './cookie-banner';
 import { setupAdminApplications } from './admin-applications';
 import { setupAdminOwners } from './admin-owners';
+import { setupAdminUsers } from './admin-users';
 
 function init(): void {
   setupHeaderScroll();
@@ -67,6 +68,9 @@ function init(): void {
   }
   if (document.getElementById('admin-owners-root')) {
     setupAdminOwners();
+  }
+  if (document.getElementById('admin-users-root')) {
+    setupAdminUsers();
   }
   // Cookie consent — on every page, shows once if not yet answered
   setupCookieBanner();
