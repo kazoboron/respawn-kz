@@ -1,4 +1,5 @@
 import { supabase } from '../lib/supabase';
+import { clearRolesCache } from '../lib/roles';
 
 export async function getCurrentUser() {
   const { data, error } = await supabase.auth.getUser();
@@ -7,6 +8,7 @@ export async function getCurrentUser() {
 }
 
 export async function signOut(): Promise<void> {
+  clearRolesCache();
   await supabase.auth.signOut();
   window.location.href = '/';
 }
@@ -32,6 +34,7 @@ export function setupAuthButton(): void {
 
   // Реагируем на изменения сессии
   supabase.auth.onAuthStateChange((_event, session) => {
+    clearRolesCache();
     render(!!session?.user);
   });
 }
