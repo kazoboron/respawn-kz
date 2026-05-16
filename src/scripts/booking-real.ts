@@ -3,6 +3,7 @@ import { CLUBS, type Club } from '../data/clubs';
 import type { NewBooking } from '../data/supabase-types';
 import { openModal } from './modal';
 import { saveReturnUrl, getCurrentUser } from './auth';
+import { notify } from '../lib/notifications';
 
 function formatPrice(value: number): string {
   return value.toLocaleString('ru-RU');
@@ -45,10 +46,14 @@ function renderBookingForm(club: Club): string {
   `;
 }
 
-async function submitBooking(data: NewBooking): Promise<{ ok: boolean; error?: string }> {
-  const { error } = await supabase.from('bookings').insert(data);
-  if (error) return { ok: false, error: error.message };
-  return { ok: true };
+async function submitBooking(data: NewBooking): Promise<{ ok: boolean; bookingId?: string; error?: string }> {
+  const { data: inserted, error } = await supabase
+    .from('bookings')
+    .insert(data)
+    .select('id')
+    .single();
+  if (error || !inserted) return { ok: false, error: error?.message ?? 'unknown error' };
+  return { ok: true, bookingId: inserted.id };
 }
 
 async function handleBookingClick(slug: string): Promise<void> {
@@ -114,6 +119,22 @@ async function handleBookingClick(slug: string): Promise<void> {
         errorEl.hidden = false;
       }
       return;
+    }
+
+    // Fire booking_created notification to club admins
+    if (result.bookingId) {
+      const { data: admins } = await supabase
+        .from('club_admins')
+        .select('user_id')
+        .eq('club_slug', club.slug);
+      // We can't resolve user_id → email client-side; pass placeholders
+      const ownerEmails = (admins ?? []).map((a: { user_id: string }) => `user-${a.user_id.slice(0, 8)}@unknown`);
+      await notify({
+        type: 'booking_created',
+        bookingId: result.bookingId,
+        clubSlug: club.slug,
+        ownerEmails,
+      });
     }
 
     const body = document.getElementById('modal-body');
