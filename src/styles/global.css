@@ -2639,6 +2639,89 @@ body.menu-open {
   opacity: 0.7;
 }
 
+/* Stats cards */
+.dashboard-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 48px;
+}
+
+.stat-card {
+  background: var(--glass-bg, rgba(255,255,255,0.03));
+  border: 1px solid var(--glass-border, rgba(255,255,255,0.08));
+  backdrop-filter: blur(20px);
+  border-radius: 16px;
+  padding: 24px;
+}
+
+.stat-card__label {
+  color: var(--text-secondary);
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.stat-card__value {
+  font-family: var(--font-mono, 'JetBrains Mono'), monospace;
+  font-size: 36px;
+  font-weight: 600;
+}
+
+/* Recent bookings */
+.dashboard-recent h2 {
+  margin: 0 0 16px;
+  font-size: 22px;
+}
+
+.dashboard-recent__list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dashboard-recent__item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--glass-bg, rgba(255,255,255,0.02));
+  border: 1px solid var(--glass-border, rgba(255,255,255,0.06));
+  border-radius: 12px;
+  padding: 12px 16px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.dashboard-recent__main {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dashboard-recent__meta {
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.dashboard-recent__side {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.dashboard-empty {
+  background: var(--glass-bg, rgba(255,255,255,0.03));
+  border: 1px solid var(--glass-border, rgba(255,255,255,0.08));
+  border-radius: 16px;
+  padding: 32px;
+  max-width: 600px;
+  text-align: center;
+}
+
+.dashboard-empty p {
+  margin: 0 0 8px;
+  color: var(--text-secondary);
+}
+
 /* ============================================
    Logo placement adjustments (new SVG logo)
    ============================================ */

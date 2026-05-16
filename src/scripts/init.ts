@@ -12,6 +12,7 @@ import { setupLoginPage } from './login-page';
 import { setupAuthCallback } from './auth-callback';
 import { setupMePage } from './me-page';
 import { setupDashboardRegister } from './dashboard-register';
+import { setupDashboard } from './dashboard';
 import { setupCookieBanner } from './cookie-banner';
 
 function init(): void {
@@ -47,6 +48,9 @@ function init(): void {
   }
   if (document.getElementById('register-root')) {
     setupDashboardRegister();
+  }
+  if (document.getElementById('dashboard-root')) {
+    setupDashboard();
   }
   // Cookie consent — on every page, shows once if not yet answered
   setupCookieBanner();

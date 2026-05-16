@@ -1,0 +1,48 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import DashboardNav from '../../components/DashboardNav.astro';
+---
+
+<BaseLayout title="Кабинет — respawn.kz">
+  <section class="dashboard-page" id="dashboard-root">
+    <div class="container">
+      <header class="dashboard-page__header">
+        <h1 class="dashboard-page__title">Кабинет клуба</h1>
+        <p class="dashboard-page__subtitle">Обзор активности твоих клубов</p>
+      </header>
+
+      <DashboardNav variant="dashboard" active="/dashboard/" />
+
+      <div class="dashboard-loading" id="dashboard-loading">
+        <p style="text-align:center;color:var(--text-muted)">Загружаем…</p>
+      </div>
+
+      <div class="dashboard-stats" id="dashboard-stats" hidden>
+        <div class="stat-card">
+          <div class="stat-card__label">Брони сегодня</div>
+          <div class="stat-card__value" id="stat-today">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__label">Ожидают подтверждения</div>
+          <div class="stat-card__value" id="stat-pending">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__label">Всего клубов</div>
+          <div class="stat-card__value" id="stat-clubs">—</div>
+        </div>
+      </div>
+
+      <div class="dashboard-recent" id="dashboard-recent" hidden>
+        <h2>Последние брони</h2>
+        <div class="dashboard-recent__list" id="dashboard-recent-list"></div>
+        <p style="margin-top:16px"><a href="/dashboard/bookings/" class="btn btn--ghost">Все брони →</a></p>
+      </div>
+
+      <div class="dashboard-empty" id="dashboard-empty" hidden>
+        <p>У тебя пока нет привязанных клубов.</p>
+        <p>Если хочешь добавить новый — <a href="/dashboard/register/">подай заявку</a>.</p>
+        <p>Если ты владелец существующего клуба из каталога — напиши на zhandos397@gmail.com, привяжу.</p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
