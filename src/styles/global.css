@@ -170,6 +170,8 @@
 html {
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
+  /* Base bg on html so AmbientBackground (position:fixed z-index:-1) is visible above it */
+  background: var(--bg-base);
 }
 
 body {
@@ -177,7 +179,7 @@ body {
   font-size: 16px;
   line-height: 1.6;
   color: var(--text-primary);
-  background: var(--bg-base);
+  background: transparent;
   overflow-x: hidden;
   min-height: 100vh;
 }
@@ -483,7 +485,7 @@ body.menu-open .hamburger span:nth-child(3) {
     var(--grad-hero-orb-1),
     var(--grad-hero-orb-2),
     var(--grad-hero-orb-3),
-    var(--bg-base);
+    transparent;
 }
 
 /* Liquid animated orbs */
@@ -779,7 +781,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .how {
   background:
     var(--grad-section-1),
-    var(--bg-base);
+    transparent;
 }
 
 .how__steps {
@@ -858,7 +860,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   background:
     var(--grad-section-2),
     radial-gradient(ellipse 50% 40% at 90% 80%, rgba(236, 72, 153, 0.16), transparent 65%),
-    var(--bg-base);
+    transparent;
 }
 
 .clubs__grid {
@@ -1001,7 +1003,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .benefits {
   background:
     var(--grad-section-3),
-    var(--bg-base);
+    transparent;
 }
 
 .benefits__grid {
@@ -1076,7 +1078,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     radial-gradient(ellipse 60% 80% at 50% 50%, rgba(168, 85, 247, 0.28), transparent 70%),
     radial-gradient(ellipse 40% 60% at 20% 80%, rgba(236, 72, 153, 0.2), transparent 65%),
     radial-gradient(ellipse 40% 60% at 80% 20%, rgba(99, 102, 241, 0.2), transparent 65%),
-    var(--bg-base);
+    transparent;
 }
 
 .cta::before {
@@ -1134,8 +1136,10 @@ input[type="date"]::-webkit-calendar-picker-indicator {
    FOOTER
    ============================================ */
 .footer {
-  background: var(--bg-surface);
-  border-top: 1px solid var(--border);
+  background: rgba(16, 10, 42, 0.6);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--glass-border);
   padding: 56px 0 32px;
 }
 
@@ -1516,7 +1520,7 @@ body.menu-open {
 .faq {
   background:
     radial-gradient(ellipse 50% 40% at 50% 100%, rgba(168, 85, 247, 0.14), transparent 70%),
-    var(--bg-base);
+    transparent;
 }
 
 .faq__list {
@@ -1595,7 +1599,7 @@ body.menu-open {
   text-align: center;
   background:
     radial-gradient(ellipse 80% 50% at 50% 0%, rgba(0, 240, 255, 0.10), transparent 70%),
-    var(--bg-base);
+    transparent;
   position: relative;
 }
 
@@ -1703,7 +1707,7 @@ body.menu-open {
    FOR-CLUBS page
    ============================================ */
 .club-benefits {
-  background: var(--bg-base);
+  background: transparent;
 }
 
 .club-benefits__grid {

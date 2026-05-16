@@ -1,0 +1,109 @@
+---
+/**
+ * Site-wide ambient background:
+ * 3 large gradient orbs slowly drifting + grain noise overlay.
+ * Position: fixed — stays in viewport on scroll, gives "atmosphere everywhere" feel.
+ * Respects prefers-reduced-motion.
+ */
+---
+
+<div class="ambient" aria-hidden="true">
+  <span class="ambient__orb ambient__orb--violet"></span>
+  <span class="ambient__orb ambient__orb--pink"></span>
+  <span class="ambient__orb ambient__orb--indigo"></span>
+  <div class="ambient__grain"></div>
+</div>
+
+<style>
+  .ambient {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    overflow: hidden;
+    /* Allow body background to show through */
+  }
+
+  .ambient__orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(100px);
+    will-change: transform;
+  }
+
+  .ambient__orb--violet {
+    width: 620px;
+    height: 620px;
+    background: radial-gradient(circle, rgba(139, 92, 246, 0.55), transparent 65%);
+    top: -200px;
+    left: -180px;
+    animation: drift-violet 32s ease-in-out infinite;
+  }
+
+  .ambient__orb--pink {
+    width: 720px;
+    height: 720px;
+    background: radial-gradient(circle, rgba(236, 72, 153, 0.45), transparent 65%);
+    bottom: -250px;
+    right: -200px;
+    animation: drift-pink 38s ease-in-out infinite;
+  }
+
+  .ambient__orb--indigo {
+    width: 480px;
+    height: 480px;
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.4), transparent 70%);
+    top: 45%;
+    left: 50%;
+    margin-left: -240px;
+    margin-top: -240px;
+    animation: drift-indigo 26s ease-in-out infinite;
+  }
+
+  @keyframes drift-violet {
+    0%   { transform: translate(0, 0) scale(1); }
+    25%  { transform: translate(80px, 60px) scale(1.05); }
+    50%  { transform: translate(140px, 120px) scale(1.1); }
+    75%  { transform: translate(60px, 80px) scale(1.05); }
+    100% { transform: translate(0, 0) scale(1); }
+  }
+
+  @keyframes drift-pink {
+    0%   { transform: translate(0, 0) scale(1); }
+    33%  { transform: translate(-100px, -60px) scale(1.1); }
+    66%  { transform: translate(-60px, -120px) scale(1.05); }
+    100% { transform: translate(0, 0) scale(1); }
+  }
+
+  @keyframes drift-indigo {
+    0%   { transform: translate(0, 0) scale(1); }
+    50%  { transform: translate(80px, -100px) scale(1.15); }
+    100% { transform: translate(0, 0) scale(1); }
+  }
+
+  /* Subtle grain noise — tiny inline SVG, no extra request */
+  .ambient__grain {
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.15 0'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.6'/></svg>");
+    background-size: 200px 200px;
+    opacity: 0.4;
+    mix-blend-mode: overlay;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ambient__orb {
+      animation: none !important;
+    }
+  }
+
+  /* On small screens, reduce orb sizes so they don't dominate */
+  @media (max-width: 768px) {
+    .ambient__orb {
+      filter: blur(70px);
+    }
+    .ambient__orb--violet { width: 400px; height: 400px; }
+    .ambient__orb--pink   { width: 480px; height: 480px; }
+    .ambient__orb--indigo { width: 320px; height: 320px; margin-left: -160px; margin-top: -160px; }
+  }
+</style>
