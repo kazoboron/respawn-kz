@@ -3303,3 +3303,67 @@ textarea:focus-visible,
   color: var(--text-secondary);
   font-size: 14px;
 }
+
+/* Admin application cards */
+.admin-apps-filters {
+  margin-bottom: 24px;
+  display: flex;
+  gap: 16px;
+}
+
+.admin-apps-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.admin-app-card {
+  background: var(--glass-bg, rgba(255,255,255,0.03));
+  border: 1px solid var(--glass-border, rgba(255,255,255,0.08));
+  border-radius: 16px;
+  padding: 24px;
+}
+
+.admin-app-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.admin-app-card__title {
+  margin: 0 0 6px;
+  font-size: 22px;
+}
+
+.admin-app-card__contact {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.admin-app-card__body {
+  margin: 16px 0;
+}
+
+.admin-app-card__body .info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.admin-app-card__footer {
+  display: flex;
+  gap: 24px;
+  color: var(--text-muted);
+  font-size: 13px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+
+.admin-app-card__actions {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--glass-border, rgba(255,255,255,0.08));
+}

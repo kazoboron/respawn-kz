@@ -16,6 +16,7 @@ import { setupDashboard } from './dashboard';
 import { setupDashboardBookings } from './dashboard-bookings';
 import { setupDashboardApplications } from './dashboard-applications';
 import { setupCookieBanner } from './cookie-banner';
+import { setupAdminApplications } from './admin-applications';
 
 function init(): void {
   setupHeaderScroll();
@@ -59,6 +60,9 @@ function init(): void {
   }
   if (document.getElementById('my-apps-root')) {
     setupDashboardApplications();
+  }
+  if (document.getElementById('admin-apps-root')) {
+    setupAdminApplications();
   }
   // Cookie consent — on every page, shows once if not yet answered
   setupCookieBanner();

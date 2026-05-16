@@ -1,0 +1,38 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import DashboardNav from '../../components/DashboardNav.astro';
+---
+
+<BaseLayout title="Заявки — Админка — respawn.kz">
+  <section class="dashboard-page" id="admin-apps-root">
+    <div class="container">
+      <header class="dashboard-page__header">
+        <h1 class="dashboard-page__title">Очередь заявок</h1>
+      </header>
+
+      <DashboardNav variant="admin" active="/admin/applications/" />
+
+      <div class="admin-apps-filters" id="admin-apps-filters" hidden>
+        <label class="filter">
+          <span class="filter__label">Показать</span>
+          <select id="admin-apps-status" class="filter__input">
+            <option value="pending">Только в очереди</option>
+            <option value="approved">Одобренные</option>
+            <option value="rejected">Отклонённые</option>
+            <option value="">Все</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="dashboard-loading" id="admin-apps-loading">
+        <p style="text-align:center;color:var(--text-muted)">Загружаем…</p>
+      </div>
+
+      <div class="admin-apps-list" id="admin-apps-list" hidden></div>
+
+      <div class="apps-empty" id="admin-apps-empty" hidden>
+        <p>Нет заявок в этой категории</p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

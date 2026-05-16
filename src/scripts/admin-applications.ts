@@ -1,0 +1,176 @@
+import { supabase } from '../lib/supabase';
+import { requireSuperAdmin } from '../lib/route-guards';
+import { type ClubApplication, type ApplicationStatus, APPLICATION_STATUS_LABELS } from '../data/supabase-types';
+import { notify } from '../lib/notifications';
+import { CITY_LABELS } from '../data/cities';
+
+function formatDate(iso: string): string {
+  return new Date(iso).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+}
+
+function renderAdminAppCard(app: ClubApplication): string {
+  const cityLabel = CITY_LABELS[app.city] ?? app.city;
+  const isPending = app.status === 'pending';
+
+  return `
+    <article class="admin-app-card" data-app-id="${app.id}">
+      <div class="admin-app-card__header">
+        <div>
+          <h3 class="admin-app-card__title">${app.club_name}</h3>
+          <div class="admin-app-card__contact">
+            ${app.applicant_name} · ${app.applicant_email} ${app.applicant_phone ? `· ${app.applicant_phone}` : ''}
+          </div>
+        </div>
+        <span class="pill pill--${app.status}">${APPLICATION_STATUS_LABELS[app.status]}</span>
+      </div>
+
+      <div class="admin-app-card__body">
+        <div class="info-grid">
+          <div><div class="info-label">Город</div><div class="info-value">${cityLabel}</div></div>
+          <div><div class="info-label">Район</div><div class="info-value">${app.district ?? '—'}</div></div>
+          <div><div class="info-label">Адрес</div><div class="info-value">${app.address}</div></div>
+          <div><div class="info-label">Часы</div><div class="info-value">${app.working_hours ?? '—'}</div></div>
+        </div>
+        ${app.equipment_note ? `<div><div class="info-label">Оборудование</div><div class="info-value">${app.equipment_note}</div></div>` : ''}
+        ${app.description ? `<div><div class="info-label">Описание</div><div class="info-value">${app.description}</div></div>` : ''}
+        ${app.photo_url ? `<div><div class="info-label">Фото</div><div class="info-value"><a href="${app.photo_url}" target="_blank" rel="noopener">Открыть ссылку →</a></div></div>` : ''}
+      </div>
+
+      <div class="admin-app-card__footer">
+        <span>Подана: ${formatDate(app.created_at)}</span>
+        ${app.reviewed_at ? `<span>Рассмотрена: ${formatDate(app.reviewed_at)}</span>` : ''}
+      </div>
+
+      ${app.review_note ? `
+        <div class="app-card__review">
+          <strong>Твой комментарий:</strong>
+          <p>${app.review_note}</p>
+        </div>
+      ` : ''}
+
+      ${isPending ? `
+        <div class="admin-app-card__actions">
+          <textarea class="auth-input" data-note="${app.id}" placeholder="Комментарий (опционально)" rows="2" style="margin-bottom:12px"></textarea>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button type="button" class="btn btn--primary btn--sm" data-action="approve" data-id="${app.id}">Одобрить</button>
+            <button type="button" class="btn btn--ghost btn--sm" data-action="reject" data-id="${app.id}">Отклонить</button>
+          </div>
+        </div>
+      ` : ''}
+    </article>
+  `;
+}
+
+async function loadApplications(statusFilter: string): Promise<ClubApplication[]> {
+  let query = supabase.from('club_applications').select('*').order('created_at', { ascending: false });
+  if (statusFilter) query = query.eq('status', statusFilter);
+  const { data, error } = await query.limit(100);
+  if (error) {
+    console.error('[admin-apps] load failed', error);
+    return [];
+  }
+  return (data ?? []) as ClubApplication[];
+}
+
+async function updateApplicationStatus(
+  id: string,
+  newStatus: ApplicationStatus,
+  reviewNote: string,
+  reviewerId: string,
+): Promise<{ ok: boolean; error?: string }> {
+  const { error } = await supabase
+    .from('club_applications')
+    .update({
+      status: newStatus,
+      review_note: reviewNote || null,
+      reviewed_by: reviewerId,
+      reviewed_at: new Date().toISOString(),
+    })
+    .eq('id', id);
+  if (error) return { ok: false, error: error.message };
+  return { ok: true };
+}
+
+export async function setupAdminApplications(): Promise<void> {
+  const root = document.getElementById('admin-apps-root');
+  if (!root) return;
+
+  const loadingEl = document.getElementById('admin-apps-loading');
+  const filtersEl = document.getElementById('admin-apps-filters');
+  const listEl = document.getElementById('admin-apps-list');
+  const emptyEl = document.getElementById('admin-apps-empty');
+  if (!loadingEl || !filtersEl || !listEl || !emptyEl) return;
+
+  const { user } = await requireSuperAdmin();
+  if (!user) return;
+
+  let currentStatus = 'pending';
+
+  async function refresh() {
+    loadingEl!.hidden = false;
+    listEl!.hidden = true;
+    emptyEl!.hidden = true;
+
+    const apps = await loadApplications(currentStatus);
+    loadingEl!.hidden = true;
+
+    if (apps.length === 0) {
+      emptyEl!.hidden = false;
+      return;
+    }
+
+    listEl!.innerHTML = apps.map(renderAdminAppCard).join('');
+    listEl!.hidden = false;
+  }
+
+  filtersEl.hidden = false;
+  (document.getElementById('admin-apps-status') as HTMLSelectElement).addEventListener('change', (e) => {
+    currentStatus = (e.target as HTMLSelectElement).value;
+    refresh();
+  });
+
+  listEl.addEventListener('click', async (e) => {
+    const target = e.target as HTMLElement;
+    const btn = target.closest('[data-action]') as HTMLButtonElement | null;
+    if (!btn) return;
+    const action = btn.getAttribute('data-action');
+    const id = btn.getAttribute('data-id');
+    if (!action || !id) return;
+
+    const noteEl = document.querySelector(`textarea[data-note="${id}"]`) as HTMLTextAreaElement | null;
+    const note = noteEl?.value.trim() ?? '';
+
+    const newStatus: ApplicationStatus = action === 'approve' ? 'approved' : 'rejected';
+
+    if (action === 'reject' && !note) {
+      if (!window.confirm('Отклонить без комментария? Заявителю будет полезно знать причину.')) return;
+    }
+
+    btn.disabled = true;
+    const oldText = btn.textContent;
+    btn.textContent = 'Сохраняем…';
+
+    const result = await updateApplicationStatus(id, newStatus, note, user.id);
+    if (!result.ok) {
+      btn.disabled = false;
+      btn.textContent = oldText;
+      alert(`Ошибка: ${result.error}`);
+      return;
+    }
+
+    // Fire notification
+    const card = btn.closest('[data-app-id]') as HTMLElement;
+    const cardEmail = card.querySelector('.admin-app-card__contact')?.textContent?.match(/[\w.-]+@[\w.-]+/)?.[0] ?? '';
+
+    if (newStatus === 'approved') {
+      await notify({ type: 'application_approved', applicationId: id, applicantEmail: cardEmail });
+      alert(`Одобрено!\n\nЧто делать дальше:\n1. Добавь клуб в src/data/clubs.ts (slug, name, address, и т.д.)\n2. Сделай commit + deploy\n3. Открой /admin/owners/ и привяжи email "${cardEmail}" к новому slug`);
+    } else {
+      await notify({ type: 'application_rejected', applicationId: id, applicantEmail: cardEmail, reason: note });
+    }
+
+    refresh();
+  });
+
+  await refresh();
+}
