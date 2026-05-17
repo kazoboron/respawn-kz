@@ -84,3 +84,241 @@ create or replace function update_outbox_result(
       sent_at = case when p_status = 'sent' then now() else sent_at end
   where id = p_id;
 $$ language sql security definer;
+
+-- ============================================================
+-- 5. Add assigned_slug to club_applications (needed by application_approved trigger)
+-- ============================================================
+alter table public.club_applications
+  add column if not exists assigned_slug text;
+
+-- ============================================================
+-- 6. Replace approve_club_application RPC to also stamp assigned_slug
+-- ============================================================
+create or replace function approve_club_application(
+  p_application_id uuid,
+  p_club_slug text,
+  p_review_note text default null
+) returns text
+language plpgsql
+security invoker
+as $$
+declare v_app club_applications;
+begin
+  if not exists (select 1 from super_admins where user_id = auth.uid()) then
+    raise exception 'Only super-admins can approve';
+  end if;
+
+  select * into v_app from club_applications where id = p_application_id;
+  if not found then
+    raise exception 'Application not found';
+  end if;
+  if v_app.status != 'pending' then
+    raise exception 'Application already %', v_app.status;
+  end if;
+
+  insert into clubs (
+    slug, name, city, district, address, phone, price_per_hour,
+    working_hours, description, gradient, initial, is_published
+  ) values (
+    p_club_slug, v_app.club_name, v_app.city, v_app.district, v_app.address,
+    v_app.applicant_phone, 1000,
+    '{}'::jsonb,
+    v_app.description,
+    'linear-gradient(135deg, #8b5cf6, #ec4899)',
+    upper(left(v_app.club_name, 1)),
+    false
+  );
+
+  if v_app.applicant_user_id is not null then
+    insert into club_admins (user_id, club_slug, granted_by)
+    values (v_app.applicant_user_id, p_club_slug, auth.uid());
+  end if;
+
+  update club_applications set
+    status = 'approved',
+    reviewed_by = auth.uid(),
+    reviewed_at = now(),
+    review_note = p_review_note,
+    assigned_slug = p_club_slug
+  where id = p_application_id;
+
+  return p_club_slug;
+end;
+$$;
+
+-- ============================================================
+-- 7. Trigger: bookings AFTER INSERT → booking_created → emails to club admins
+-- ============================================================
+create or replace function notify_booking_created()
+returns trigger as $$
+declare
+  v_payload jsonb;
+  v_admin_email text;
+begin
+  v_payload := jsonb_build_object(
+    'booking_id', NEW.id,
+    'club_slug', NEW.club_slug,
+    'club_name', NEW.club_name,
+    'date', NEW.date::text,
+    'time_slot', NEW.time_slot,
+    'hours', NEW.hours,
+    'total_price', NEW.total_price,
+    'customer_email', get_user_email(NEW.user_id)
+  );
+
+  for v_admin_email in select email from get_club_admin_emails(NEW.club_slug) loop
+    insert into public.notifications_outbox
+      (event_type, source_table, source_id, recipient_email, payload)
+    values
+      ('booking_created', 'bookings', NEW.id, v_admin_email, v_payload)
+    on conflict (event_type, source_id, recipient_email) do nothing;
+  end loop;
+
+  return NEW;
+end;
+$$ language plpgsql security definer;
+
+create trigger bookings_notify_created
+  after insert on public.bookings
+  for each row execute function notify_booking_created();
+
+-- ============================================================
+-- 8. Trigger: bookings AFTER UPDATE OF status → booking_confirmed/cancelled/completed/no_show
+-- Recipient = the party who did NOT initiate the change (status_changed_by vs user_id)
+-- ============================================================
+create or replace function notify_booking_status_change()
+returns trigger as $$
+declare
+  v_event_type text;
+  v_recipient_type text;
+  v_payload jsonb;
+  v_customer_email text;
+  v_admin_email text;
+begin
+  if NEW.status = OLD.status then
+    return NEW;
+  end if;
+
+  v_event_type := 'booking_' || NEW.status;
+  v_customer_email := get_user_email(NEW.user_id);
+
+  if NEW.status_changed_by = NEW.user_id then
+    v_recipient_type := 'club_admins';
+  else
+    v_recipient_type := 'customer';
+  end if;
+
+  v_payload := jsonb_build_object(
+    'booking_id', NEW.id,
+    'club_slug', NEW.club_slug,
+    'club_name', NEW.club_name,
+    'date', NEW.date::text,
+    'time_slot', NEW.time_slot,
+    'hours', NEW.hours,
+    'total_price', NEW.total_price,
+    'old_status', OLD.status,
+    'new_status', NEW.status,
+    'customer_email', v_customer_email
+  );
+
+  if v_recipient_type = 'customer' then
+    insert into public.notifications_outbox
+      (event_type, source_table, source_id, recipient_email, payload)
+    values
+      (v_event_type, 'bookings', NEW.id, v_customer_email, v_payload)
+    on conflict (event_type, source_id, recipient_email) do nothing;
+  else
+    for v_admin_email in select email from get_club_admin_emails(NEW.club_slug) loop
+      insert into public.notifications_outbox
+        (event_type, source_table, source_id, recipient_email, payload)
+      values
+        (v_event_type, 'bookings', NEW.id, v_admin_email, v_payload)
+      on conflict (event_type, source_id, recipient_email) do nothing;
+    end loop;
+  end if;
+
+  return NEW;
+end;
+$$ language plpgsql security definer;
+
+create trigger bookings_notify_status_change
+  after update of status on public.bookings
+  for each row execute function notify_booking_status_change();
+
+-- ============================================================
+-- 9. Trigger: club_applications AFTER INSERT → application_submitted → super_admins
+-- ============================================================
+create or replace function notify_application_submitted()
+returns trigger as $$
+declare
+  v_payload jsonb;
+  v_super_email text;
+begin
+  v_payload := jsonb_build_object(
+    'application_id', NEW.id,
+    'applicant_email', NEW.applicant_email,
+    'applicant_name', NEW.applicant_name,
+    'applicant_phone', NEW.applicant_phone,
+    'club_name', NEW.club_name,
+    'city', NEW.city,
+    'address', NEW.address,
+    'description', NEW.description
+  );
+
+  for v_super_email in select email from get_super_admin_emails() loop
+    insert into public.notifications_outbox
+      (event_type, source_table, source_id, recipient_email, payload)
+    values
+      ('application_submitted', 'club_applications', NEW.id, v_super_email, v_payload)
+    on conflict (event_type, source_id, recipient_email) do nothing;
+  end loop;
+
+  return NEW;
+end;
+$$ language plpgsql security definer;
+
+create trigger applications_notify_submitted
+  after insert on public.club_applications
+  for each row execute function notify_application_submitted();
+
+-- ============================================================
+-- 10. Trigger: club_applications AFTER UPDATE OF status → application_approved/rejected
+-- ============================================================
+create or replace function notify_application_status_change()
+returns trigger as $$
+declare
+  v_event_type text;
+  v_payload jsonb;
+begin
+  if NEW.status = OLD.status then
+    return NEW;
+  end if;
+  if NEW.status not in ('approved', 'rejected') then
+    return NEW;
+  end if;
+
+  v_event_type := 'application_' || NEW.status;
+
+  v_payload := jsonb_build_object(
+    'application_id', NEW.id,
+    'applicant_email', NEW.applicant_email,
+    'applicant_name', NEW.applicant_name,
+    'club_name', NEW.club_name,
+    'club_slug', NEW.assigned_slug,
+    'review_note', NEW.review_note,
+    'new_status', NEW.status
+  );
+
+  insert into public.notifications_outbox
+    (event_type, source_table, source_id, recipient_email, payload)
+  values
+    (v_event_type, 'club_applications', NEW.id, NEW.applicant_email, v_payload)
+  on conflict (event_type, source_id, recipient_email) do nothing;
+
+  return NEW;
+end;
+$$ language plpgsql security definer;
+
+create trigger applications_notify_status_change
+  after update of status on public.club_applications
+  for each row execute function notify_application_status_change();
