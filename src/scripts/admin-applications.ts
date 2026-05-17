@@ -3,6 +3,7 @@ import { requireSuperAdmin } from '../lib/route-guards';
 import { type ClubApplication, type ApplicationStatus, APPLICATION_STATUS_LABELS } from '../data/supabase-types';
 import { notify } from '../lib/notifications';
 import { CITY_LABELS } from '../data/cities';
+import { generateUniqueClubSlug } from '../lib/slugify';
 
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -150,23 +151,71 @@ export async function setupAdminApplications(): Promise<void> {
     const oldText = btn.textContent;
     btn.textContent = 'Сохраняем…';
 
-    const result = await updateApplicationStatus(id, newStatus, note, user.id);
-    if (!result.ok) {
-      btn.disabled = false;
-      btn.textContent = oldText;
-      alert(`Ошибка: ${result.error}`);
-      return;
-    }
-
-    // Fire notification
     const card = btn.closest('[data-app-id]') as HTMLElement;
     const cardEmail = card.querySelector('.admin-app-card__contact')?.textContent?.match(/[\w.-]+@[\w.-]+/)?.[0] ?? '';
 
     if (newStatus === 'approved') {
+      // Fetch the full application to get club_name for slug generation
+      const { data: app, error: fetchErr } = await supabase
+        .from('club_applications')
+        .select('club_name')
+        .eq('id', id)
+        .single();
+      if (fetchErr || !app) {
+        btn.disabled = false;
+        btn.textContent = oldText;
+        alert(`Не удалось загрузить заявку: ${fetchErr?.message ?? 'unknown'}`);
+        return;
+      }
+
+      // Generate unique slug from club_name (cyrillic-aware)
+      let newSlug: string;
+      try {
+        newSlug = await generateUniqueClubSlug(app.club_name);
+      } catch (err) {
+        btn.disabled = false;
+        btn.textContent = oldText;
+        alert(`Не удалось сгенерировать уникальный slug: ${(err as Error).message}`);
+        return;
+      }
+
+      // Call RPC for atomic approval
+      const { data: rpcSlug, error: rpcErr } = await supabase.rpc('approve_club_application', {
+        p_application_id: id,
+        p_club_slug: newSlug,
+        p_review_note: note || null,
+      });
+
+      if (rpcErr) {
+        btn.disabled = false;
+        btn.textContent = oldText;
+        alert(`Ошибка одобрения: ${rpcErr.message}`);
+        return;
+      }
+
       await notify({ type: 'application_approved', applicationId: id, applicantEmail: cardEmail });
-      alert(`Одобрено!\n\nЧто делать дальше:\n1. Добавь клуб в src/data/clubs.ts (slug, name, address, и т.д.)\n2. Сделай commit + deploy\n3. Открой /admin/owners/ и привяжи email "${cardEmail}" к новому slug`);
+      alert(
+        `Одобрено!\n\nКлуб создан как DRAFT с slug "${rpcSlug}".\n\n` +
+        `Дальше:\n` +
+        `1. Заявитель (${cardEmail}) теперь club_admin этого клуба\n` +
+        `2. Открой /dashboard/club/edit?slug=${rpcSlug} для редактирования (или жди что заявитель сам заполнит)\n` +
+        `3. После заполнения — toggle is_published в той же форме`
+      );
     } else {
-      await notify({ type: 'application_rejected', applicationId: id, applicantEmail: cardEmail, reason: note });
+      // Reject path uses the old update flow (no RPC needed)
+      const result = await updateApplicationStatus(id, newStatus, note, user.id);
+      if (!result.ok) {
+        btn.disabled = false;
+        btn.textContent = oldText;
+        alert(`Ошибка: ${result.error}`);
+        return;
+      }
+      await notify({
+        type: 'application_rejected',
+        applicationId: id,
+        applicantEmail: cardEmail,
+        reason: note,
+      });
     }
 
     refresh();
