@@ -1,8 +1,10 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import DashboardNav from '../../components/DashboardNav.astro';
-import { CLUBS } from '../../data/clubs';
+import { loadAllClubsForAdmin } from '../../lib/clubs-loader';
 import { CITY_LABELS } from '../../data/cities';
+
+const clubs = await loadAllClubsForAdmin();
 ---
 
 <BaseLayout title="Владельцы — Админка — respawn.kz">
@@ -23,11 +25,14 @@ import { CITY_LABELS } from '../../data/cities';
       </div>
 
       <div class="owners-list" id="owners-list" hidden>
-        {CLUBS.map((club) => (
+        {clubs.map((club) => (
           <article class="owner-card" data-club-slug={club.slug}>
             <div class="owner-card__header">
               <div>
-                <h3 class="owner-card__title">{club.name}</h3>
+                <h3 class="owner-card__title">
+                  {club.name}
+                  {!club.is_published && <span class="pill pill--draft" style="margin-left:8px">DRAFT</span>}
+                </h3>
                 <div class="owner-card__meta">{CITY_LABELS[club.city] ?? club.city} · {club.address}</div>
               </div>
               <code class="owner-card__slug">{club.slug}</code>
