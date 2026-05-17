@@ -3,7 +3,6 @@ import { type ClubRow } from '../data/supabase-types';
 import type { NewBooking } from '../data/supabase-types';
 import { openModal } from './modal';
 import { saveReturnUrl, getCurrentUser } from './auth';
-import { notify } from '../lib/notifications';
 
 const DAYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
 const DAY_LABELS_RU: Record<string, string> = {
@@ -272,20 +271,6 @@ async function handleBookingClick(btn: HTMLElement): Promise<void> {
       }
       await refreshSlots();
       return;
-    }
-
-    if (result.bookingId) {
-      const { data: admins } = await supabase
-        .from('club_admins')
-        .select('user_id')
-        .eq('club_slug', club.slug);
-      const ownerEmails = (admins ?? []).map((a: { user_id: string }) => `user-${a.user_id.slice(0, 8)}@unknown`);
-      await notify({
-        type: 'booking_created',
-        bookingId: result.bookingId,
-        clubSlug: club.slug,
-        ownerEmails,
-      });
     }
 
     const body = document.getElementById('modal-body');
