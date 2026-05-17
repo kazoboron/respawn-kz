@@ -21,3 +21,7 @@ npm-debug.log*
 # Local env
 .env
 .env.local
+
+# Local handoff snapshots (contain secrets — don't commit)
+HANDOFF.md
+HANDOFF-*.md
