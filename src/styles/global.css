@@ -3520,3 +3520,43 @@ textarea:focus-visible,
   color: rgb(244, 114, 182);
   border: 1px solid rgba(236, 72, 153, 0.3);
 }
+
+/* Мои клубы block on /dashboard/ */
+.my-clubs {
+  margin-top: 48px;
+}
+
+.my-clubs h2 {
+  margin: 0 0 16px;
+  font-size: 22px;
+}
+
+.my-clubs__list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.my-club-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  background: var(--glass-bg, rgba(255,255,255,0.03));
+  border: 1px solid var(--glass-border, rgba(255,255,255,0.08));
+  border-radius: 12px;
+}
+
+.my-club-card__main {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.my-club-card__meta {
+  color: var(--text-secondary);
+  font-size: 14px;
+  margin-left: 12px;
+}

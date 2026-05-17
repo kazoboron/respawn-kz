@@ -99,4 +99,30 @@ export async function setupDashboard(): Promise<void> {
     recentListEl.innerHTML = recent.map(renderRecentRow).join('');
   }
   recentEl.hidden = false;
+
+  // Load and render user's clubs
+  const myClubsEl = document.getElementById('my-clubs');
+  const myClubsListEl = document.getElementById('my-clubs-list');
+  if (myClubsEl && myClubsListEl) {
+    const clubSlugList = isSuperAdmin ? [] : clubSlugs;  // super-admins see no "my clubs" block (they have /admin/)
+    if (clubSlugList.length > 0) {
+      const { data: myClubs } = await supabase
+        .from('clubs')
+        .select('slug, name, city, is_published, rating')
+        .in('slug', clubSlugList);
+
+      myClubsListEl.innerHTML = (myClubs ?? []).map((c: { slug: string; name: string; city: string; is_published: boolean; rating: number }) => `
+        <article class="my-club-card">
+          <div class="my-club-card__main">
+            <strong>${c.name}</strong>
+            ${!c.is_published ? '<span class="pill pill--draft" style="margin-left:8px">DRAFT</span>' : ''}
+            <span class="my-club-card__meta">${c.city} · ★ ${c.rating ?? 0}</span>
+          </div>
+          <a href="/dashboard/club/edit?slug=${c.slug}" class="btn btn--ghost btn--sm">Редактировать</a>
+        </article>
+      `).join('');
+
+      myClubsEl.hidden = false;
+    }
+  }
 }
