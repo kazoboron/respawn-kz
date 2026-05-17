@@ -6,7 +6,7 @@ import {
   STATUS_LABELS,
   STATUS_COLORS,
 } from '../data/supabase-types';
-import { notify } from '../lib/notifications';
+
 interface Filters {
   club: string;
   status: string;
@@ -114,23 +114,6 @@ async function transitionBooking(id: string, newStatus: BookingStatus): Promise<
   return { ok: true };
 }
 
-async function fireNotificationForTransition(b: Booking, newStatus: BookingStatus, customerEmail: string): Promise<void> {
-  switch (newStatus) {
-    case 'confirmed':
-      await notify({ type: 'booking_confirmed', bookingId: b.id, customerEmail });
-      break;
-    case 'cancelled':
-      await notify({ type: 'booking_cancelled', bookingId: b.id, recipientEmails: [customerEmail] });
-      break;
-    case 'completed':
-      await notify({ type: 'booking_completed', bookingId: b.id, customerEmail });
-      break;
-    case 'no_show':
-      await notify({ type: 'booking_no_show', bookingId: b.id, customerEmail });
-      break;
-  }
-}
-
 export async function setupDashboardBookings(): Promise<void> {
   const root = document.getElementById('bookings-root');
   if (!root) return;
@@ -161,18 +144,6 @@ export async function setupDashboardBookings(): Promise<void> {
 
   // Reactive load
   const filters: Filters = { club: '', status: '', dateFrom: '' };
-
-  // Cache user emails by user_id to enable notification firing
-  const userEmailCache = new Map<string, string>();
-  async function getCustomerEmail(userId: string): Promise<string> {
-    if (userEmailCache.has(userId)) return userEmailCache.get(userId)!;
-    // Note: we cannot directly query auth.users from client. For MVP, we use
-    // a placeholder email and let notify() stub log it. When Resend is wired,
-    // an Edge Function will resolve the email server-side.
-    const placeholder = `user-${userId.slice(0, 8)}@unknown`;
-    userEmailCache.set(userId, placeholder);
-    return placeholder;
-  }
 
   async function refresh() {
     loadingEl!.hidden = false;
@@ -230,16 +201,6 @@ export async function setupDashboardBookings(): Promise<void> {
       btn.textContent = oldText;
       alert(`Не удалось: ${result.error}`);
       return;
-    }
-
-    // Find the booking record to fire notification
-    const card = btn.closest('[data-booking-id]') as HTMLElement;
-    const bookingId = card.getAttribute('data-booking-id')!;
-    // Re-fetch the booking for accurate state; customer email not available client-side
-    const { data: updated } = await supabase.from('bookings').select('*').eq('id', bookingId).single();
-    if (updated) {
-      const customerEmail = await getCustomerEmail(updated.user_id);
-      await fireNotificationForTransition(updated as Booking, to, customerEmail);
     }
 
     // Refresh full list to update buttons and pills
