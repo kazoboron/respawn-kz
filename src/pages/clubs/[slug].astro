@@ -172,7 +172,7 @@ const jsonLd = {
       <section class="similar">
         <h2 class="section__title">Похожие клубы</h2>
         <div class="clubs__grid">
-          {similar.map((c) => <ClubCard club={{slug: c.slug, name: c.name, initial: c.initial ?? '', gradient: c.gradient ?? '', city: c.city, district: c.district ?? '', address: c.address, phone: c.phone ?? '', hours: 'См. на странице', rating: c.rating, reviews: c.reviews_count, price: c.price_per_hour, tags: c.tags, description: c.description ?? '', equipment: c.equipment, galleryGradients: [c.gradient ?? '']}} />)}
+          {similar.map((c) => <ClubCard club={{slug: c.slug, name: c.name, initial: c.initial, gradient: c.gradient, city: c.city, district: c.district, address: c.address, phone: c.phone, rating: c.rating, reviews: c.reviews_count, price: c.price_per_hour, tags: c.tags}} />)}
         </div>
       </section>
     </div>

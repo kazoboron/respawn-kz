@@ -1,5 +1,21 @@
-import type { Club } from '../data/clubs';
 import { CITY_LABELS } from '../data/cities';
+
+// Inline Club type (replaces import from deleted ../data/clubs)
+interface Club {
+  slug: string;
+  name: string;
+  city: string;
+  district: string | null;
+  address: string;
+  phone: string | null;
+  price: number;
+  rating: number;
+  reviews: number;
+  tags: string[];
+  gradient: string | null;
+  initial: string | null;
+  working_hours: Record<string, { open: string; close: string } | null>;
+}
 
 export type SortMode = 'rating' | 'price-asc' | 'price-desc';
 

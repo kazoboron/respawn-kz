@@ -6,10 +6,44 @@ import HowItWorks from '../components/HowItWorks.astro';
 import ClubCard from '../components/ClubCard.astro';
 import Benefits from '../components/Benefits.astro';
 import FAQ from '../components/FAQ.astro';
-import { CLUBS } from '../data/clubs';
 import { LANDING_FAQ } from '../data/content';
+import { loadAllClubs, type ClubRow } from '../lib/clubs-loader';
 
-const topClubs = CLUBS.slice(0, 6);
+// Map ClubRow to Club interface for template (transform DB schema to display schema)
+interface Club {
+  slug: string;
+  name: string;
+  city: string;
+  district: string | null;
+  address: string;
+  phone: string | null;
+  price: number;
+  rating: number;
+  reviews: number;
+  tags: string[];
+  gradient: string | null;
+  initial: string | null;
+}
+
+function clubRowToDisplay(row: ClubRow): Club {
+  return {
+    slug: row.slug,
+    name: row.name,
+    city: row.city,
+    district: row.district,
+    address: row.address,
+    phone: row.phone,
+    price: row.price_per_hour,
+    rating: row.rating,
+    reviews: row.reviews_count,
+    tags: row.tags,
+    gradient: row.gradient,
+    initial: row.initial,
+  };
+}
+
+const clubs = await loadAllClubs();
+const topClubs = clubs.slice(0, 6).map(clubRowToDisplay);
 ---
 
 <BaseLayout
