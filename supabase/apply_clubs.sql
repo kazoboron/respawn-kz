@@ -12,6 +12,8 @@
 --   3. node scripts/apply-sql.mjs supabase/migrations/0008_clubs_fk_and_slot_trigger.sql
 --   4. node scripts/apply-sql.mjs supabase/migrations/0009_approve_application_rpc.sql
 --   5. node scripts/apply-sql.mjs supabase/migrations/0010_fix_super_admins_rls.sql
+--   6. node scripts/apply-sql.mjs supabase/migrations/0011_storage_setup.sql
+--      -- creates club-photos bucket with RLS write-gated by club_admin
 --
 -- Migration 0010 was added during execution to fix infinite recursion
 -- in self-referential super_admins RLS that surfaced only when anon
@@ -46,6 +48,9 @@
 --     where conrelid='public.club_admins'::regclass
 --       and contype='f';
 --     -- expected: includes club_admins_club_slug_fkey
+--
+--   select id, public from storage.buckets where id='club-photos';
+--     -- expected: 1 row, public=true (added by migration 0011)
 -- =====================================================================
 
 select 'See header comments above for deploy steps. This file is documentation, not a runnable bundle.' as instruction;
