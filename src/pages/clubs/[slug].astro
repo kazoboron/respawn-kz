@@ -1,27 +1,48 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ClubCard from '../../components/ClubCard.astro';
-import { CLUBS, getSimilarClubs, type Club } from '../../data/clubs';
+import { loadAllClubs, loadClubBySlug, loadSimilarClubs, type ClubRow } from '../../lib/clubs-loader';
 import { CITY_LABELS } from '../../data/cities';
 
-export function getStaticPaths() {
-  return CLUBS.map((club) => ({
+export async function getStaticPaths() {
+  const clubs = await loadAllClubs();
+  return clubs.map((club) => ({
     params: { slug: club.slug },
     props: { club },
   }));
 }
 
 interface Props {
-  club: Club;
+  club: ClubRow;
 }
 
 const { club } = Astro.props;
 const cityLabel = CITY_LABELS[club.city] ?? club.city;
-const similar = getSimilarClubs(club.slug, 3);
+const similar = await loadSimilarClubs(club.slug, 3);
 
 function formatPrice(value: number): string {
   return value.toLocaleString('ru-RU');
 }
+
+// Working hours summary string for display (use Mon as representative)
+function summarizeHours(wh: ClubRow['working_hours']): string {
+  const mon = wh.mon;
+  if (!mon) return 'По расписанию';
+  if (mon.open === '24h') return 'Круглосуточно';
+  return `${mon.open} – ${mon.close}`;
+}
+const hoursLabel = summarizeHours(club.working_hours);
+
+// Compact data-club JSON for booking modal — only fields it needs
+const clubDataAttr = JSON.stringify({
+  slug: club.slug,
+  name: club.name,
+  price_per_hour: club.price_per_hour,
+  working_hours: club.working_hours,
+  city: club.city,
+  district: club.district,
+  address: club.address,
+});
 
 // Schema.org LocalBusiness JSON-LD
 const jsonLd = {
@@ -30,7 +51,7 @@ const jsonLd = {
   '@id': `https://respawn.kz/clubs/${club.slug}/`,
   name: club.name,
   description: club.description,
-  image: `https://respawn.kz${club.galleryGradients[0]?.startsWith('http') ? '' : '/img/club-hero.jpg'}`,
+  image: `https://respawn.kz/img/club-hero.jpg`,
   url: `https://respawn.kz/clubs/${club.slug}/`,
   telephone: club.phone,
   address: {
@@ -43,18 +64,18 @@ const jsonLd = {
   aggregateRating: {
     '@type': 'AggregateRating',
     ratingValue: club.rating,
-    reviewCount: club.reviews,
+    reviewCount: club.reviews_count,
     bestRating: 5,
     worstRating: 1,
   },
-  priceRange: `от ${formatPrice(club.price)} ₸/час`,
-  openingHours: club.hours === 'Круглосуточно' ? 'Mo-Su 00:00-23:59' : club.hours,
+  priceRange: `от ${formatPrice(club.price_per_hour)} ₸/час`,
+  openingHours: hoursLabel === 'Круглосуточно' ? 'Mo-Su 00:00-23:59' : hoursLabel,
 };
 ---
 
 <BaseLayout
   title={`${club.name} — ${cityLabel} — respawn.kz`}
-  description={`${club.name}, ${cityLabel}, ${club.district}. От ${formatPrice(club.price)} ₸/час. ${club.tags.join(', ')}.`}
+  description={`${club.name}, ${cityLabel}, ${club.district ?? ''}. От ${formatPrice(club.price_per_hour)} ₸/час. ${club.tags.join(', ')}.`}
   activeRoute="clubs"
 >
   <script type="application/ld+json" slot="head" set:html={JSON.stringify(jsonLd)} />
@@ -76,7 +97,7 @@ const jsonLd = {
           <span class="club-card__meta-sep">·</span>
           <span>{club.district}</span>
           <span class="club-card__meta-sep">·</span>
-          <span class="pill pill--rating">★ {club.rating} ({club.reviews} отзывов)</span>
+          <span class="pill pill--rating">★ {club.rating} ({club.reviews_count} отзывов)</span>
         </div>
         <div class="club-page__tags">
           {club.tags.map((t) => <span class="tag">{t}</span>)}
@@ -84,8 +105,8 @@ const jsonLd = {
       </header>
 
       <div class="club-page__gallery">
-        {club.galleryGradients.map((g, i) => (
-          <div class="gallery-item" style={`background: ${g};`}>
+        {(club.photos.length > 0 ? club.photos : [club.gradient ?? 'linear-gradient(135deg, #8b5cf6, #ec4899)']).map((src, i) => (
+          <div class="gallery-item" style={src.startsWith('linear-gradient') ? `background: ${src};` : `background-image: url(${src}); background-size: cover;`}>
             <span class="gallery-item__num">{i + 1}</span>
           </div>
         ))}
@@ -110,7 +131,7 @@ const jsonLd = {
             <div class="info-grid">
               <div>
                 <div class="info-label">Часы работы</div>
-                <div class="info-value">{club.hours}</div>
+                <div class="info-value">{hoursLabel}</div>
               </div>
               <div>
                 <div class="info-label">Адрес</div>
@@ -118,7 +139,7 @@ const jsonLd = {
               </div>
               <div>
                 <div class="info-label">Телефон</div>
-                <div class="info-value"><a href={`tel:${club.phone.replace(/[^+\d]/g, '')}`}>{club.phone}</a></div>
+                <div class="info-value">{club.phone ? <a href={`tel:${club.phone.replace(/[^+\d]/g, '')}`}>{club.phone}</a> : '—'}</div>
               </div>
             </div>
           </section>
@@ -128,10 +149,12 @@ const jsonLd = {
           <div class="pricing-card">
             <div class="pricing-card__amount">
               <span class="pricing-card__from">от</span>
-              <span class="pricing-card__value">{formatPrice(club.price)} ₸</span>
+              <span class="pricing-card__value">{formatPrice(club.price_per_hour)} ₸</span>
               <span class="pricing-card__unit">/час</span>
             </div>
-            <button class="btn btn--primary btn--large pricing-card__btn" data-book={club.slug}>
+            <button class="btn btn--primary btn--large pricing-card__btn"
+                    data-book={club.slug}
+                    data-club={clubDataAttr}>
               Забронировать слот
             </button>
             <div class="pricing-card__pay">
@@ -149,7 +172,7 @@ const jsonLd = {
       <section class="similar">
         <h2 class="section__title">Похожие клубы</h2>
         <div class="clubs__grid">
-          {similar.map((c) => <ClubCard club={c} />)}
+          {similar.map((c) => <ClubCard club={{slug: c.slug, name: c.name, initial: c.initial ?? '', gradient: c.gradient ?? '', city: c.city, district: c.district ?? '', address: c.address, phone: c.phone ?? '', hours: 'См. на странице', rating: c.rating, reviews: c.reviews_count, price: c.price_per_hour, tags: c.tags, description: c.description ?? '', equipment: c.equipment, galleryGradients: [c.gradient ?? '']}} />)}
         </div>
       </section>
     </div>
