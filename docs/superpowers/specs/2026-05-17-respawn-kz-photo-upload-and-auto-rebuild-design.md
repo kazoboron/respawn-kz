@@ -37,6 +37,30 @@ Combining them because Photo Upload's value depends on the rebuild trigger worki
 - Polling Cloudflare API to detect deploy completion (just show estimate)
 - Edge Function wrapper to keep deploy hook URL truly secret (URL is "public env" for MVP; can rotate if abused)
 
+## Auto-rebuild status (post-deploy discovery)
+
+**Implementation status:** code shipped, but auto-rebuild is currently inert because
+the Cloudflare Pages project for respawn-kz is `ad_hoc` type (direct upload via
+`wrangler pages deploy`), not git-source. Deploy hooks only fire for projects
+connected to a git provider.
+
+**Verified via Cloudflare API:** created a deploy hook successfully, but POSTing
+to its trigger URL returns 500 Internal Server Error — confirming the hook has
+nothing to "rebuild from" without a git source.
+
+**Decision:** ship photo upload now (works fully). Defer auto-rebuild to a
+follow-up task. To enable it, two paths:
+1. Connect GitHub repo to CF Pages in dashboard (~2 min user action). Auto-deploys
+   on push + deploy hooks become functional. Cleanest path.
+2. Set up GitHub Actions workflow with `workflow_dispatch` + dispatch from save
+   action via Supabase Edge Function (~30 min code).
+
+**Current behavior:** `dashboard-club-edit.ts` shows the message
+"Изменения появятся на сайте после следующего деплоя" when `PUBLIC_CF_DEPLOY_HOOK_URL`
+is unset (which it is, post-discovery). `triggerSiteRebuild()` in `deploy-trigger.ts`
+gracefully no-ops. The code path is preserved for when option 1 is chosen later —
+just set the env var and the auto-rebuild path activates.
+
 ## Architecture
 
 ### 1. Storage bucket setup
