@@ -1,6 +1,6 @@
 import { supabase, supabaseConfigured } from '../lib/supabase';
 import { getCurrentUser } from './auth';
-import { type Booking, STATUS_LABELS } from '../data/supabase-types';
+import { type Booking, STATUS_LABELS, STATUS_COLORS, isTerminalStatus } from '../data/supabase-types';
 import { CITY_LABELS } from '../data/cities';
 
 function formatPrice(value: number): string {
@@ -13,8 +13,10 @@ function formatDate(date: string): string {
 
 function renderBookingCard(b: Booking): string {
   const cityLabel = CITY_LABELS[b.city_id] ?? b.city_id;
-  const canCancel = b.status === 'pending';
-  const statusClass = `pill pill--${b.status}`;
+  // Cancellable: pending always; confirmed only if booking date is today or future and not terminal
+  const today = new Date().toISOString().slice(0, 10);
+  const canCancel = !isTerminalStatus(b.status) && b.date >= today;
+  const statusClass = `pill ${STATUS_COLORS[b.status]}`;
   return `
     <article class="me-booking" data-booking-id="${b.id}">
       <div class="me-booking__main">
