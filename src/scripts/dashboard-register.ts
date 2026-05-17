@@ -1,6 +1,5 @@
 import { supabase } from '../lib/supabase';
 import { requireLogin } from '../lib/route-guards';
-import { notify } from '../lib/notifications';
 import { type ClubApplication, type NewClubApplication, APPLICATION_STATUS_LABELS } from '../data/supabase-types';
 
 function formatDate(iso: string): string {
@@ -109,12 +108,6 @@ export async function setupDashboardRegister(): Promise<void> {
       errorEl.hidden = false;
       return;
     }
-
-    await notify({
-      type: 'application_submitted',
-      applicationId: data.id,
-      applicantEmail: newApp.applicant_email,
-    });
 
     formEl.hidden = true;
     existingEl.hidden = true;
