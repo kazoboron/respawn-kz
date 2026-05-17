@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "mcp__obsidian__obsidian_append_content",
-      "mcp__obsidian__obsidian_get_file_contents"
+      "mcp__obsidian__obsidian_get_file_contents",
+      "Bash(git -C C:\\\\ClaudeCode log --oneline -20)"
     ]
   }
 }
