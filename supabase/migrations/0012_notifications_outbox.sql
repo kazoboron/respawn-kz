@@ -50,7 +50,7 @@ create policy "super_admins read outbox" on public.notifications_outbox
 create or replace function get_user_email(p_user_id uuid)
 returns text as $$
   select email from auth.users where id = p_user_id;
-$$ language sql security definer stable;
+$$ language sql security definer stable set search_path = public;
 
 create or replace function get_club_admin_emails(p_club_slug text)
 returns table (email text) as $$
@@ -58,14 +58,21 @@ returns table (email text) as $$
   from public.club_admins ca
   join auth.users u on u.id = ca.user_id
   where ca.club_slug = p_club_slug;
-$$ language sql security definer stable;
+$$ language sql security definer stable set search_path = public;
 
 create or replace function get_super_admin_emails()
 returns table (email text) as $$
   select u.email
   from public.super_admins sa
   join auth.users u on u.id = sa.user_id;
-$$ language sql security definer stable;
+$$ language sql security definer stable set search_path = public;
+
+revoke execute on function get_user_email(uuid) from public, anon, authenticated;
+revoke execute on function get_club_admin_emails(text) from public, anon, authenticated;
+revoke execute on function get_super_admin_emails() from public, anon, authenticated;
+grant execute on function get_user_email(uuid) to service_role;
+grant execute on function get_club_admin_emails(text) to service_role;
+grant execute on function get_super_admin_emails() to service_role;
 
 -- ============================================================
 -- 4. RPC for Edge Function to update outbox rows atomically
@@ -83,7 +90,10 @@ create or replace function update_outbox_result(
       resend_message_id = coalesce(p_resend_message_id, resend_message_id),
       sent_at = case when p_status = 'sent' then now() else sent_at end
   where id = p_id;
-$$ language sql security definer;
+$$ language sql security definer set search_path = public;
+
+revoke execute on function update_outbox_result(uuid, text, text, text) from public, anon, authenticated;
+grant execute on function update_outbox_result(uuid, text, text, text) to service_role;
 
 -- ============================================================
 -- 5. Add assigned_slug to club_applications (needed by application_approved trigger)
@@ -176,7 +186,7 @@ begin
 
   return NEW;
 end;
-$$ language plpgsql security definer;
+$$ language plpgsql security definer set search_path = public;
 
 create trigger bookings_notify_created
   after insert on public.bookings
@@ -198,6 +208,9 @@ begin
   if NEW.status = OLD.status then
     return NEW;
   end if;
+  if NEW.status not in ('confirmed', 'cancelled', 'completed', 'no_show') then
+    return NEW;
+  end if;
 
   v_event_type := 'booking_' || NEW.status;
   v_customer_email := get_user_email(NEW.user_id);
@@ -206,6 +219,12 @@ begin
     v_recipient_type := 'club_admins';
   else
     v_recipient_type := 'customer';
+  end if;
+
+  -- Defensive: if the customer email is missing (deleted user, etc.), skip
+  -- the customer-branch notification rather than crash the underlying UPDATE.
+  if v_recipient_type = 'customer' and v_customer_email is null then
+    return NEW;
   end if;
 
   v_payload := jsonb_build_object(
@@ -239,7 +258,7 @@ begin
 
   return NEW;
 end;
-$$ language plpgsql security definer;
+$$ language plpgsql security definer set search_path = public;
 
 create trigger bookings_notify_status_change
   after update of status on public.bookings
@@ -275,7 +294,7 @@ begin
 
   return NEW;
 end;
-$$ language plpgsql security definer;
+$$ language plpgsql security definer set search_path = public;
 
 create trigger applications_notify_submitted
   after insert on public.club_applications
@@ -317,7 +336,7 @@ begin
 
   return NEW;
 end;
-$$ language plpgsql security definer;
+$$ language plpgsql security definer set search_path = public;
 
 create trigger applications_notify_status_change
   after update of status on public.club_applications
