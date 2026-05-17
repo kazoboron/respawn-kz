@@ -2444,6 +2444,15 @@ body.menu-open {
   margin-bottom: 16px;
 }
 
+.booking-form__notice {
+  padding: 10px 14px;
+  background: rgba(251, 146, 60, 0.12);
+  border: 1px solid rgba(251, 146, 60, 0.3);
+  color: rgb(253, 186, 116);
+  border-radius: 8px;
+  font-size: 14px;
+}
+
 .booking-form__total {
   text-align: center;
   font-size: 18px;
