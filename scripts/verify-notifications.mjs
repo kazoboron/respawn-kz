@@ -79,4 +79,4 @@ for (const c of checks) {
 
 console.log(`\n${passed}/${checks.length} passed${failed > 0 ? `, ${failed} FAILED` : ''}`);
 await client.end();
-exit(failed > 0 ? 1 : 0);
+exit(failed > 0 ? 2 : 0);
