@@ -1,7 +1,6 @@
 import { supabase } from '../lib/supabase';
 import { requireClubAdmin } from '../lib/route-guards';
 import { type Booking, STATUS_LABELS, STATUS_COLORS } from '../data/supabase-types';
-import { CLUBS } from '../data/clubs';
 
 function formatPrice(value: number): string {
   return value.toLocaleString('ru-RU');
@@ -16,8 +15,15 @@ function todayISO(): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
+let clubNameMap: Map<string, string> = new Map();
+
+async function loadClubNames(): Promise<void> {
+  const { data } = await supabase.from('clubs').select('slug, name');
+  clubNameMap = new Map((data ?? []).map((c: { slug: string; name: string }) => [c.slug, c.name]));
+}
+
 function getClubName(slug: string): string {
-  return CLUBS.find((c) => c.slug === slug)?.name ?? slug;
+  return clubNameMap.get(slug) ?? slug;
 }
 
 function renderRecentRow(b: Booking): string {
@@ -48,6 +54,7 @@ export async function setupDashboard(): Promise<void> {
 
   // Gate: require club_admin or super_admin
   const { clubSlugs, isSuperAdmin } = await requireClubAdmin();
+  await loadClubNames();
 
   if (clubSlugs.length === 0 && !isSuperAdmin) {
     loadingEl.hidden = true;

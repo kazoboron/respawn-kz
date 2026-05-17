@@ -7,8 +7,6 @@ import {
   STATUS_COLORS,
 } from '../data/supabase-types';
 import { notify } from '../lib/notifications';
-import { CLUBS } from '../data/clubs';
-
 interface Filters {
   club: string;
   status: string;
@@ -23,8 +21,16 @@ function formatDate(date: string): string {
   return new Date(date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
 }
 
+interface ClubLite { slug: string; name: string; }
+let allClubs: ClubLite[] = [];
+
+async function loadClubsLite(): Promise<void> {
+  const { data } = await supabase.from('clubs').select('slug, name');
+  allClubs = (data ?? []) as ClubLite[];
+}
+
 function getClubName(slug: string): string {
-  return CLUBS.find((c) => c.slug === slug)?.name ?? slug;
+  return allClubs.find((c) => c.slug === slug)?.name ?? slug;
 }
 
 // Available transitions for a given booking status (admin perspective)
@@ -137,12 +143,13 @@ export async function setupDashboardBookings(): Promise<void> {
 
   // Gate
   const { clubSlugs, isSuperAdmin } = await requireClubAdmin();
+  await loadClubsLite();
 
   // Populate club filter
   const clubSelect = document.getElementById('filter-club') as HTMLSelectElement;
   const allowedClubs = isSuperAdmin
-    ? CLUBS
-    : CLUBS.filter((c) => clubSlugs.includes(c.slug));
+    ? allClubs
+    : allClubs.filter((c) => clubSlugs.includes(c.slug));
   allowedClubs.forEach((c) => {
     const opt = document.createElement('option');
     opt.value = c.slug;
