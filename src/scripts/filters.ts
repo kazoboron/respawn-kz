@@ -1,4 +1,4 @@
-import { CLUBS, type Club } from '../data/clubs';
+import type { Club } from '../data/clubs';
 import { CITY_LABELS } from '../data/cities';
 
 export type SortMode = 'rating' | 'price-asc' | 'price-desc';
@@ -100,6 +100,21 @@ function renderCard(club: Club): string {
     </article>
   `;
 }
+
+function loadClubsFromInline(): Club[] {
+  const el = document.getElementById('catalog-data');
+  if (!el) {
+    console.error('[filters] #catalog-data script tag not found');
+    return [];
+  }
+  try {
+    return JSON.parse(el.textContent ?? '[]') as Club[];
+  } catch (err) {
+    console.error('[filters] failed to parse #catalog-data', err);
+    return [];
+  }
+}
+const CLUBS = loadClubsFromInline();
 
 export function setupCatalogFilters(): void {
   const grid = document.getElementById('catalog-grid');
