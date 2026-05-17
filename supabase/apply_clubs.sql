@@ -1,0 +1,40 @@
+-- =====================================================================
+-- Clubs in DB + Slot Validation — DEPLOY SEQUENCE
+-- =====================================================================
+--
+-- Unlike apply_b2b_cabinet.sql (one-paste bundle), the clubs deploy is
+-- STAGED because the seed step parses src/data/clubs.ts via Node.
+--
+-- Apply in this exact order:
+--
+--   1. node scripts/apply-sql.mjs supabase/migrations/0007_clubs_table.sql
+--   2. node scripts/seed-clubs.mjs        -- inserts 12 clubs from clubs.ts
+--   3. node scripts/apply-sql.mjs supabase/migrations/0008_clubs_fk_and_slot_trigger.sql
+--   4. node scripts/apply-sql.mjs supabase/migrations/0009_approve_application_rpc.sql
+--
+-- DATABASE_URL env var must be set before each command (see
+-- scripts/apply-sql.mjs for format expected).
+--
+-- Verification queries (run any time after step 4):
+--
+--   select count(*) from clubs;
+--     -- expected: 12
+--
+--   select to_regclass('public.clubs') is not null as table_exists;
+--     -- expected: true
+--
+--   select count(*) from pg_trigger
+--     where tgrelid='public.bookings'::regclass
+--       and tgname like 'bookings_%';
+--     -- expected: 2 (status_transition_check + slot_validation)
+--
+--   select proname from pg_proc where proname='approve_club_application';
+--     -- expected: 1 row
+--
+--   select conname from pg_constraint
+--     where conrelid='public.club_admins'::regclass
+--       and contype='f';
+--     -- expected: includes club_admins_club_slug_fkey
+-- =====================================================================
+
+select 'See header comments above for deploy steps. This file is documentation, not a runnable bundle.' as instruction;
