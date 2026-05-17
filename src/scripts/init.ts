@@ -19,6 +19,7 @@ import { setupCookieBanner } from './cookie-banner';
 import { setupAdminApplications } from './admin-applications';
 import { setupAdminOwners } from './admin-owners';
 import { setupAdminUsers } from './admin-users';
+import { setupDashboardClubEdit } from './dashboard-club-edit';
 
 function init(): void {
   setupHeaderScroll();
@@ -53,6 +54,9 @@ function init(): void {
   }
   if (document.getElementById('register-root')) {
     setupDashboardRegister();
+  }
+  if (document.getElementById('club-edit-root')) {
+    setupDashboardClubEdit();
   }
   if (document.getElementById('dashboard-root')) {
     setupDashboard();
