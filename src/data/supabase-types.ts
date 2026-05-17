@@ -101,3 +101,9 @@ export interface SuperAdmin {
   added_at: string;
   added_by: string | null;
 }
+
+// =====================================================================
+// Club (re-export from clubs-loader for client scripts)
+// =====================================================================
+
+export type { ClubRow } from '../lib/clubs-loader';
