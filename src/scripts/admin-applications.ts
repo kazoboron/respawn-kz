@@ -1,7 +1,6 @@
 import { supabase } from '../lib/supabase';
 import { requireSuperAdmin } from '../lib/route-guards';
 import { type ClubApplication, type ApplicationStatus, APPLICATION_STATUS_LABELS } from '../data/supabase-types';
-import { notify } from '../lib/notifications';
 import { CITY_LABELS } from '../data/cities';
 import { generateUniqueClubSlug } from '../lib/slugify';
 
@@ -196,7 +195,6 @@ export async function setupAdminApplications(): Promise<void> {
         return;
       }
 
-      await notify({ type: 'application_approved', applicationId: id, applicantEmail: cardEmail });
       alert(
         `Одобрено!\n\nКлуб создан как DRAFT с slug "${rpcSlug}".\n\n` +
         `Дальше:\n` +
@@ -213,12 +211,6 @@ export async function setupAdminApplications(): Promise<void> {
         alert(`Ошибка: ${result.error}`);
         return;
       }
-      await notify({
-        type: 'application_rejected',
-        applicationId: id,
-        applicantEmail: cardEmail,
-        reason: note,
-      });
     }
 
     refresh();
