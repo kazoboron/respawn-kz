@@ -1,6 +1,8 @@
 import { supabase } from '../lib/supabase';
 import { getRoles } from '../lib/roles';
 import { type ClubRow } from '../data/supabase-types';
+import { uploadClubPhoto, isUploadedUrl, urlToStoragePath, deleteClubPhoto } from '../lib/photo-upload';
+import { triggerSiteRebuild } from '../lib/deploy-trigger';
 
 const DAYS = [
   { key: 'mon', label: 'Понедельник' },
@@ -79,9 +81,40 @@ function attachDayHandlers(container: HTMLElement): void {
 }
 
 function renderPhotoRow(url: string): string {
+  if (url && isUploadedUrl(url)) {
+    const filename = url.split('/').pop() ?? 'photo';
+    return `
+      <div class="photos-list__row photos-list__row--uploaded" data-url="${url}">
+        <img src="${url}" class="photos-list__thumb" alt="" loading="lazy" />
+        <span class="photos-list__name">${filename}</span>
+        <button type="button" class="btn btn--ghost btn--sm photos-list__remove">×</button>
+      </div>
+    `;
+  }
   return `
-    <div class="photos-list__row">
+    <div class="photos-list__row photos-list__row--url">
       <input type="url" class="auth-input" value="${url}" placeholder="https://..." />
+      <button type="button" class="btn btn--ghost btn--sm photos-list__remove">×</button>
+    </div>
+  `;
+}
+
+function renderUploadingRow(filename: string): string {
+  return `
+    <div class="photos-list__row photos-list__row--uploading">
+      <span class="photos-list__thumb photos-list__thumb--placeholder">⏳</span>
+      <span class="photos-list__name">${filename}</span>
+      <span style="color:var(--text-muted);font-size:13px">загрузка…</span>
+    </div>
+  `;
+}
+
+function renderErrorRow(filename: string, error: string): string {
+  return `
+    <div class="photos-list__row photos-list__row--error">
+      <span class="photos-list__thumb photos-list__thumb--placeholder" style="color:rgb(248,113,113)">⚠</span>
+      <span class="photos-list__name">${filename}</span>
+      <span style="color:rgb(248,113,113);font-size:13px">${error}</span>
       <button type="button" class="btn btn--ghost btn--sm photos-list__remove">×</button>
     </div>
   `;
@@ -176,12 +209,47 @@ export async function setupDashboardClubEdit(): Promise<void> {
 
   // Photos
   const photosList = document.getElementById('photos-list')!;
+  const fileInput = document.getElementById('photo-file-input') as HTMLInputElement;
+  const pickBtn = document.getElementById('photo-pick-btn')!;
+  const addUrlBtn = document.getElementById('add-photo-url')!;
+  const uploader = document.getElementById('photos-uploader')!;
+
   function renderAllPhotos(urls: string[]) {
     photosList.innerHTML = urls.map(renderPhotoRow).join('');
   }
   renderAllPhotos(c.photos ?? []);
 
-  document.getElementById('add-photo')!.addEventListener('click', () => {
+  async function handleFiles(files: FileList | File[]) {
+    for (const file of Array.from(files)) {
+      if (photosList.children.length >= 6) {
+        alert('Максимум 6 фото');
+        break;
+      }
+      const placeholder = document.createElement('div');
+      placeholder.innerHTML = renderUploadingRow(file.name);
+      const row = placeholder.firstElementChild!;
+      photosList.appendChild(row);
+
+      const result = await uploadClubPhoto(slug!, file);
+      if (result.ok && result.publicUrl) {
+        const newRow = document.createElement('div');
+        newRow.innerHTML = renderPhotoRow(result.publicUrl);
+        row.replaceWith(newRow.firstElementChild!);
+      } else {
+        const errRow = document.createElement('div');
+        errRow.innerHTML = renderErrorRow(file.name, result.error ?? 'unknown');
+        row.replaceWith(errRow.firstElementChild!);
+      }
+    }
+  }
+
+  pickBtn.addEventListener('click', () => fileInput.click());
+  fileInput.addEventListener('change', () => {
+    if (fileInput.files) handleFiles(fileInput.files);
+    fileInput.value = '';  // reset so same file can re-pick
+  });
+
+  addUrlBtn.addEventListener('click', () => {
     if (photosList.children.length >= 6) {
       alert('Максимум 6 фото');
       return;
@@ -189,9 +257,34 @@ export async function setupDashboardClubEdit(): Promise<void> {
     photosList.insertAdjacentHTML('beforeend', renderPhotoRow(''));
   });
 
-  photosList.addEventListener('click', (e) => {
+  // Drag-drop on the uploader strip
+  uploader.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    uploader.classList.add('photos-uploader--drag');
+  });
+  uploader.addEventListener('dragleave', () => {
+    uploader.classList.remove('photos-uploader--drag');
+  });
+  uploader.addEventListener('drop', async (e) => {
+    e.preventDefault();
+    uploader.classList.remove('photos-uploader--drag');
+    if (e.dataTransfer?.files) await handleFiles(e.dataTransfer.files);
+  });
+
+  // Remove handler: delete from Storage if uploaded
+  photosList.addEventListener('click', async (e) => {
     const btn = (e.target as HTMLElement).closest('.photos-list__remove');
-    if (btn) btn.parentElement?.remove();
+    if (!btn) return;
+    const row = btn.parentElement;
+    if (!row) return;
+    const uploadedUrl = row.getAttribute('data-url');
+    row.remove();
+    if (uploadedUrl) {
+      const path = urlToStoragePath(uploadedUrl);
+      if (path) {
+        deleteClubPhoto(path).catch((err) => console.warn('[edit] storage delete failed', err));
+      }
+    }
   });
 
   // Publication toggle visible only to super-admin
@@ -214,9 +307,19 @@ export async function setupDashboardClubEdit(): Promise<void> {
       .map((el) => (el as HTMLInputElement).value);
     const equipment = (formEl.querySelector('[name="equipment"]') as HTMLTextAreaElement).value
       .split('\n').map((s) => s.trim()).filter(Boolean);
-    const photoUrls = Array.from(photosList.querySelectorAll('input[type="url"]'))
-      .map((el) => (el as HTMLInputElement).value.trim())
-      .filter(Boolean);
+    // Collect photo URLs from both uploaded rows (data-url) and url-input rows
+    const photoUrls: string[] = [];
+    photosList.querySelectorAll('.photos-list__row').forEach((row) => {
+      const uploadedUrl = row.getAttribute('data-url');
+      if (uploadedUrl) {
+        photoUrls.push(uploadedUrl);
+        return;
+      }
+      const urlInput = row.querySelector('input[type="url"]') as HTMLInputElement | null;
+      if (urlInput && urlInput.value.trim()) {
+        photoUrls.push(urlInput.value.trim());
+      }
+    });
     const workingHours = readTimePicker(picker);
 
     const patch: Record<string, unknown> = {
@@ -254,8 +357,13 @@ export async function setupDashboardClubEdit(): Promise<void> {
       return;
     }
 
-    successEl.innerHTML = '<strong>Сохранено!</strong> Изменения появятся в каталоге после следующего деплоя.';
+    successEl.innerHTML = '<strong>Сохранено!</strong> Сайт обновится через 30-60 секунд.';
     successEl.hidden = false;
     window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // Fire-and-forget rebuild trigger (don't await — let user see success immediately)
+    triggerSiteRebuild().then((r) => {
+      if (!r.ok) console.warn('[edit] deploy trigger failed:', r.error);
+    });
   });
 }
