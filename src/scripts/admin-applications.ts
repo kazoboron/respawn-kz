@@ -14,7 +14,7 @@ function renderAdminAppCard(app: ClubApplication): string {
   const isPending = app.status === 'pending';
 
   return `
-    <article class="admin-app-card" data-app-id="${app.id}">
+    <article class="admin-app-card" data-app-id="${app.id}" data-applicant-email="${app.applicant_email}">
       <div class="admin-app-card__header">
         <div>
           <h3 class="admin-app-card__title">${app.club_name}</h3>
@@ -152,7 +152,10 @@ export async function setupAdminApplications(): Promise<void> {
     btn.textContent = 'Сохраняем…';
 
     const card = btn.closest('[data-app-id]') as HTMLElement;
-    const cardEmail = card.querySelector('.admin-app-card__contact')?.textContent?.match(/[\w.-]+@[\w.-]+/)?.[0] ?? '';
+    // Read applicant email from data-attribute (set by renderAdminAppCard).
+    // Previously scraped via regex from .admin-app-card__contact text — fragile
+    // if name contained an '@'. Now authoritative.
+    const cardEmail = card.getAttribute('data-applicant-email') ?? '';
 
     if (newStatus === 'approved') {
       // Fetch the full application to get club_name for slug generation

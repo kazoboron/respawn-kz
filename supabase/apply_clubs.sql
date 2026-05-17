@@ -11,6 +11,14 @@
 --   2. node scripts/seed-clubs.mjs        -- inserts 12 clubs from clubs.ts
 --   3. node scripts/apply-sql.mjs supabase/migrations/0008_clubs_fk_and_slot_trigger.sql
 --   4. node scripts/apply-sql.mjs supabase/migrations/0009_approve_application_rpc.sql
+--   5. node scripts/apply-sql.mjs supabase/migrations/0010_fix_super_admins_rls.sql
+--
+-- Migration 0010 was added during execution to fix infinite recursion
+-- in self-referential super_admins RLS that surfaced only when anon
+-- queries clubs at SSG build time (sub-project 1 didn't hit it because
+-- all super_admins queries had auth.uid() short-circuit via OR).
+--
+-- After all 5 steps: verify with `node scripts/verify-clubs.mjs`.
 --
 -- DATABASE_URL env var must be set before each command (see
 -- scripts/apply-sql.mjs for format expected).
@@ -30,6 +38,9 @@
 --
 --   select proname from pg_proc where proname='approve_club_application';
 --     -- expected: 1 row
+--
+--   select proname from pg_proc where proname='is_super_admin';
+--     -- expected: 1 row (added by migration 0010)
 --
 --   select conname from pg_constraint
 --     where conrelid='public.club_admins'::regclass
