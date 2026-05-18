@@ -53,7 +53,9 @@ const jsonLd: Record<string, unknown> = {
   '@id': `https://respawn.kz/clubs/${club.slug}/`,
   name: club.name,
   description: club.description,
-  image: `https://respawn.kz/img/club-hero.jpg`,
+  image: club.photos?.[0]
+    ? new URL(club.photos[0], 'https://respawn.kz').toString()
+    : 'https://respawn.kz/img/club-hero.webp',
   url: `https://respawn.kz/clubs/${club.slug}/`,
   telephone: club.phone,
   address: {
@@ -87,6 +89,7 @@ if (topReviews.length > 0) {
   title={`${club.name} — ${cityLabel} — respawn.kz`}
   description={`${club.name}, ${cityLabel}, ${club.district ?? ''}. От ${formatPrice(club.price_per_hour)} ₸/час. ${club.tags.join(', ')}.`}
   activeRoute="clubs"
+  ogImage={club.photos?.[0] ?? '/img/club-hero.webp'}
 >
   <script type="application/ld+json" slot="head" set:html={JSON.stringify(jsonLd)} />
 
