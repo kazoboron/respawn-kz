@@ -343,11 +343,13 @@ export async function setupDashboardClubEdit(): Promise<void> {
     }
 
     const submitBtn = formEl.querySelector('button[type="submit"]') as HTMLButtonElement;
+    submitBtn.setAttribute('aria-busy', 'true');
     submitBtn.disabled = true;
     submitBtn.textContent = 'Сохраняем…';
 
     const { error: updateErr } = await supabase.from('clubs').update(patch).eq('slug', slug);
 
+    submitBtn.removeAttribute('aria-busy');
     submitBtn.disabled = false;
     submitBtn.textContent = 'Сохранить';
 

@@ -37,7 +37,7 @@ import DashboardNav from '../../components/DashboardNav.astro';
         <button type="button" class="btn btn--ghost" id="filter-reset">Сбросить</button>
       </div>
 
-      <div class="dashboard-loading" id="bookings-loading">
+      <div class="dashboard-loading" id="bookings-loading" aria-live="polite" aria-busy="true">
         <p style="text-align:center;color:var(--text-muted)">Загружаем…</p>
       </div>
 
@@ -45,6 +45,10 @@ import DashboardNav from '../../components/DashboardNav.astro';
 
       <div class="bookings-empty" id="bookings-empty" hidden>
         <p>Бронирований не найдено</p>
+      </div>
+
+      <div id="bookings-error" role="alert" hidden style="padding:16px;color:rgb(248,113,113)">
+        <p>Не удалось загрузить брони. <button type="button" class="btn btn--ghost btn--sm" data-retry-bookings>Повторить</button></p>
       </div>
     </div>
   </section>

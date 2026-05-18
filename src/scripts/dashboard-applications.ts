@@ -43,6 +43,7 @@ export async function setupDashboardApplications(): Promise<void> {
   const loadingEl = document.getElementById('my-apps-loading');
   const listEl = document.getElementById('my-apps-list');
   const emptyEl = document.getElementById('my-apps-empty');
+  const errorEl = document.getElementById('my-apps-error');
   if (!loadingEl || !listEl || !emptyEl) return;
 
   const { user } = await requireLogin();
@@ -57,8 +58,13 @@ export async function setupDashboardApplications(): Promise<void> {
   loadingEl.hidden = true;
 
   if (error) {
-    listEl.innerHTML = `<p>Ошибка: ${error.message}</p>`;
-    listEl.hidden = false;
+    console.error('[dashboard-apps] load failed', error);
+    if (errorEl) {
+      errorEl.hidden = false;
+    } else {
+      listEl.innerHTML = `<p>Ошибка: ${error.message}</p>`;
+      listEl.hidden = false;
+    }
     return;
   }
 

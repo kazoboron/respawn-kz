@@ -12,7 +12,7 @@ import DashboardNav from '../../components/DashboardNav.astro';
 
       <DashboardNav variant="dashboard" active="/dashboard/applications/" />
 
-      <div class="dashboard-loading" id="my-apps-loading">
+      <div class="dashboard-loading" id="my-apps-loading" aria-live="polite" aria-busy="true">
         <p style="text-align:center;color:var(--text-muted)">Загружаем…</p>
       </div>
 
@@ -21,6 +21,11 @@ import DashboardNav from '../../components/DashboardNav.astro';
       <div class="apps-empty" id="my-apps-empty" hidden>
         <p>У тебя ещё нет поданных заявок.</p>
         <a href="/dashboard/register/" class="btn btn--primary" style="margin-top:16px">Подать заявку</a>
+      </div>
+
+      <div id="my-apps-error" role="alert" hidden style="text-align:center;padding:40px 20px;color:var(--text-muted)">
+        <p>Не удалось загрузить заявки.</p>
+        <button type="button" class="btn btn--ghost btn--sm" style="margin-top:12px" onclick="location.reload()">Обновить страницу</button>
       </div>
     </div>
   </section>

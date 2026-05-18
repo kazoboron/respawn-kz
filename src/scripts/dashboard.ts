@@ -50,6 +50,7 @@ export async function setupDashboard(): Promise<void> {
   const recentEl = document.getElementById('dashboard-recent');
   const recentListEl = document.getElementById('dashboard-recent-list');
   const emptyEl = document.getElementById('dashboard-empty');
+  const errorEl = document.getElementById('dashboard-error');
   if (!loadingEl || !statsEl || !recentEl || !recentListEl || !emptyEl) return;
 
   // Gate: require club_admin or super_admin
@@ -73,8 +74,12 @@ export async function setupDashboard(): Promise<void> {
 
   if (error) {
     console.error('[dashboard] failed to load bookings', error);
-    emptyEl.innerHTML = `<p>Ошибка загрузки: ${error.message}</p>`;
-    emptyEl.hidden = false;
+    if (errorEl) {
+      errorEl.hidden = false;
+    } else {
+      emptyEl.innerHTML = `<p>Ошибка загрузки: ${error.message}</p>`;
+      emptyEl.hidden = false;
+    }
     return;
   }
 

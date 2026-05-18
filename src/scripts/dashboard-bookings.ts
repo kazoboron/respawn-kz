@@ -86,7 +86,7 @@ function renderBookingCard(b: Booking): string {
   `;
 }
 
-async function loadBookings(clubSlugs: string[], isSuperAdmin: boolean, filters: Filters): Promise<Booking[]> {
+async function loadBookings(clubSlugs: string[], isSuperAdmin: boolean, filters: Filters): Promise<Booking[] | null> {
   let query = supabase.from('bookings').select('*').order('date', { ascending: false });
 
   if (!isSuperAdmin && clubSlugs.length > 0) {
@@ -100,7 +100,7 @@ async function loadBookings(clubSlugs: string[], isSuperAdmin: boolean, filters:
   const { data, error } = await query.limit(200);
   if (error) {
     console.error('[bookings] load failed', error);
-    return [];
+    return null;
   }
   return (data ?? []) as Booking[];
 }
@@ -122,6 +122,8 @@ export async function setupDashboardBookings(): Promise<void> {
   const filtersEl = document.getElementById('bookings-filters');
   const listEl = document.getElementById('bookings-list');
   const emptyEl = document.getElementById('bookings-empty');
+  const errorEl = document.getElementById('bookings-error');
+  const retryBtn = errorEl?.querySelector<HTMLButtonElement>('[data-retry-bookings]') ?? null;
   if (!loadingEl || !filtersEl || !listEl || !emptyEl) return;
 
   // Gate
@@ -147,12 +149,19 @@ export async function setupDashboardBookings(): Promise<void> {
 
   async function refresh() {
     loadingEl!.hidden = false;
+    loadingEl!.setAttribute('aria-busy', 'true');
     listEl!.hidden = true;
     emptyEl!.hidden = true;
+    if (errorEl) errorEl.hidden = true;
 
     const bookings = await loadBookings(clubSlugs, isSuperAdmin, filters);
     loadingEl!.hidden = true;
+    loadingEl!.setAttribute('aria-busy', 'false');
 
+    if (bookings === null) {
+      if (errorEl) errorEl.hidden = false;
+      return;
+    }
     if (bookings.length === 0) {
       emptyEl!.hidden = false;
       return;
@@ -161,6 +170,8 @@ export async function setupDashboardBookings(): Promise<void> {
     listEl!.innerHTML = bookings.map(renderBookingCard).join('');
     listEl!.hidden = false;
   }
+
+  retryBtn?.addEventListener('click', () => refresh());
 
   // Filter handlers
   clubSelect.addEventListener('change', () => { filters.club = clubSelect.value; refresh(); });
@@ -191,14 +202,16 @@ export async function setupDashboardBookings(): Promise<void> {
 
     if (!window.confirm(`Перевести в статус "${STATUS_LABELS[to]}"?`)) return;
 
+    const originalText = btn.textContent ?? '';
+    btn.setAttribute('aria-busy', 'true');
     btn.disabled = true;
-    const oldText = btn.textContent;
     btn.textContent = 'Сохраняем…';
 
     const result = await transitionBooking(id, to);
     if (!result.ok) {
+      btn.removeAttribute('aria-busy');
       btn.disabled = false;
-      btn.textContent = oldText;
+      btn.textContent = originalText;
       alert(`Не удалось: ${result.error}`);
       return;
     }

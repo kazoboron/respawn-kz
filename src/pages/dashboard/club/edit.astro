@@ -13,11 +13,11 @@ import { CITIES } from '../../../data/cities';
 
       <DashboardNav variant="dashboard" />
 
-      <div class="dashboard-loading" id="club-edit-loading">
+      <div class="dashboard-loading" id="club-edit-loading" aria-live="polite" aria-busy="true">
         <p style="text-align:center;color:var(--text-muted)">Загружаем…</p>
       </div>
 
-      <div class="club-edit-error" id="club-edit-error" hidden style="padding:24px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:12px;color:rgb(248,113,113)"></div>
+      <div class="club-edit-error" id="club-edit-error" role="alert" hidden style="padding:24px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:12px;color:rgb(248,113,113)"></div>
 
       <form id="club-edit-form" class="dashboard-form" hidden>
         <fieldset class="dashboard-fieldset">
