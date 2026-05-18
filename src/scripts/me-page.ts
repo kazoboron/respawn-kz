@@ -127,7 +127,19 @@ export async function setupMePage(): Promise<void> {
   const bookings = await loadBookings();
   if (loadingEl) loadingEl.hidden = true;
 
-  if (!bookings || bookings.length === 0) {
+  if (bookings === null) {
+    const errorEl = document.getElementById('me-error');
+    if (errorEl) {
+      errorEl.hidden = false;
+    } else {
+      // Fallback if no dedicated error element exists
+      emptyEl.innerHTML = '<p>Не удалось загрузить брони. <a href="" onclick="location.reload();return false;">Обновить страницу</a></p>';
+      emptyEl.hidden = false;
+    }
+    return;
+  }
+
+  if (bookings.length === 0) {
     emptyEl.hidden = false;
     return;
   }

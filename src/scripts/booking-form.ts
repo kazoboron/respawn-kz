@@ -191,7 +191,14 @@ async function rebuildTimeSelect(
     ? Array.from({ length: 24 }, (_, i) => i)
     : generateSlots(parseHour(hours.open), parseHour(hours.close));
 
+  // Show loading state while fetching booked slots
+  timeSelect.innerHTML = '<option value="">— загрузка слотов —</option>';
+  timeSelect.disabled = true;
+  timeSelect.setAttribute('aria-busy', 'true');
+
   const booked = await fetchBookedForDay(club.slug, dateStr, excludeBookingId);
+
+  timeSelect.removeAttribute('aria-busy');
 
   const options = allowed.map((h) => {
     const blocked = isStartBlocked(h, duration, booked, allowed);
@@ -292,13 +299,15 @@ export async function openBookingFormModal(opts: BookingFormOptions): Promise<vo
 
     const submitBtn = form.querySelector('button[type="submit"]') as HTMLButtonElement;
     submitBtn.disabled = true;
-    submitBtn.textContent = 'Сохраняем…';
+    submitBtn.setAttribute('aria-busy', 'true');
+    submitBtn.textContent = 'Бронируем…';
     if (errorEl) errorEl.hidden = true;
     form.querySelectorAll<HTMLElement>('[aria-invalid]').forEach((el) => el.setAttribute('aria-invalid', 'false'));
 
     const result = await onSubmit(data);
 
     submitBtn.disabled = false;
+    submitBtn.removeAttribute('aria-busy');
     submitBtn.textContent = submitLabel;
 
     if (!result.ok) {

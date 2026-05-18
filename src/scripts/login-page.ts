@@ -31,6 +31,7 @@ export function setupLoginPage(): void {
     if (emailInput) emailInput.setAttribute('aria-invalid', 'false');
     const btn = form.querySelector('button[type="submit"]') as HTMLButtonElement;
     btn.disabled = true;
+    btn.setAttribute('aria-busy', 'true');
     btn.textContent = supabaseConfigured ? 'Отправляем…' : 'Входим…';
 
     const { error } = await supabase.auth.signInWithOtp({
@@ -42,6 +43,7 @@ export function setupLoginPage(): void {
 
     if (error) {
       btn.disabled = false;
+      btn.removeAttribute('aria-busy');
       btn.textContent = supabaseConfigured ? 'Получить ссылку' : 'Войти';
       if (emailInput) emailInput.setAttribute('aria-invalid', 'true');
       if (errorEl) {
@@ -60,6 +62,7 @@ export function setupLoginPage(): void {
 
     // Реальный Supabase: показываем «письмо отправлено»
     btn.disabled = false;
+    btn.removeAttribute('aria-busy');
     btn.textContent = 'Получить ссылку';
     if (emailInput) emailInput.setAttribute('aria-invalid', 'false');
     if (successEl) {

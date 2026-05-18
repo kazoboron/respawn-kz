@@ -3788,7 +3788,7 @@ textarea:focus-visible,
 }
 
 /* Public reviews section on /clubs/[slug] */
-.reviews-list { display: flex; flex-direction: column; gap: 16px; }
+.reviews-list { display: flex; flex-direction: column; gap: 16px; list-style: none; padding: 0; margin: 0; }
 .review-card {
   background: var(--surface, #14141c);
   border: 1px solid var(--border-subtle, #2a2a35);

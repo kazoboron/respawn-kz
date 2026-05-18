@@ -13,8 +13,13 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         </div>
       </header>
 
-      <div class="me-loading" id="me-loading">
+      <div class="me-loading" id="me-loading" aria-live="polite" aria-busy="true">
         <p style="text-align:center;color:var(--text-muted)">Загружаем брони…</p>
+      </div>
+
+      <div class="me-error" id="me-error" role="alert" hidden style="text-align:center;padding:40px 20px;color:var(--text-muted)">
+        <p>Не удалось загрузить брони.</p>
+        <button type="button" class="btn btn--ghost btn--sm" style="margin-top:12px" onclick="location.reload()">Обновить страницу</button>
       </div>
 
       <ul class="me-bookings__list" id="me-bookings" hidden></ul>

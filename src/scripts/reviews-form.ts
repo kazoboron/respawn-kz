@@ -146,7 +146,7 @@ export async function setupReviewsForm(): Promise<void> {
 
     if (textareaEl) textareaEl.setAttribute('aria-invalid', 'false');
     const submitBtn = form.querySelector<HTMLButtonElement>('button[type="submit"]');
-    if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Сохраняем…'; }
+    if (submitBtn) { submitBtn.disabled = true; submitBtn.setAttribute('aria-busy', 'true'); submitBtn.textContent = 'Публикуем…'; }
 
     const newRow: NewReview = {
       booking_id: b.id,
@@ -161,7 +161,7 @@ export async function setupReviewsForm(): Promise<void> {
     if (error) {
       if (textareaEl) textareaEl.setAttribute('aria-invalid', 'true');
       if (errorEl) { errorEl.textContent = translateError(error.message); errorEl.hidden = false; }
-      if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Опубликовать'; }
+      if (submitBtn) { submitBtn.disabled = false; submitBtn.removeAttribute('aria-busy'); submitBtn.textContent = 'Опубликовать'; }
       return;
     }
 
