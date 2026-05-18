@@ -57,26 +57,30 @@ async function runAudit(url, chromePort) {
   return { url, score, failures };
 }
 
-const chrome = await chromeLauncher.launch({ chromeFlags: ['--headless'] });
-const results = [];
-for (const path of PATHS) {
-  const url = `${baseUrl}${path}`;
-  try {
-    const r = await runAudit(url, chrome.port);
-    results.push(r);
-    console.log(`${r.score >= 95 ? '✅' : '⚠️ '} ${path} — ${r.score}`);
-  } catch (e) {
-    results.push({ url, score: 0, failures: [{ id: 'error', title: e.message }] });
-    console.log(`❌ ${path} — ERROR: ${e.message}`);
+let chrome;
+try {
+  chrome = await chromeLauncher.launch({ chromeFlags: ['--headless'] });
+  const results = [];
+  for (const path of PATHS) {
+    const url = `${baseUrl}${path}`;
+    try {
+      const r = await runAudit(url, chrome.port);
+      results.push(r);
+      console.log(`${r.score >= 95 ? '✅' : '⚠️ '} ${path} — ${r.score}`);
+    } catch (e) {
+      results.push({ url, score: 0, failures: [{ id: 'error', title: e.message }] });
+      console.log(`❌ ${path} — ERROR: ${e.message}`);
+    }
   }
+
+  const outDir = join(__dirname, '..', 'docs', 'audit');
+  mkdirSync(outDir, { recursive: true });
+  writeFileSync(join(outDir, 'a11y-latest.json'), JSON.stringify(results, null, 2));
+
+  const avg = Math.round(results.reduce((s, r) => s + r.score, 0) / results.length);
+  const passing = results.filter((r) => r.score >= 95).length;
+  console.log(`\nSummary: ${passing}/${results.length} ≥95, avg ${avg}`);
+  console.log(`Full report: docs/audit/a11y-latest.json`);
+} finally {
+  await chrome?.kill();
 }
-await chrome.kill();
-
-const outDir = join(__dirname, '..', 'docs', 'audit');
-mkdirSync(outDir, { recursive: true });
-writeFileSync(join(outDir, 'a11y-latest.json'), JSON.stringify(results, null, 2));
-
-const avg = Math.round(results.reduce((s, r) => s + r.score, 0) / results.length);
-const passing = results.filter((r) => r.score >= 95).length;
-console.log(`\nSummary: ${passing}/${results.length} ≥95, avg ${avg}`);
-console.log(`Full report: docs/audit/a11y-latest.json`);
