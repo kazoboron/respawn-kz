@@ -1,0 +1,28 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import DashboardNav from '../../components/DashboardNav.astro';
+---
+<BaseLayout
+  title="Модерация отзывов — respawn.kz"
+  description="Управление отзывами клубов"
+>
+  <section class="container dashboard-page">
+    <DashboardNav variant="admin" active="/admin/reviews/" />
+    <header class="dashboard-page__header">
+      <h1>Модерация отзывов</h1>
+      <p class="dashboard-page__sub">Последние 50 отзывов. Скрытые исключаются из публичного рейтинга клуба.</p>
+    </header>
+
+    <div id="admin-reviews-root">
+      <div class="admin-filter">
+        <label><input type="radio" name="status-filter" value="all" checked /> Все</label>
+        <label><input type="radio" name="status-filter" value="published" /> Опубликованы</label>
+        <label><input type="radio" name="status-filter" value="hidden" /> Скрыты</label>
+      </div>
+
+      <div id="admin-reviews-list" class="admin-reviews-list">
+        <p class="reviews-loading">Загрузка…</p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
