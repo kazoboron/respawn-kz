@@ -107,3 +107,34 @@ export interface SuperAdmin {
 // =====================================================================
 
 export type { ClubRow } from '../lib/clubs-loader';
+
+// =====================================================================
+// Review
+// =====================================================================
+
+export type ReviewStatus = 'published' | 'hidden';
+
+export interface Review {
+  id: string;
+  booking_id: string;
+  user_id: string;
+  club_slug: string;
+  rating: number;
+  text: string;
+  status: ReviewStatus;
+  hidden_by: string | null;
+  hidden_at: string | null;
+  hidden_reason: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export type NewReview = Omit<
+  Review,
+  'id' | 'status' | 'hidden_by' | 'hidden_at' | 'hidden_reason' | 'created_at' | 'updated_at'
+>;
+
+export const REVIEW_STATUS_LABELS: Record<ReviewStatus, string> = {
+  published: 'Опубликован',
+  hidden: 'Скрыт',
+};
