@@ -24,8 +24,8 @@ export function setupCookieBanner(): void {
 
   const banner = document.createElement('div');
   banner.className = 'cookie-banner';
-  banner.setAttribute('role', 'dialog');
-  banner.setAttribute('aria-label', 'Согласие на cookies');
+  banner.setAttribute('role', 'region');
+  banner.setAttribute('aria-label', 'Согласие на использование cookies');
   banner.innerHTML = `
     <div class="cookie-banner__inner">
       <p class="cookie-banner__text">
@@ -40,6 +40,10 @@ export function setupCookieBanner(): void {
   `;
 
   document.body.appendChild(banner);
+
+  // Move focus to accept button
+  const acceptBtn = banner.querySelector<HTMLButtonElement>('[data-consent="accepted"]');
+  acceptBtn?.focus();
 
   // animate in
   requestAnimationFrame(() => {
