@@ -42,6 +42,7 @@ function renderBookingCard(b: Booking, r: Review | undefined): string {
   const cityLabel = CITY_LABELS[b.city_id] ?? b.city_id;
   const today = new Date().toISOString().slice(0, 10);
   const canCancel = !isTerminalStatus(b.status) && b.date >= today;
+  const canReschedule = b.status === 'pending' && b.date >= today;
   const statusClass = `pill ${STATUS_COLORS[b.status]}`;
   return `
     <article class="me-booking" data-booking-id="${b.id}">
@@ -58,6 +59,7 @@ function renderBookingCard(b: Booking, r: Review | undefined): string {
       <div class="me-booking__side">
         <div class="me-booking__price">${formatPrice(b.total_price)} ₸</div>
         <span class="${statusClass}">${STATUS_LABELS[b.status]}</span>
+        ${canReschedule ? `<button class="btn btn--ghost btn--sm" data-reschedule="${b.id}">Изменить</button>` : ''}
         ${canCancel ? `<button class="btn btn--ghost btn--sm" data-cancel="${b.id}">Отменить</button>` : ''}
       </div>
       ${renderReviewFooter(b, r)}
@@ -137,27 +139,41 @@ export async function setupMePage(): Promise<void> {
 
   listEl.addEventListener('click', async (e) => {
     const target = e.target as HTMLElement;
-    const btn = target.closest('[data-cancel]') as HTMLElement | null;
-    if (!btn) return;
-    const id = btn.getAttribute('data-cancel');
+
+    const rescheduleBtn = target.closest('[data-reschedule]') as HTMLElement | null;
+    if (rescheduleBtn) {
+      const id = rescheduleBtn.getAttribute('data-reschedule');
+      if (!id) return;
+      const booking = bookings.find((b) => b.id === id);
+      if (!booking) return;
+      const { openRescheduleModal } = await import('./booking-reschedule');
+      await openRescheduleModal(booking);
+      // After modal closes, reload to reflect new state (cheap + safe for MVP).
+      window.location.reload();
+      return;
+    }
+
+    const cancelBtn = target.closest('[data-cancel]') as HTMLElement | null;
+    if (!cancelBtn) return;
+    const id = cancelBtn.getAttribute('data-cancel');
     if (!id) return;
 
     if (!window.confirm('Точно отменить бронь?')) return;
 
-    btn.setAttribute('disabled', '');
-    btn.textContent = 'Отменяем…';
+    cancelBtn.setAttribute('disabled', '');
+    cancelBtn.textContent = 'Отменяем…';
     const ok = await cancelBooking(id);
     if (!ok) {
-      btn.removeAttribute('disabled');
-      btn.textContent = 'Отменить';
+      cancelBtn.removeAttribute('disabled');
+      cancelBtn.textContent = 'Отменить';
       alert('Не удалось отменить. Попробуй ещё раз.');
       return;
     }
 
-    const card = btn.closest('[data-booking-id]') as HTMLElement;
+    const card = cancelBtn.closest('[data-booking-id]') as HTMLElement;
     const statusEl = card.querySelector('.pill') as HTMLElement;
     statusEl.className = 'pill pill--cancelled';
     statusEl.textContent = STATUS_LABELS.cancelled;
-    btn.remove();
+    cancelBtn.remove();
   });
 }
