@@ -6,11 +6,11 @@ function isUuid(s: string): boolean {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s);
 }
 
-async function loadAllAdmins(): Promise<ClubAdmin[]> {
+async function loadAllAdmins(): Promise<ClubAdmin[] | null> {
   const { data, error } = await supabase.from('club_admins').select('*');
   if (error) {
     console.error('[admin-owners] load failed', error);
-    return [];
+    return null;
   }
   return (data ?? []) as ClubAdmin[];
 }
@@ -53,6 +53,7 @@ export async function setupAdminOwners(): Promise<void> {
 
   const loadingEl = document.getElementById('owners-loading');
   const listEl = document.getElementById('owners-list');
+  const errorEl = document.getElementById('owners-error');
   if (!loadingEl || !listEl) return;
 
   const { user } = await requireSuperAdmin();
@@ -60,6 +61,10 @@ export async function setupAdminOwners(): Promise<void> {
 
   async function refresh() {
     const admins = await loadAllAdmins();
+    if (admins === null) {
+      if (errorEl) errorEl.hidden = false;
+      return;
+    }
     const bySlug = new Map<string, ClubAdmin[]>();
     admins.forEach((a) => {
       const arr = bySlug.get(a.club_slug) ?? [];
@@ -90,16 +95,19 @@ export async function setupAdminOwners(): Promise<void> {
         alert('Введи валидный UUID (формат: 8-4-4-4-12 hex)');
         return;
       }
+      grantBtn.setAttribute('aria-busy', 'true');
       grantBtn.disabled = true;
       grantBtn.textContent = 'Сохраняем…';
       const result = await grantOwnership(uid, slug, user.id);
       if (!result.ok) {
         alert(`Ошибка: ${result.error}`);
+        grantBtn.removeAttribute('aria-busy');
         grantBtn.disabled = false;
         grantBtn.textContent = 'Привязать';
         return;
       }
       input.value = '';
+      grantBtn.removeAttribute('aria-busy');
       grantBtn.disabled = false;
       grantBtn.textContent = 'Привязать';
       await refresh();
@@ -110,11 +118,13 @@ export async function setupAdminOwners(): Promise<void> {
     if (revokeBtn) {
       const id = revokeBtn.getAttribute('data-revoke')!;
       if (!window.confirm('Отвязать этого владельца?')) return;
+      revokeBtn.setAttribute('aria-busy', 'true');
       revokeBtn.disabled = true;
       revokeBtn.textContent = '…';
       const result = await revokeOwnership(id);
       if (!result.ok) {
         alert(`Ошибка: ${result.error}`);
+        revokeBtn.removeAttribute('aria-busy');
         revokeBtn.disabled = false;
         revokeBtn.textContent = 'Отвязать';
         return;

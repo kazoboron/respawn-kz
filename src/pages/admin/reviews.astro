@@ -21,8 +21,15 @@ import DashboardNav from '../../components/DashboardNav.astro';
         <label><input type="radio" name="status-filter" value="hidden" /> Скрыты</label>
       </fieldset>
 
-      <div id="admin-reviews-list" class="admin-reviews-list">
-        <p class="reviews-loading">Загрузка…</p>
+      <div id="admin-reviews-loading" class="dashboard-loading" aria-live="polite">
+        <p style="text-align:center;color:var(--text-muted)">Загрузка…</p>
+      </div>
+      <div id="admin-reviews-list" class="admin-reviews-list" aria-busy="true" aria-live="polite"></div>
+      <div id="admin-reviews-empty" hidden>
+        <p style="text-align:center;color:var(--text-muted)">Отзывов с этим фильтром нет.</p>
+      </div>
+      <div id="admin-reviews-error" role="alert" hidden style="padding:16px;color:rgb(248,113,113)">
+        <p>Не удалось загрузить отзывы. <button type="button" class="btn btn--ghost btn--sm" data-retry-admin-reviews>Повторить</button></p>
       </div>
     </div>
   </section>

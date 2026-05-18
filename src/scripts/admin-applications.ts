@@ -71,13 +71,13 @@ function renderAdminAppCard(app: ClubApplication): string {
   `;
 }
 
-async function loadApplications(statusFilter: string): Promise<ClubApplication[]> {
+async function loadApplications(statusFilter: string): Promise<ClubApplication[] | null> {
   let query = supabase.from('club_applications').select('*').order('created_at', { ascending: false });
   if (statusFilter) query = query.eq('status', statusFilter);
   const { data, error } = await query.limit(100);
   if (error) {
     console.error('[admin-apps] load failed', error);
-    return [];
+    return null;
   }
   return (data ?? []) as ClubApplication[];
 }
@@ -109,6 +109,8 @@ export async function setupAdminApplications(): Promise<void> {
   const filtersEl = document.getElementById('admin-apps-filters');
   const listEl = document.getElementById('admin-apps-list');
   const emptyEl = document.getElementById('admin-apps-empty');
+  const errorEl = document.getElementById('admin-apps-error');
+  const retryBtn = errorEl?.querySelector<HTMLButtonElement>('[data-retry-admin-apps]') ?? null;
   if (!loadingEl || !filtersEl || !listEl || !emptyEl) return;
 
   const { user } = await requireSuperAdmin();
@@ -118,12 +120,19 @@ export async function setupAdminApplications(): Promise<void> {
 
   async function refresh() {
     loadingEl!.hidden = false;
+    loadingEl!.setAttribute('aria-busy', 'true');
     listEl!.hidden = true;
     emptyEl!.hidden = true;
+    if (errorEl) errorEl.hidden = true;
 
     const apps = await loadApplications(currentStatus);
     loadingEl!.hidden = true;
+    loadingEl!.setAttribute('aria-busy', 'false');
 
+    if (apps === null) {
+      if (errorEl) errorEl.hidden = false;
+      return;
+    }
     if (apps.length === 0) {
       emptyEl!.hidden = false;
       return;
@@ -132,6 +141,8 @@ export async function setupAdminApplications(): Promise<void> {
     listEl!.innerHTML = apps.map(renderAdminAppCard).join('');
     listEl!.hidden = false;
   }
+
+  retryBtn?.addEventListener('click', () => refresh());
 
   filtersEl.hidden = false;
   (document.getElementById('admin-apps-status') as HTMLSelectElement).addEventListener('change', (e) => {
@@ -156,9 +167,10 @@ export async function setupAdminApplications(): Promise<void> {
       if (!window.confirm('Отклонить без комментария? Заявителю будет полезно знать причину.')) return;
     }
 
+    const originalText = btn.textContent ?? '';
+    btn.setAttribute('aria-busy', 'true');
     btn.disabled = true;
-    const oldText = btn.textContent;
-    btn.textContent = 'Сохраняем…';
+    btn.textContent = action === 'approve' ? 'Одобряем…' : 'Отклоняем…';
 
     const card = btn.closest('[data-app-id]') as HTMLElement;
     // Read applicant email from data-attribute (set by renderAdminAppCard).
@@ -174,8 +186,9 @@ export async function setupAdminApplications(): Promise<void> {
         .eq('id', id)
         .single();
       if (fetchErr || !app) {
+        btn.removeAttribute('aria-busy');
         btn.disabled = false;
-        btn.textContent = oldText;
+        btn.textContent = originalText;
         alert(`Не удалось загрузить заявку: ${fetchErr?.message ?? 'unknown'}`);
         return;
       }
@@ -185,8 +198,9 @@ export async function setupAdminApplications(): Promise<void> {
       try {
         newSlug = await generateUniqueClubSlug(app.club_name);
       } catch (err) {
+        btn.removeAttribute('aria-busy');
         btn.disabled = false;
-        btn.textContent = oldText;
+        btn.textContent = originalText;
         alert(`Не удалось сгенерировать уникальный slug: ${(err as Error).message}`);
         return;
       }
@@ -199,8 +213,9 @@ export async function setupAdminApplications(): Promise<void> {
       });
 
       if (rpcErr) {
+        btn.removeAttribute('aria-busy');
         btn.disabled = false;
-        btn.textContent = oldText;
+        btn.textContent = originalText;
         alert(`Ошибка одобрения: ${rpcErr.message}`);
         return;
       }
@@ -216,8 +231,9 @@ export async function setupAdminApplications(): Promise<void> {
       // Reject path uses the old update flow (no RPC needed)
       const result = await updateApplicationStatus(id, newStatus, note, user.id);
       if (!result.ok) {
+        btn.removeAttribute('aria-busy');
         btn.disabled = false;
-        btn.textContent = oldText;
+        btn.textContent = originalText;
         alert(`Ошибка: ${result.error}`);
         return;
       }

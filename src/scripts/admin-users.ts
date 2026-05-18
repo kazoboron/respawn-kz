@@ -111,16 +111,23 @@ export async function setupAdminUsers(): Promise<void> {
       return;
     }
 
+    searchBtn.setAttribute('aria-busy', 'true');
+    searchBtn.disabled = true;
     resultEl.innerHTML = '<p style="color:var(--text-muted)">Ищем…</p>';
 
     let result: UserSearchResult | null = null;
-    if (isUuid(q)) {
-      result = await lookupByUid(q);
-    } else if (isEmail(q)) {
-      result = await lookupByEmail(q.toLowerCase());
-    } else {
-      resultEl.innerHTML = '<p style="color:rgb(248, 113, 113)">Введи email или UUID</p>';
-      return;
+    try {
+      if (isUuid(q)) {
+        result = await lookupByUid(q);
+      } else if (isEmail(q)) {
+        result = await lookupByEmail(q.toLowerCase());
+      } else {
+        resultEl.innerHTML = '<p style="color:rgb(248, 113, 113)">Введи email или UUID</p>';
+        return;
+      }
+    } finally {
+      searchBtn.removeAttribute('aria-busy');
+      searchBtn.disabled = false;
     }
 
     if (!result) {

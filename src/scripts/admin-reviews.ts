@@ -59,7 +59,7 @@ function renderRow(r: ReviewWithClub): string {
   `;
 }
 
-async function loadReviews(filter: Filter): Promise<ReviewWithClub[]> {
+async function loadReviews(filter: Filter): Promise<ReviewWithClub[] | null> {
   let q = supabase
     .from('reviews')
     .select('*, clubs(name)')
@@ -69,7 +69,7 @@ async function loadReviews(filter: Filter): Promise<ReviewWithClub[]> {
   const { data, error } = await q;
   if (error) {
     console.error('[admin-reviews] load failed', error);
-    return [];
+    return null;
   }
   return (data ?? []) as ReviewWithClub[];
 }
@@ -103,6 +103,10 @@ async function unhideReview(id: string): Promise<boolean> {
 export async function setupAdminReviews(): Promise<void> {
   const root = document.getElementById('admin-reviews-root');
   const listEl = document.getElementById('admin-reviews-list');
+  const loadingEl = document.getElementById('admin-reviews-loading');
+  const emptyEl = document.getElementById('admin-reviews-empty');
+  const errorEl = document.getElementById('admin-reviews-error');
+  const retryBtn = errorEl?.querySelector<HTMLButtonElement>('[data-retry-admin-reviews]') ?? null;
   if (!root || !listEl) return;
 
   const { user } = await requireSuperAdmin();
@@ -110,15 +114,36 @@ export async function setupAdminReviews(): Promise<void> {
 
   let currentFilter: Filter = 'all';
 
+  function showLoading(): void {
+    if (loadingEl) loadingEl.hidden = false;
+    listEl!.setAttribute('aria-busy', 'true');
+    if (emptyEl) emptyEl.hidden = true;
+    if (errorEl) errorEl.hidden = true;
+  }
+
+  function hideLoading(): void {
+    if (loadingEl) loadingEl.hidden = true;
+    listEl!.setAttribute('aria-busy', 'false');
+  }
+
   async function refresh() {
-    listEl!.innerHTML = '<p class="reviews-loading">Загрузка…</p>';
+    showLoading();
     const rows = await loadReviews(currentFilter);
+    hideLoading();
+
+    if (rows === null) {
+      if (errorEl) errorEl.hidden = false;
+      return;
+    }
     if (rows.length === 0) {
-      listEl!.innerHTML = '<p class="reviews-empty">Отзывов с этим фильтром нет.</p>';
+      if (emptyEl) emptyEl.hidden = false;
+      listEl!.innerHTML = '';
       return;
     }
     listEl!.innerHTML = rows.map(renderRow).join('');
   }
+
+  retryBtn?.addEventListener('click', () => refresh());
 
   root.addEventListener('change', (e) => {
     const target = e.target as HTMLInputElement;
@@ -135,18 +160,25 @@ export async function setupAdminReviews(): Promise<void> {
     const action = btn.getAttribute('data-action');
     if (!id || !action) return;
 
+    const originalText = btn.textContent ?? '';
     let ok = false;
     if (action === 'hide') {
       const reason = window.prompt('Причина скрытия (опционально):') ?? '';
+      btn.setAttribute('aria-busy', 'true');
       btn.disabled = true;
+      btn.textContent = 'Скрываем…';
       ok = await hideReview(id, reason, user.id);
     } else if (action === 'unhide') {
+      btn.setAttribute('aria-busy', 'true');
       btn.disabled = true;
+      btn.textContent = 'Публикуем…';
       ok = await unhideReview(id);
     }
 
     if (!ok) {
+      btn.removeAttribute('aria-busy');
       btn.disabled = false;
+      btn.textContent = originalText;
       alert('Не удалось обновить статус. Попробуй ещё раз.');
       return;
     }
