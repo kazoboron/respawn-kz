@@ -87,5 +87,9 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site ?? 'https://respawn.
     <script>
       import '../scripts/init';
     </script>
+    <script>
+      import { registerSW } from 'virtual:pwa-register';
+      registerSW({ immediate: true });
+    </script>
   </body>
 </html>
