@@ -24,7 +24,8 @@
       "WebFetch(domain:cloudflarestatus.com)",
       "WebFetch(domain:www.cloudflarestatus.com)",
       "WebFetch(domain:api.cloudflare.com)",
-      "Bash(curl -s \"https://respawn.kz\")"
+      "Bash(curl -s \"https://respawn.kz\")",
+      "Bash(GH_TOKEN=* gh run view *)"
     ]
   }
 }
