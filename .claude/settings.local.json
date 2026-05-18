@@ -3,7 +3,26 @@
     "allow": [
       "mcp__obsidian__obsidian_append_content",
       "mcp__obsidian__obsidian_get_file_contents",
-      "Bash(git -C C:\\\\ClaudeCode log --oneline -20)"
+      "mcp__obsidian__obsidian_list_files_in_dir",
+      "mcp__obsidian__obsidian_batch_get_file_contents",
+      "mcp__obsidian__obsidian_patch_content",
+      "Bash(git *)",
+      "Bash(npm run *)",
+      "Bash(npx astro *)",
+      "Bash(npx wrangler *)",
+      "Bash(npm install *)",
+      "Bash(node scripts/audit-a11y.mjs *)",
+      "Bash(curl -sI http://localhost:4321/)",
+      "Bash(curl -sI http://localhost:4321/clubs/)",
+      "Bash(curl -sI http://localhost:4321/clubs/cyberzone/)",
+      "Bash(curl -sI http://localhost:4321/login/)",
+      "Bash(curl -sI http://localhost:4321/about/)",
+      "PowerShell(Invoke-WebRequest *)",
+      "PowerShell(Start-Sleep *)",
+      "PowerShell(Get-Process *)",
+      "Read(//tmp/**)",
+      "WebFetch(domain:cloudflarestatus.com)",
+      "WebFetch(domain:www.cloudflarestatus.com)"
     ]
   }
 }
