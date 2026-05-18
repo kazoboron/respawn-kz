@@ -156,6 +156,31 @@ ${p.review_note ? `Причина: ${p.review_note}\n` : 'Свяжись с по
 Подать новую заявку: ${SITE_URL}/dashboard/register/
     `,
   },
+
+  review_created: {
+    subject: (p) => `Новый отзыв в ${p.club_name ?? 'клубе'} — ★${p.rating}`,
+    bodyHtml: (p) => `
+      <h1>Новый отзыв</h1>
+      <p>В клубе <strong>${p.club_name}</strong> оставлен новый отзыв.</p>
+      <ul>
+        <li>Оценка: ★${p.rating} / 5</li>
+        <li>Клиент: ${p.customer_email}</li>
+      </ul>
+      <blockquote style="border-left: 3px solid #00d4ff; padding-left: 12px; color: #cfcfd9; margin: 16px 0;">
+        ${p.text}
+      </blockquote>
+      <p><a href="${SITE_URL}/clubs/${p.club_slug}/">Открыть страницу клуба</a></p>
+    `,
+    bodyText: (p) => `
+Новый отзыв в клубе ${p.club_name}.
+Оценка: ${p.rating}/5
+Клиент: ${p.customer_email}
+
+«${p.text}»
+
+Страница клуба: ${SITE_URL}/clubs/${p.club_slug}/
+    `,
+  },
 };
 
 export function renderTemplate(
