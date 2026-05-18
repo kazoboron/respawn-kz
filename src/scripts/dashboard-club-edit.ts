@@ -357,17 +357,14 @@ export async function setupDashboardClubEdit(): Promise<void> {
       return;
     }
 
-    // If deploy hook is configured, mention auto-rebuild; otherwise be honest.
-    const hookConfigured = !!import.meta.env.PUBLIC_CF_DEPLOY_HOOK_URL;
-    successEl.innerHTML = hookConfigured
-      ? '<strong>Сохранено!</strong> Сайт обновится через 30-60 секунд.'
-      : '<strong>Сохранено!</strong> Изменения появятся на сайте после следующего деплоя.';
+    // Optimistic: assume rebuild trigger works. Real failure logged but not user-visible.
+    successEl.innerHTML = '<strong>Сохранено!</strong> Сайт обновится через 1-2 минуты.';
     successEl.hidden = false;
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
-    // Fire-and-forget rebuild trigger if configured (no-op otherwise)
-    triggerSiteRebuild().then((r) => {
-      if (!r.ok && hookConfigured) console.warn('[edit] deploy trigger failed:', r.error);
+    // Fire-and-forget rebuild trigger via Supabase Edge Function → GitHub Actions
+    triggerSiteRebuild(`club edit: ${slug}`).then((r) => {
+      if (!r.ok) console.warn('[edit] deploy trigger failed:', r.error);
     });
   });
 }
