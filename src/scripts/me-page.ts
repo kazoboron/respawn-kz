@@ -20,7 +20,7 @@ function escapeHtml(s: string): string {
     .replace(/'/g, '&#39;');
 }
 
-function renderReviewFooter(b: Booking, r: Review | undefined): string {
+function renderReviewFooter(b: Booking, r: Review | undefined, aria: string): string {
   if (b.status !== 'completed') return '';
   if (r) {
     const excerpt = r.text.length > 80 ? r.text.slice(0, 80) + '…' : r.text;
@@ -33,7 +33,7 @@ function renderReviewFooter(b: Booking, r: Review | undefined): string {
   }
   return `
     <div class="me-booking__review">
-      <a class="btn btn--sm btn--ghost" href="/reviews/new?booking_id=${b.id}">Оставить отзыв</a>
+      <a class="btn btn--sm btn--ghost" href="/reviews/new?booking_id=${b.id}" aria-label="Оставить отзыв на бронь в ${aria}">Оставить отзыв</a>
     </div>
   `;
 }
@@ -44,8 +44,9 @@ function renderBookingCard(b: Booking, r: Review | undefined): string {
   const canCancel = !isTerminalStatus(b.status) && b.date >= today;
   const canReschedule = b.status === 'pending' && b.date >= today;
   const statusClass = `pill ${STATUS_COLORS[b.status]}`;
+  const aria = `${b.club_name} ${formatDate(b.date)} ${b.time_slot}`;
   return `
-    <article class="me-booking" data-booking-id="${b.id}">
+    <li class="me-booking" data-booking-id="${b.id}">
       <div class="me-booking__main">
         <h3 class="me-booking__name"><a href="/clubs/${b.club_slug}/">${b.club_name}</a></h3>
         <div class="me-booking__meta">
@@ -59,11 +60,11 @@ function renderBookingCard(b: Booking, r: Review | undefined): string {
       <div class="me-booking__side">
         <div class="me-booking__price">${formatPrice(b.total_price)} ₸</div>
         <span class="${statusClass}" aria-label="Статус: ${STATUS_LABELS[b.status]}">${STATUS_LABELS[b.status]}</span>
-        ${canReschedule ? `<button class="btn btn--ghost btn--sm" data-reschedule="${b.id}">Изменить</button>` : ''}
-        ${canCancel ? `<button class="btn btn--ghost btn--sm" data-cancel="${b.id}">Отменить</button>` : ''}
+        ${canReschedule ? `<button class="btn btn--ghost btn--sm" data-reschedule="${b.id}" aria-label="Изменить бронь в ${aria}">Изменить</button>` : ''}
+        ${canCancel ? `<button class="btn btn--ghost btn--sm" data-cancel="${b.id}" aria-label="Отменить бронь в ${aria}">Отменить</button>` : ''}
       </div>
-      ${renderReviewFooter(b, r)}
-    </article>
+      ${renderReviewFooter(b, r, aria)}
+    </li>
   `;
 }
 

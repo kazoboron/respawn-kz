@@ -14,11 +14,12 @@ import DashboardNav from '../../components/DashboardNav.astro';
     </header>
 
     <div id="admin-reviews-root">
-      <div class="admin-filter">
+      <fieldset class="admin-filter">
+        <legend class="sr-only">Фильтр по статусу</legend>
         <label><input type="radio" name="status-filter" value="all" checked /> Все</label>
         <label><input type="radio" name="status-filter" value="published" /> Опубликованы</label>
         <label><input type="radio" name="status-filter" value="hidden" /> Скрыты</label>
-      </div>
+      </fieldset>
 
       <div id="admin-reviews-list" class="admin-reviews-list">
         <p class="reviews-loading">Загрузка…</p>

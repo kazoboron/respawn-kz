@@ -2510,6 +2510,9 @@ body.menu-open {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
 .me-booking {
@@ -3822,7 +3825,7 @@ textarea:focus-visible,
 }
 
 /* Admin reviews moderation page */
-.admin-filter { display: flex; gap: 16px; margin-bottom: 16px; }
+.admin-filter { display: flex; gap: 16px; margin-bottom: 16px; border: none; padding: 0; min-inline-size: 0; }
 .admin-filter label { color: var(--text-secondary, #8a8a95); font-size: 14px; cursor: pointer; }
 .admin-reviews-list { display: flex; flex-direction: column; gap: 12px; }
 .admin-review {

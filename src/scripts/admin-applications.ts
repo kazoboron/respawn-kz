@@ -62,8 +62,8 @@ function renderAdminAppCard(app: ClubApplication): string {
           ></textarea>
           <div id="action-status-${app.id}" aria-live="polite" style="display:none"></div>
           <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <button type="button" class="btn btn--primary btn--sm" data-action="approve" data-id="${app.id}">Одобрить</button>
-            <button type="button" class="btn btn--ghost btn--sm" data-action="reject" data-id="${app.id}">Отклонить</button>
+            <button type="button" class="btn btn--primary btn--sm" data-action="approve" data-id="${app.id}" aria-label="Одобрить заявку ${app.club_name} от ${app.applicant_name}">Одобрить</button>
+            <button type="button" class="btn btn--ghost btn--sm" data-action="reject" data-id="${app.id}" aria-label="Отклонить заявку ${app.club_name} от ${app.applicant_name}">Отклонить</button>
           </div>
         </div>
       ` : ''}
