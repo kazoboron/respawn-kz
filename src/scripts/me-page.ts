@@ -1,6 +1,6 @@
 import { supabase, supabaseConfigured } from '../lib/supabase';
 import { getCurrentUser } from './auth';
-import { type Booking, STATUS_LABELS, STATUS_COLORS, isTerminalStatus } from '../data/supabase-types';
+import { type Booking, type Review, STATUS_LABELS, STATUS_COLORS, isTerminalStatus } from '../data/supabase-types';
 import { CITY_LABELS } from '../data/cities';
 
 function formatPrice(value: number): string {
@@ -11,9 +11,35 @@ function formatDate(date: string): string {
   return new Date(date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
 }
 
-function renderBookingCard(b: Booking): string {
+function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function renderReviewFooter(b: Booking, r: Review | undefined): string {
+  if (b.status !== 'completed') return '';
+  if (r) {
+    const excerpt = r.text.length > 80 ? r.text.slice(0, 80) + '…' : r.text;
+    return `
+      <div class="me-booking__review">
+        <span class="pill pill--rating">★ ${r.rating}</span>
+        <span class="me-review-excerpt">${escapeHtml(excerpt)}</span>
+      </div>
+    `;
+  }
+  return `
+    <div class="me-booking__review">
+      <a class="btn btn--sm btn--ghost" href="/reviews/new?booking_id=${b.id}">Оставить отзыв</a>
+    </div>
+  `;
+}
+
+function renderBookingCard(b: Booking, r: Review | undefined): string {
   const cityLabel = CITY_LABELS[b.city_id] ?? b.city_id;
-  // Cancellable: pending always; confirmed only if booking date is today or future and not terminal
   const today = new Date().toISOString().slice(0, 10);
   const canCancel = !isTerminalStatus(b.status) && b.date >= today;
   const statusClass = `pill ${STATUS_COLORS[b.status]}`;
@@ -34,6 +60,7 @@ function renderBookingCard(b: Booking): string {
         <span class="${statusClass}">${STATUS_LABELS[b.status]}</span>
         ${canCancel ? `<button class="btn btn--ghost btn--sm" data-cancel="${b.id}">Отменить</button>` : ''}
       </div>
+      ${renderReviewFooter(b, r)}
     </article>
   `;
 }
@@ -48,6 +75,21 @@ async function loadBookings(): Promise<Booking[] | null> {
     return null;
   }
   return data as Booking[];
+}
+
+async function loadReviewsByBookingIds(ids: string[]): Promise<Map<string, Review>> {
+  if (ids.length === 0) return new Map();
+  const { data, error } = await supabase
+    .from('reviews')
+    .select('*')
+    .in('booking_id', ids);
+  if (error) {
+    console.error('[me] failed to load reviews', error);
+    return new Map();
+  }
+  const map = new Map<string, Review>();
+  for (const r of (data ?? []) as Review[]) map.set(r.booking_id, r);
+  return map;
 }
 
 async function cancelBooking(id: string): Promise<boolean> {
@@ -74,7 +116,6 @@ export async function setupMePage(): Promise<void> {
 
   if (emailEl) emailEl.textContent = user.email ?? '';
 
-  // Demo-режим: показать индикатор
   if (!supabaseConfigured) {
     const banner = document.getElementById('me-demo-banner');
     if (banner) banner.hidden = false;
@@ -88,7 +129,10 @@ export async function setupMePage(): Promise<void> {
     return;
   }
 
-  listEl.innerHTML = bookings.map(renderBookingCard).join('');
+  const completedIds = bookings.filter((b) => b.status === 'completed').map((b) => b.id);
+  const reviewMap = await loadReviewsByBookingIds(completedIds);
+
+  listEl.innerHTML = bookings.map((b) => renderBookingCard(b, reviewMap.get(b.id))).join('');
   listEl.hidden = false;
 
   listEl.addEventListener('click', async (e) => {

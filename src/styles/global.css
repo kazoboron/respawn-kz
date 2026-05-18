@@ -3753,3 +3753,21 @@ textarea:focus-visible,
 .review-form-page__already { text-align: center; padding: 48px 16px; }
 .review-form { display: flex; flex-direction: column; gap: 16px; }
 .review-form__counter { color: var(--text-tertiary, #6a6a75); font-size: 12px; text-align: right; }
+
+/* Review excerpt inside /me booking card */
+.me-booking__review {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-subtle, #2a2a35);
+  flex-wrap: wrap;
+}
+.me-review-excerpt {
+  color: var(--text-secondary, #8a8a95);
+  font-size: 13px;
+  line-height: 1.4;
+  flex: 1 1 auto;
+  min-width: 0;
+}
