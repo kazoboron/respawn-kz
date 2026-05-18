@@ -73,6 +73,11 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site ?? 'https://respawn.
   <body>
     <AmbientBackground />
     <a href="#main-content" class="skip-link">Перейти к контенту</a>
+    <noscript>
+      <div class="noscript-banner" role="alert">
+        Для бронирования и личного кабинета требуется включить JavaScript.
+      </div>
+    </noscript>
     <Header activeRoute={activeRoute} />
     <main id="main-content" tabindex="-1">
       <slot />

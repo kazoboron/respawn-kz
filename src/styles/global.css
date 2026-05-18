@@ -2607,6 +2607,14 @@ body.menu-open {
   color: var(--neon-yellow);
 }
 
+.noscript-banner {
+  background: var(--warning);
+  color: var(--bg-base);
+  padding: var(--space-3) var(--space-4);
+  text-align: center;
+  font-weight: 600;
+}
+
 /* DashboardNav */
 .dash-nav {
   display: flex;
