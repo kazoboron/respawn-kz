@@ -3110,7 +3110,7 @@ textarea:focus-visible,
 }
 
 .dashboard-success h2 {
-  color: var(--c-violet-400, #a78bfa);
+  color: var(--text-primary);  /* was var(--c-violet-400); migrated for WCAG AA compliance */
   margin: 0 0 12px;
 }
 
@@ -3427,7 +3427,7 @@ textarea:focus-visible,
   padding: 4px 10px;
   border-radius: 6px;
   font-size: 12px;
-  color: var(--c-violet-400, #a78bfa);
+  color: var(--c-violet-300);  /* was var(--c-violet-400); migrated for WCAG AA at small text size */
 }
 
 .owner-card__current {
