@@ -3,6 +3,7 @@
 // Usage: DATABASE_URL=... TO_EMAIL=you@example.com node scripts/seed-test-notification.mjs
 
 import pg from 'pg';
+import { randomUUID } from 'node:crypto';
 
 const { Client } = pg;
 const databaseUrl = process.env.DATABASE_URL;
@@ -15,7 +16,7 @@ if (!databaseUrl || !toEmail) {
 const client = new Client({ connectionString: databaseUrl });
 await client.connect();
 
-const fakeId = '00000000-0000-0000-0000-' + Date.now().toString().padStart(12, '0');
+const fakeId = randomUUID();
 
 const payload = {
   booking_id: fakeId,
