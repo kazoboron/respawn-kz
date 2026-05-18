@@ -3771,3 +3771,40 @@ textarea:focus-visible,
   flex: 1 1 auto;
   min-width: 0;
 }
+
+/* Public reviews section on /clubs/[slug] */
+.reviews-list { display: flex; flex-direction: column; gap: 16px; }
+.review-card {
+  background: var(--surface, #14141c);
+  border: 1px solid var(--border-subtle, #2a2a35);
+  border-radius: 12px;
+  padding: 16px 20px;
+}
+.review-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+.review-card__date {
+  color: var(--text-tertiary, #6a6a75);
+  font-size: 12px;
+}
+.review-card__text {
+  color: var(--text-primary, #e6e6e9);
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+.reviews-actions { margin-top: 16px; text-align: center; }
+.reviews-empty,
+.reviews-loading,
+.reviews-error {
+  color: var(--text-secondary, #8a8a95);
+  font-size: 14px;
+  padding: 16px 0;
+  text-align: center;
+}

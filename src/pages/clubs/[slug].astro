@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ClubCard from '../../components/ClubCard.astro';
 import { loadAllClubs, loadClubBySlug, loadSimilarClubs, type ClubRow } from '../../lib/clubs-loader';
+import { loadTopReviewsForClub } from '../../lib/reviews-loader';
 import { CITY_LABELS } from '../../data/cities';
 
 export async function getStaticPaths() {
@@ -19,6 +20,7 @@ interface Props {
 const { club } = Astro.props;
 const cityLabel = CITY_LABELS[club.city] ?? club.city;
 const similar = await loadSimilarClubs(club.slug, 3);
+const topReviews = await loadTopReviewsForClub(club.slug, 5);
 
 function formatPrice(value: number): string {
   return value.toLocaleString('ru-RU');
@@ -45,7 +47,7 @@ const clubDataAttr = JSON.stringify({
 });
 
 // Schema.org LocalBusiness JSON-LD
-const jsonLd = {
+const jsonLd: Record<string, unknown> = {
   '@context': 'https://schema.org',
   '@type': 'GameServer',
   '@id': `https://respawn.kz/clubs/${club.slug}/`,
@@ -71,6 +73,14 @@ const jsonLd = {
   priceRange: `от ${formatPrice(club.price_per_hour)} ₸/час`,
   openingHours: hoursLabel === 'Круглосуточно' ? 'Mo-Su 00:00-23:59' : hoursLabel,
 };
+if (topReviews.length > 0) {
+  jsonLd.review = topReviews.map((r) => ({
+    '@type': 'Review',
+    reviewRating: { '@type': 'Rating', ratingValue: r.rating, bestRating: 5, worstRating: 1 },
+    reviewBody: r.text,
+    datePublished: r.created_at,
+  }));
+}
 ---
 
 <BaseLayout
@@ -175,6 +185,21 @@ const jsonLd = {
           {similar.map((c) => <ClubCard club={{slug: c.slug, name: c.name, initial: c.initial, gradient: c.gradient, city: c.city, district: c.district, address: c.address, phone: c.phone, rating: c.rating, reviews: c.reviews_count, price: c.price_per_hour, tags: c.tags}} />)}
         </div>
       </section>
+
+        <section class="club-section" id="reviews-section">
+          <h2 class="club-section__title">Отзывы</h2>
+          <div id="reviews-list" class="reviews-list">
+            <p class="reviews-loading">Загрузка…</p>
+          </div>
+          <div class="reviews-actions">
+            <button id="reviews-load-more" class="btn btn--ghost btn--sm" hidden>Показать ещё</button>
+          </div>
+          <p id="reviews-empty" class="reviews-empty" hidden>Пока отзывов нет. Будь первым после посещения.</p>
+        </section>
+
+        <script define:vars={{ slug: club.slug }} type="module">
+          window.__clubReviewsSlug = slug;
+        </script>
     </div>
   </section>
 </BaseLayout>
