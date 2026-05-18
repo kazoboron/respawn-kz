@@ -14,10 +14,39 @@ function hide(id: string) {
 function setRating(value: number) {
   const hidden = document.querySelector<HTMLInputElement>('input[name="rating"]');
   if (hidden) hidden.value = String(value);
-  const btns = document.querySelectorAll<HTMLButtonElement>('.rating-stars__btn');
-  btns.forEach((btn) => {
-    const v = Number(btn.getAttribute('data-rating-value'));
-    btn.classList.toggle('is-active', v <= value);
+  const group = document.querySelector<HTMLElement>('[role="radiogroup"]');
+  if (group) updateRatingStarsState(group, value);
+}
+
+function updateRatingStarsState(group: HTMLElement, n: number) {
+  group.querySelectorAll<HTMLButtonElement>('[role="radio"]').forEach((b, i) => {
+    const v = i + 1;
+    b.setAttribute('aria-checked', v === n ? 'true' : 'false');
+    b.setAttribute('tabindex', v === n ? '0' : '-1');
+    b.classList.toggle('is-active', v <= n);
+  });
+}
+
+function setupRatingStarsKeyboard(group: HTMLElement, onChange: (n: number) => void) {
+  const buttons = Array.from(group.querySelectorAll<HTMLButtonElement>('[role="radio"]'));
+  group.addEventListener('keydown', (e) => {
+    const current = document.activeElement as HTMLButtonElement;
+    const idx = buttons.indexOf(current);
+    if (idx === -1) return;
+    let next = idx;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next = (idx + 1) % buttons.length;
+    else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') next = (idx - 1 + buttons.length) % buttons.length;
+    else if (e.key === ' ' || e.key === 'Enter') {
+      e.preventDefault();
+      const n = Number(current.dataset.ratingValue);
+      onChange(n);
+      return;
+    } else return;
+    e.preventDefault();
+    buttons.forEach((b, i) => b.setAttribute('tabindex', i === next ? '0' : '-1'));
+    buttons[next].focus();
+    const n = Number(buttons[next].dataset.ratingValue);
+    onChange(n);
   });
 }
 
@@ -82,6 +111,10 @@ export async function setupReviewsForm(): Promise<void> {
       setRating(v);
     });
   });
+  const ratingGroup = document.querySelector<HTMLElement>('[role="radiogroup"]');
+  if (ratingGroup) {
+    setupRatingStarsKeyboard(ratingGroup, (n) => setRating(n));
+  }
 
   // Char counter
   const textarea = document.querySelector<HTMLTextAreaElement>('textarea[name="text"]');
