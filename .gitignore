@@ -28,3 +28,6 @@ HANDOFF-*.md
 
 # Lighthouse audit output (generated, not committed — large + changes every run)
 docs/audit/a11y-latest.json
+
+# Claude Code local settings (may contain tokens — never commit)
+.claude/settings.local.json
