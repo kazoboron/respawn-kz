@@ -35,8 +35,8 @@ function renderRow(r: ReviewWithClub): string {
     ? `<button class="btn btn--sm btn--ghost" data-action="hide" data-id="${r.id}">Скрыть</button>`
     : `<button class="btn btn--sm" data-action="unhide" data-id="${r.id}">Опубликовать</button>`;
   const statusPill = r.status === 'published'
-    ? `<span class="pill pill--confirmed">${REVIEW_STATUS_LABELS.published}</span>`
-    : `<span class="pill pill--cancelled">${REVIEW_STATUS_LABELS.hidden}</span>`;
+    ? `<span class="pill pill--confirmed" aria-label="Статус: ${REVIEW_STATUS_LABELS.published}">${REVIEW_STATUS_LABELS.published}</span>`
+    : `<span class="pill pill--cancelled" aria-label="Статус: ${REVIEW_STATUS_LABELS.hidden}">${REVIEW_STATUS_LABELS.hidden}</span>`;
   const reason = r.hidden_reason ? `<div class="admin-review__reason">Причина: ${escapeHtml(r.hidden_reason)}</div>` : '';
   return `
     <article class="admin-review" data-review-id="${r.id}">

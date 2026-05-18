@@ -39,7 +39,7 @@ function formatPrice(value: number): string {
       <h3 class="club-card__name">
         <a href={`/clubs/${club.slug}/`}>{club.name}</a>
       </h3>
-      <span class="pill pill--rating">★ {club.rating}</span>
+      <span class="pill pill--rating" aria-label={`Рейтинг ${club.rating.toFixed(1)} из 5`}><span aria-hidden="true">★</span> {club.rating}</span>
     </div>
     <div class="club-card__meta">
       <span>{CITY_LABELS[club.city] ?? club.city}</span>

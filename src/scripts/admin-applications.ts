@@ -21,7 +21,7 @@ function renderAdminAppCard(app: ClubApplication): string {
             ${app.applicant_name} · ${app.applicant_email} ${app.applicant_phone ? `· ${app.applicant_phone}` : ''}
           </div>
         </div>
-        <span class="pill pill--${app.status}">${APPLICATION_STATUS_LABELS[app.status]}</span>
+        <span class="pill pill--${app.status}" aria-label="Статус: ${APPLICATION_STATUS_LABELS[app.status]}">${APPLICATION_STATUS_LABELS[app.status]}</span>
       </div>
 
       <div class="admin-app-card__body">

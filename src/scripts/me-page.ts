@@ -26,7 +26,7 @@ function renderReviewFooter(b: Booking, r: Review | undefined): string {
     const excerpt = r.text.length > 80 ? r.text.slice(0, 80) + '…' : r.text;
     return `
       <div class="me-booking__review">
-        <span class="pill pill--rating">★ ${r.rating}</span>
+        <span class="pill pill--rating" aria-label="Рейтинг ${r.rating} из 5"><span aria-hidden="true">★</span> ${r.rating}</span>
         <span class="me-review-excerpt">${escapeHtml(excerpt)}</span>
       </div>
     `;
@@ -58,7 +58,7 @@ function renderBookingCard(b: Booking, r: Review | undefined): string {
       </div>
       <div class="me-booking__side">
         <div class="me-booking__price">${formatPrice(b.total_price)} ₸</div>
-        <span class="${statusClass}">${STATUS_LABELS[b.status]}</span>
+        <span class="${statusClass}" aria-label="Статус: ${STATUS_LABELS[b.status]}">${STATUS_LABELS[b.status]}</span>
         ${canReschedule ? `<button class="btn btn--ghost btn--sm" data-reschedule="${b.id}">Изменить</button>` : ''}
         ${canCancel ? `<button class="btn btn--ghost btn--sm" data-cancel="${b.id}">Отменить</button>` : ''}
       </div>
@@ -177,6 +177,7 @@ export async function setupMePage(): Promise<void> {
     const statusEl = card.querySelector('.pill') as HTMLElement;
     statusEl.className = 'pill pill--cancelled';
     statusEl.textContent = STATUS_LABELS.cancelled;
+    statusEl.setAttribute('aria-label', `Статус: ${STATUS_LABELS.cancelled}`);
     cancelBtn.remove();
   });
 }

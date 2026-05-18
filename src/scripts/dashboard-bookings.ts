@@ -79,7 +79,7 @@ function renderBookingCard(b: Booking): string {
         </div>
       </div>
       <div class="booking-card__side">
-        <span class="pill ${STATUS_COLORS[b.status]}">${STATUS_LABELS[b.status]}</span>
+        <span class="pill ${STATUS_COLORS[b.status]}" aria-label="Статус: ${STATUS_LABELS[b.status]}">${STATUS_LABELS[b.status]}</span>
         ${buttons ? `<div class="booking-card__actions">${buttons}</div>` : ''}
       </div>
     </article>
