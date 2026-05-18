@@ -87,14 +87,14 @@ function renderPhotoRow(url: string): string {
       <div class="photos-list__row photos-list__row--uploaded" data-url="${url}">
         <img src="${url}" class="photos-list__thumb" alt="" loading="lazy" />
         <span class="photos-list__name">${filename}</span>
-        <button type="button" class="btn btn--ghost btn--sm photos-list__remove">×</button>
+        <button type="button" class="btn btn--ghost btn--sm photos-list__remove" aria-label="Удалить фото">×</button>
       </div>
     `;
   }
   return `
     <div class="photos-list__row photos-list__row--url">
       <input type="url" class="auth-input" value="${url}" placeholder="https://..." />
-      <button type="button" class="btn btn--ghost btn--sm photos-list__remove">×</button>
+      <button type="button" class="btn btn--ghost btn--sm photos-list__remove" aria-label="Удалить фото">×</button>
     </div>
   `;
 }
@@ -115,7 +115,7 @@ function renderErrorRow(filename: string, error: string): string {
       <span class="photos-list__thumb photos-list__thumb--placeholder" style="color:rgb(248,113,113)">⚠</span>
       <span class="photos-list__name">${filename}</span>
       <span style="color:rgb(248,113,113);font-size:13px">${error}</span>
-      <button type="button" class="btn btn--ghost btn--sm photos-list__remove">×</button>
+      <button type="button" class="btn btn--ghost btn--sm photos-list__remove" aria-label="Удалить фото">×</button>
     </div>
   `;
 }
