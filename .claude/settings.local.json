@@ -22,7 +22,9 @@
       "PowerShell(Get-Process *)",
       "Read(//tmp/**)",
       "WebFetch(domain:cloudflarestatus.com)",
-      "WebFetch(domain:www.cloudflarestatus.com)"
+      "WebFetch(domain:www.cloudflarestatus.com)",
+      "WebFetch(domain:api.cloudflare.com)",
+      "Bash(curl -s \"https://respawn.kz\")"
     ]
   }
 }
