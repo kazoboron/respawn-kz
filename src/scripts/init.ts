@@ -1,5 +1,6 @@
 import { setupGeolocation } from './geolocation';
 import { setupModal } from './modal';
+import { setupModalA11y } from './modal-a11y';
 import { setupMobileMenu } from './menu';
 import { setupHeaderScroll } from './header-scroll';
 import { setupSearchForm, setupTimeSelect, setupDateDefault } from './search';
@@ -28,6 +29,7 @@ function init(): void {
   setupHeaderScroll();
   setupMobileMenu();
   setupModal();
+  setupModalA11y();
   setupBookingButtons();
   setupAuthButton();
   if (document.getElementById('search-form')) {
