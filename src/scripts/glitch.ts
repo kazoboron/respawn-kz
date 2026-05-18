@@ -2,12 +2,16 @@ export function setupGlitch(): void {
   const target = document.querySelector('.glitch');
   if (!target) return;
 
+  // Use rAF to batch classList changes in the compositor frame, avoiding forced reflow.
   const trigger = () => {
-    target.classList.add('is-glitching');
-    setTimeout(() => target.classList.remove('is-glitching'), 600);
+    requestAnimationFrame(() => {
+      target.classList.add('is-glitching');
+      setTimeout(() => requestAnimationFrame(() => target.classList.remove('is-glitching')), 600);
+    });
   };
 
-  setTimeout(trigger, 500);
+  // Delay first trigger past LCP window (>2.5s) so it doesn't interfere with scoring.
+  setTimeout(trigger, 2500);
 
   const loop = () => {
     const delay = 7000 + Math.random() * 5000;

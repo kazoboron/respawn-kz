@@ -9,5 +9,6 @@ export function setupHeaderScroll(): void {
     }
   };
   window.addEventListener('scroll', onScroll, { passive: true });
-  onScroll();
+  // Defer initial check to next paint frame — avoids a forced-reflow during page load.
+  requestAnimationFrame(onScroll);
 }
