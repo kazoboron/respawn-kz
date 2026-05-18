@@ -25,3 +25,6 @@ npm-debug.log*
 # Local handoff snapshots (contain secrets — don't commit)
 HANDOFF.md
 HANDOFF-*.md
+
+# Lighthouse audit output (generated, not committed — large + changes every run)
+docs/audit/a11y-latest.json
