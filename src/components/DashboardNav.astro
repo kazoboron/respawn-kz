@@ -28,14 +28,18 @@ const items: NavItem[] = variant === 'dashboard'
     ];
 ---
 
-<nav class="dash-nav" data-variant={variant}>
-  {items.map((item) => (
-    <a
-      href={item.href}
-      class:list={['dash-nav__link', { 'dash-nav__link--active': active === item.href }]}
-    >
-      {item.icon && <span class="dash-nav__icon">{item.icon}</span>}
-      <span>{item.label}</span>
-    </a>
-  ))}
+<nav class="dash-nav" data-variant={variant} aria-label="Кабинет">
+  {items.map((item) => {
+    const isActive = active === item.href;
+    return (
+      <a
+        href={item.href}
+        class:list={['dash-nav__link', { 'dash-nav__link--active': isActive }]}
+        aria-current={isActive ? 'page' : undefined}
+      >
+        {item.icon && <span class="dash-nav__icon">{item.icon}</span>}
+        <span>{item.label}</span>
+      </a>
+    );
+  })}
 </nav>
