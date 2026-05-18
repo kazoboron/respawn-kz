@@ -19,7 +19,7 @@ async function loadClubRow(slug: string): Promise<ClubRow | null> {
   return data as ClubRow;
 }
 
-export async function openRescheduleModal(b: Booking): Promise<void> {
+export async function openRescheduleModal(b: Booking, onSuccess?: () => void): Promise<void> {
   const club = await loadClubRow(b.club_slug);
   if (!club) {
     alert('Не удалось загрузить данные клуба. Попробуй обновить страницу.');
@@ -50,6 +50,7 @@ export async function openRescheduleModal(b: Booking): Promise<void> {
           total_price: d.total_price,
         })
         .eq('id', b.id);
+      if (!error && onSuccess) onSuccess();
       return { ok: !error, error: error?.message };
     },
   });

@@ -147,9 +147,12 @@ export async function setupMePage(): Promise<void> {
       const booking = bookings.find((b) => b.id === id);
       if (!booking) return;
       const { openRescheduleModal } = await import('./booking-reschedule');
-      await openRescheduleModal(booking);
-      // After modal closes, reload to reflect new state (cheap + safe for MVP).
-      window.location.reload();
+      // The modal handles its own lifecycle; reload only after explicit success
+      // signal (passed as callback so it fires when the user-visible success
+      // screen has had time to display).
+      await openRescheduleModal(booking, () => {
+        setTimeout(() => window.location.reload(), 2500);
+      });
       return;
     }
 
