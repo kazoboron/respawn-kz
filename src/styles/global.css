@@ -2136,6 +2136,10 @@ body.menu-open {
   border-radius: var(--radius-md);
   position: relative;
   overflow: hidden;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  display: block;
 }
 
 .gallery-item__num {

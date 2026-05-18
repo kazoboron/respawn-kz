@@ -92,12 +92,12 @@ if (topReviews.length > 0) {
 
   <section class="club-page">
     <div class="container">
-      <nav class="breadcrumb">
+      <nav class="breadcrumb" aria-label="Хлебные крошки">
         <a href="/">Главная</a>
         <span class="breadcrumb__sep">/</span>
         <a href="/clubs/">Клубы</a>
         <span class="breadcrumb__sep">/</span>
-        <span class="breadcrumb__current">{club.name}</span>
+        <span class="breadcrumb__current" aria-current="page">{club.name}</span>
       </nav>
 
       <header class="club-page__hero">
@@ -115,11 +115,20 @@ if (topReviews.length > 0) {
       </header>
 
       <div class="club-page__gallery">
-        {(club.photos.length > 0 ? club.photos : [club.gradient ?? 'linear-gradient(135deg, #8b5cf6, #ec4899)']).map((src, i) => (
-          <div class="gallery-item" style={src.startsWith('linear-gradient') ? `background: ${src};` : `background-image: url(${src}); background-size: cover;`}>
-            <span class="gallery-item__num">{i + 1}</span>
+        {club.photos.length > 0 ? (
+          club.photos.map((src, i) => (
+            <img
+              src={src}
+              alt={`${club.name} — фото ${i + 1}`}
+              loading="lazy"
+              class="gallery-item"
+            />
+          ))
+        ) : (
+          <div class="gallery-item" style={`background: ${club.gradient ?? 'linear-gradient(135deg, #8b5cf6, #ec4899)'};`}>
+            <span class="gallery-item__num">1</span>
           </div>
-        ))}
+        )}
       </div>
 
       <div class="club-page__layout">
@@ -192,7 +201,7 @@ if (topReviews.length > 0) {
             <p class="reviews-loading">Загрузка…</p>
           </div>
           <div class="reviews-actions">
-            <button id="reviews-load-more" class="btn btn--ghost btn--sm" hidden>Показать ещё</button>
+            <button id="reviews-load-more" class="btn btn--ghost btn--sm" aria-controls="reviews-list" hidden>Показать ещё</button>
           </div>
           <p id="reviews-empty" class="reviews-empty" hidden>Пока отзывов нет. Будь первым после посещения.</p>
         </section>
