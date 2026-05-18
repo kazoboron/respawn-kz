@@ -93,7 +93,7 @@ function renderCard(club: Club): string {
       </a>
       <div class="club-card__body">
         <div class="club-card__header">
-          <h3 class="club-card__name"><a href="/clubs/${club.slug}/">${club.name}</a></h3>
+          <h2 class="club-card__name"><a href="/clubs/${club.slug}/">${club.name}</a></h2>
           <span class="pill pill--rating">★ ${club.rating}</span>
         </div>
         <div class="club-card__meta">

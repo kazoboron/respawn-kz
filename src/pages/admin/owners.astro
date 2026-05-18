@@ -29,10 +29,10 @@ const clubs = await loadAllClubsForAdmin();
           <article class="owner-card" data-club-slug={club.slug}>
             <div class="owner-card__header">
               <div>
-                <h3 class="owner-card__title">
+                <h2 class="owner-card__title">
                   {club.name}
                   {!club.is_published && <span class="pill pill--draft" style="margin-left:8px">DRAFT</span>}
-                </h3>
+                </h2>
                 <div class="owner-card__meta">{CITY_LABELS[club.city] ?? club.city} · {club.address}</div>
               </div>
               <code class="owner-card__slug">{club.slug}</code>

@@ -34,7 +34,7 @@ function renderRow(r: ReviewWithClub): string {
   const ariaExcerpt = `отзыв ${r.text.slice(0, 30)}…`;
   const action = r.status === 'published'
     ? `<button class="btn btn--sm btn--ghost" data-action="hide" data-id="${r.id}" aria-label="Скрыть ${ariaExcerpt}">Скрыть</button>`
-    : `<button class="btn btn--sm" data-action="unhide" data-id="${r.id}" aria-label="Показать ${ariaExcerpt}">Опубликовать</button>`;
+    : `<button class="btn btn--sm" data-action="unhide" data-id="${r.id}" aria-label="Опубликовать ${ariaExcerpt}">Опубликовать</button>`;
   const statusPill = r.status === 'published'
     ? `<span class="pill pill--confirmed" aria-label="Статус: ${REVIEW_STATUS_LABELS.published}">${REVIEW_STATUS_LABELS.published}</span>`
     : `<span class="pill pill--cancelled" aria-label="Статус: ${REVIEW_STATUS_LABELS.hidden}">${REVIEW_STATUS_LABELS.hidden}</span>`;

@@ -39,7 +39,8 @@ const PATHS = [
   '/dashboard/applications/',
   '/dashboard/register/',
   '/dashboard/club/edit/',
-  '/404/',
+  // NOTE: /404/ removed — Astro builds dist/404.html (not dist/404/index.html).
+  // Cloudflare Pages serves it on any 404. Auditing /404/ always scores 0.
 ];
 
 async function runAudit(url, chromePort) {
