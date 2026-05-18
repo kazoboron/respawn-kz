@@ -354,13 +354,17 @@ export async function setupDashboardClubEdit(): Promise<void> {
     if (updateErr) {
       saveErrorEl.textContent = `Не удалось сохранить: ${updateErr.message}`;
       saveErrorEl.hidden = false;
+      saveErrorEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
       return;
     }
 
     // Optimistic: assume rebuild trigger works. Real failure logged but not user-visible.
     successEl.innerHTML = '<strong>Сохранено!</strong> Сайт обновится через 1-2 минуты.';
     successEl.hidden = false;
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Scroll the success banner into view (it sits right above the Save button at
+    // the bottom of the form). Previously we scrolled to top — that moved the
+    // banner OUT of view on long forms with photos.
+    successEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
     // Fire-and-forget rebuild trigger via Supabase Edge Function → GitHub Actions
     triggerSiteRebuild(`club edit: ${slug}`).then((r) => {
