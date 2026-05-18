@@ -181,6 +181,41 @@ ${p.review_note ? `Причина: ${p.review_note}\n` : 'Свяжись с по
 Страница клуба: ${SITE_URL}/clubs/${p.club_slug}/
     `,
   },
+
+  booking_rescheduled: {
+    subject: (p) => `Бронь изменена — ${p.club_name}`,
+    bodyHtml: (p) => `
+      <h1>Бронь изменена клиентом</h1>
+      <p>Клиент изменил детали брони в клубе <strong>${p.club_name}</strong>.</p>
+      <table style="border-collapse: collapse; margin: 16px 0;">
+        <tr style="color: #8a8a95;">
+          <td style="padding: 4px 12px 4px 0;">Было:</td>
+          <td><s>${p.old_date} · ${p.old_time_slot} · ${p.old_hours} ч</s></td>
+        </tr>
+        <tr>
+          <td style="padding: 4px 12px 4px 0; color: #00d4ff;">Стало:</td>
+          <td><strong>${p.new_date} · ${p.new_time_slot} · ${p.new_hours} ч</strong></td>
+        </tr>
+      </table>
+      <ul>
+        <li>Сумма: ${p.total_price} ₸</li>
+        <li>Клиент: ${p.customer_email}</li>
+      </ul>
+      <p>Бронь ожидает подтверждения. <a href="${SITE_URL}/dashboard/bookings/">Открыть в кабинете</a></p>
+    `,
+    bodyText: (p) => `
+Клиент изменил детали брони в клубе ${p.club_name}.
+
+Было: ${p.old_date} · ${p.old_time_slot} · ${p.old_hours} ч
+Стало: ${p.new_date} · ${p.new_time_slot} · ${p.new_hours} ч
+
+Сумма: ${p.total_price} ₸
+Клиент: ${p.customer_email}
+
+Бронь ожидает подтверждения.
+Кабинет: ${SITE_URL}/dashboard/bookings/
+    `,
+  },
 };
 
 export function renderTemplate(
