@@ -20,6 +20,7 @@ import { setupAdminApplications } from './admin-applications';
 import { setupAdminOwners } from './admin-owners';
 import { setupAdminUsers } from './admin-users';
 import { setupDashboardClubEdit } from './dashboard-club-edit';
+import { setupReviewsForm } from './reviews-form';
 
 function init(): void {
   setupHeaderScroll();
@@ -75,6 +76,9 @@ function init(): void {
   }
   if (document.getElementById('admin-users-root')) {
     setupAdminUsers();
+  }
+  if (document.getElementById('review-form-root')) {
+    setupReviewsForm();
   }
   // Cookie consent — on every page, shows once if not yet answered
   setupCookieBanner();

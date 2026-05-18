@@ -3744,3 +3744,12 @@ textarea:focus-visible,
   outline-offset: 2px;
   border-radius: 2px;
 }
+
+/* Review form page */
+.review-form-page { padding: 32px 0; }
+.review-form-page__loading { color: var(--text-secondary, #8a8a95); padding: 16px 0; }
+.review-form-page__title { font-size: 28px; margin: 8px 0 4px; }
+.review-form-page__context { color: var(--text-secondary, #8a8a95); margin: 0 0 24px; }
+.review-form-page__already { text-align: center; padding: 48px 16px; }
+.review-form { display: flex; flex-direction: column; gap: 16px; }
+.review-form__counter { color: var(--text-tertiary, #6a6a75); font-size: 12px; text-align: right; }

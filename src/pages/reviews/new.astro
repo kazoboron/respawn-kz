@@ -1,0 +1,64 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import RatingStars from '../../components/RatingStars.astro';
+---
+<BaseLayout
+  title="Оставить отзыв — respawn.kz"
+  description="Поделись впечатлением о клубе"
+>
+  <section class="container review-form-page">
+    <nav class="breadcrumb">
+      <a href="/me/">Личный кабинет</a>
+      <span class="breadcrumb__sep">/</span>
+      <span class="breadcrumb__current">Новый отзыв</span>
+    </nav>
+
+    <div id="review-form-root">
+      <div id="review-loading" class="review-form-page__loading">Загрузка…</div>
+
+      <div id="review-form-block" hidden>
+        <h1 id="review-title" class="review-form-page__title">Оставить отзыв</h1>
+        <p id="review-context" class="review-form-page__context"></p>
+
+        <form id="review-submit-form" class="review-form" novalidate>
+          <label class="auth-field">
+            <span class="auth-label">Оценка</span>
+            <RatingStars value={0} interactive={true} size="lg" />
+            <input type="hidden" name="rating" value="0" />
+          </label>
+
+          <label class="auth-field">
+            <span class="auth-label">Комментарий (от 10 символов)</span>
+            <textarea
+              name="text"
+              class="auth-input"
+              required
+              minlength="10"
+              maxlength="1000"
+              rows="6"
+              placeholder="Расскажи о своём визите — что понравилось, что улучшить."
+            ></textarea>
+          </label>
+
+          <div class="review-form__counter"><span id="char-count">0</span> / 1000</div>
+
+          <div class="auth-error" id="review-error" hidden></div>
+
+          <button type="submit" class="btn btn--primary btn--large" style="width:100%">Опубликовать</button>
+        </form>
+      </div>
+
+      <div id="review-already" class="review-form-page__already" hidden>
+        <h1>Отзыв уже оставлен</h1>
+        <p>На эту бронь отзыв уже есть. Один отзыв — на один визит.</p>
+        <a href="/me/" class="btn btn--ghost btn--large">Вернуться в кабинет</a>
+      </div>
+
+      <div id="review-not-eligible" class="review-form-page__already" hidden>
+        <h1>Нельзя оставить отзыв</h1>
+        <p>Отзыв можно оставить только после визита, когда клуб отметил бронь как завершённую.</p>
+        <a href="/me/" class="btn btn--ghost btn--large">Вернуться в кабинет</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
