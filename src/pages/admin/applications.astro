@@ -13,9 +13,9 @@ import DashboardNav from '../../components/DashboardNav.astro';
       <DashboardNav variant="admin" active="/admin/applications/" />
 
       <div class="admin-apps-filters" id="admin-apps-filters" hidden>
-        <label class="filter">
+        <label class="filter" for="admin-apps-status">
           <span class="filter__label">Показать</span>
-          <select id="admin-apps-status" class="filter__input">
+          <select id="admin-apps-status" class="filter__input" aria-label="Фильтр по статусу заявок">
             <option value="pending">Только в очереди</option>
             <option value="approved">Одобренные</option>
             <option value="rejected">Отклонённые</option>

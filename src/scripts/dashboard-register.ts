@@ -106,8 +106,17 @@ export async function setupDashboardRegister(): Promise<void> {
       submitBtn.textContent = 'Отправить заявку';
       errorEl.textContent = `Не удалось отправить: ${error?.message ?? 'неизвестная ошибка'}`;
       errorEl.hidden = false;
+      // Mark required fields as invalid so screen readers surface the association
+      formEl.querySelectorAll<HTMLInputElement | HTMLSelectElement>('[required]').forEach((el) => {
+        if (!el.value.trim()) el.setAttribute('aria-invalid', 'true');
+      });
       return;
     }
+
+    // Clear aria-invalid on success
+    formEl.querySelectorAll<HTMLElement>('[aria-invalid]').forEach((el) => {
+      el.setAttribute('aria-invalid', 'false');
+    });
 
     formEl.hidden = true;
     existingEl.hidden = true;

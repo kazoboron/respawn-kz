@@ -355,8 +355,17 @@ export async function setupDashboardClubEdit(): Promise<void> {
       saveErrorEl.textContent = `Не удалось сохранить: ${updateErr.message}`;
       saveErrorEl.hidden = false;
       saveErrorEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      // Mark required fields that are empty as invalid
+      formEl.querySelectorAll<HTMLInputElement | HTMLSelectElement>('[required]').forEach((el) => {
+        if (!el.value.trim()) el.setAttribute('aria-invalid', 'true');
+      });
       return;
     }
+
+    // Clear aria-invalid on successful save
+    formEl.querySelectorAll<HTMLElement>('[aria-invalid]').forEach((el) => {
+      el.setAttribute('aria-invalid', 'false');
+    });
 
     // Optimistic: assume rebuild trigger works. Real failure logged but not user-visible.
     successEl.innerHTML = '<strong>Сохранено!</strong> Сайт обновится через 1-2 минуты.';

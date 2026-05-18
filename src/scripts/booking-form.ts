@@ -136,27 +136,32 @@ function renderForm(club: ClubRow, initial: BookingFormInitial | undefined, subm
   return `
     <form id="booking-form" class="booking-form">
       <div class="booking-form__row">
-        <label class="auth-field">
+        <label class="auth-field" for="booking-date">
           <span class="auth-label">Дата</span>
-          <input type="date" name="date" class="auth-input" required min="${todayStr}" max="${maxStr}" value="${dateValue}" />
+          <input type="date" id="booking-date" name="date" class="auth-input" required
+                 min="${todayStr}" max="${maxStr}" value="${dateValue}"
+                 aria-describedby="booking-notice booking-error" aria-invalid="false" />
         </label>
-        <label class="auth-field">
+        <label class="auth-field" for="booking-time-slot">
           <span class="auth-label">Время</span>
-          <select name="time_slot" class="auth-input" required>
+          <select id="booking-time-slot" name="time_slot" class="auth-input" required
+                  aria-describedby="booking-notice booking-error" aria-invalid="false">
             <option value="">— загрузка —</option>
           </select>
         </label>
-        <label class="auth-field">
+        <label class="auth-field" for="booking-hours">
           <span class="auth-label">Часов</span>
-          <input type="number" name="hours" class="auth-input" required min="1" max="12" value="${hoursValue}" />
+          <input type="number" id="booking-hours" name="hours" class="auth-input" required
+                 min="1" max="12" value="${hoursValue}"
+                 aria-describedby="booking-notice booking-error" aria-invalid="false" />
         </label>
       </div>
-      <div class="booking-form__notice" id="booking-notice" hidden></div>
+      <div class="booking-form__notice" id="booking-notice" aria-live="polite" hidden></div>
       <div class="booking-form__total" id="booking-total">
         Итого: <strong>${formatPrice(initialTotal)} ₸</strong>
       </div>
       <button type="submit" class="btn btn--primary btn--large" style="width:100%">${submitLabel}</button>
-      <div class="auth-error" id="booking-error" hidden></div>
+      <div class="auth-error" id="booking-error" aria-live="polite" hidden></div>
     </form>
   `;
 }
@@ -281,6 +286,7 @@ export async function openBookingFormModal(opts: BookingFormOptions): Promise<vo
 
     if (!data.time_slot) {
       if (errorEl) { errorEl.textContent = 'Выбери время.'; errorEl.hidden = false; }
+      timeSelect.setAttribute('aria-invalid', 'true');
       return;
     }
 
@@ -288,6 +294,7 @@ export async function openBookingFormModal(opts: BookingFormOptions): Promise<vo
     submitBtn.disabled = true;
     submitBtn.textContent = 'Сохраняем…';
     if (errorEl) errorEl.hidden = true;
+    form.querySelectorAll<HTMLElement>('[aria-invalid]').forEach((el) => el.setAttribute('aria-invalid', 'false'));
 
     const result = await onSubmit(data);
 
@@ -299,6 +306,7 @@ export async function openBookingFormModal(opts: BookingFormOptions): Promise<vo
         errorEl.textContent = translateError(result.error ?? '');
         errorEl.hidden = false;
       }
+      timeSelect.setAttribute('aria-invalid', 'true');
       await refreshSlots();
       return;
     }

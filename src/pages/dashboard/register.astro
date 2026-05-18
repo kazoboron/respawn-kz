@@ -33,84 +33,99 @@ import { CITIES } from '../../data/cities';
         <!-- Если у юзера есть pending заявка — покажем её -->
       </div>
 
-      <form id="register-form" class="dashboard-form" hidden>
-        <div class="dashboard-form__row">
-          <label class="auth-field">
-            <span class="auth-label">Имя контактного лица *</span>
-            <input type="text" name="applicant_name" class="auth-input" required maxlength="120" />
-          </label>
-          <label class="auth-field">
-            <span class="auth-label">Email *</span>
-            <input type="email" name="applicant_email" class="auth-input" required readonly />
-          </label>
-        </div>
+      <form id="register-form" class="dashboard-form" hidden aria-describedby="register-error">
+        <fieldset class="dashboard-fieldset">
+          <legend class="dashboard-fieldset__legend">Контактное лицо</legend>
+          <div class="dashboard-form__row">
+            <label class="auth-field" for="reg-applicant-name">
+              <span class="auth-label">Имя контактного лица *</span>
+              <input type="text" id="reg-applicant-name" name="applicant_name" class="auth-input" required maxlength="120"
+                     aria-describedby="register-error" aria-invalid="false" />
+            </label>
+            <label class="auth-field" for="reg-applicant-email">
+              <span class="auth-label">Email *</span>
+              <input type="email" id="reg-applicant-email" name="applicant_email" class="auth-input" required readonly
+                     aria-describedby="register-error" aria-invalid="false" />
+            </label>
+          </div>
 
-        <div class="dashboard-form__row">
-          <label class="auth-field">
-            <span class="auth-label">Телефон *</span>
-            <input type="tel" name="applicant_phone" class="auth-input" required
-                   placeholder="+7 (727) 123-45-67" pattern="[+\d\s()\-]{10,}" />
-          </label>
-          <label class="auth-field">
-            <span class="auth-label">Название клуба *</span>
-            <input type="text" name="club_name" class="auth-input" required maxlength="120" />
-          </label>
-        </div>
+          <div class="dashboard-form__row">
+            <label class="auth-field" for="reg-applicant-phone">
+              <span class="auth-label">Телефон *</span>
+              <input type="tel" id="reg-applicant-phone" name="applicant_phone" class="auth-input" required
+                     placeholder="+7 (727) 123-45-67" pattern="[+\d\s()\-]{10,}"
+                     aria-describedby="register-error" aria-invalid="false" />
+            </label>
+            <label class="auth-field" for="reg-club-name">
+              <span class="auth-label">Название клуба *</span>
+              <input type="text" id="reg-club-name" name="club_name" class="auth-input" required maxlength="120"
+                     aria-describedby="register-error" aria-invalid="false" />
+            </label>
+          </div>
+        </fieldset>
 
-        <div class="dashboard-form__row">
-          <label class="auth-field">
-            <span class="auth-label">Город *</span>
-            <select name="city" class="auth-input" required>
-              <option value="">Выбери город</option>
-              {CITIES.map((c) => <option value={c.id}>{c.label}</option>)}
-            </select>
+        <fieldset class="dashboard-fieldset">
+          <legend class="dashboard-fieldset__legend">Местоположение</legend>
+          <div class="dashboard-form__row">
+            <label class="auth-field" for="reg-city">
+              <span class="auth-label">Город *</span>
+              <select id="reg-city" name="city" class="auth-input" required
+                      aria-describedby="register-error" aria-invalid="false">
+                <option value="">Выбери город</option>
+                {CITIES.map((c) => <option value={c.id}>{c.label}</option>)}
+              </select>
+            </label>
+            <label class="auth-field" for="reg-district">
+              <span class="auth-label">Район</span>
+              <input type="text" id="reg-district" name="district" class="auth-input" maxlength="120"
+                     placeholder="Например: Алмалинский р-н" />
+            </label>
+          </div>
+
+          <label class="auth-field" for="reg-address">
+            <span class="auth-label">Адрес *</span>
+            <input type="text" id="reg-address" name="address" class="auth-input" required maxlength="200"
+                   placeholder="ул. Абая, 150"
+                   aria-describedby="register-error" aria-invalid="false" />
           </label>
-          <label class="auth-field">
-            <span class="auth-label">Район</span>
-            <input type="text" name="district" class="auth-input" maxlength="120"
-                   placeholder="Например: Алмалинский р-н" />
+        </fieldset>
+
+        <fieldset class="dashboard-fieldset">
+          <legend class="dashboard-fieldset__legend">О клубе</legend>
+          <div class="dashboard-form__row">
+            <label class="auth-field" for="reg-working-hours">
+              <span class="auth-label">Часы работы</span>
+              <input type="text" id="reg-working-hours" name="working_hours" class="auth-input" maxlength="80"
+                     placeholder="10:00–02:00 или Круглосуточно" />
+            </label>
+            <label class="auth-field" for="reg-photo-url">
+              <span class="auth-label">Фото (ссылка)</span>
+              <input type="url" id="reg-photo-url" name="photo_url" class="auth-input" maxlength="500"
+                     placeholder="Google Drive / Imgur / Яндекс.Диск" />
+            </label>
+          </div>
+
+          <label class="auth-field" for="reg-equipment-note">
+            <span class="auth-label">Оборудование</span>
+            <textarea id="reg-equipment-note" name="equipment_note" class="auth-input" rows="3" maxlength="500"
+                      placeholder="Кол-во PC, тип, периферия, VR…"></textarea>
           </label>
-        </div>
 
-        <label class="auth-field">
-          <span class="auth-label">Адрес *</span>
-          <input type="text" name="address" class="auth-input" required maxlength="200"
-                 placeholder="ул. Абая, 150" />
-        </label>
-
-        <div class="dashboard-form__row">
-          <label class="auth-field">
-            <span class="auth-label">Часы работы</span>
-            <input type="text" name="working_hours" class="auth-input" maxlength="80"
-                   placeholder="10:00–02:00 или Круглосуточно" />
+          <label class="auth-field" for="reg-description">
+            <span class="auth-label">Краткое описание</span>
+            <textarea id="reg-description" name="description" class="auth-input" rows="3" maxlength="500"
+                      placeholder="Что отличает твой клуб"></textarea>
           </label>
-          <label class="auth-field">
-            <span class="auth-label">Фото (ссылка)</span>
-            <input type="url" name="photo_url" class="auth-input" maxlength="500"
-                   placeholder="Google Drive / Imgur / Яндекс.Диск" />
-          </label>
-        </div>
+        </fieldset>
 
-        <label class="auth-field">
-          <span class="auth-label">Оборудование</span>
-          <textarea name="equipment_note" class="auth-input" rows="3" maxlength="500"
-                    placeholder="Кол-во PC, тип, периферия, VR…"></textarea>
-        </label>
-
-        <label class="auth-field">
-          <span class="auth-label">Краткое описание</span>
-          <textarea name="description" class="auth-input" rows="3" maxlength="500"
-                    placeholder="Что отличает твой клуб"></textarea>
-        </label>
-
-        <div class="auth-error" id="register-error" hidden></div>
+        <div class="auth-error" id="register-error" aria-live="polite" hidden></div>
 
         <button type="submit" class="btn btn--primary btn--large dashboard-form__submit">
           Отправить заявку
         </button>
       </form>
 
-      <div class="dashboard-success" id="register-success" hidden>
+      <div class="dashboard-success" id="register-success" aria-live="polite" role="status" hidden>
         <h2>Заявка отправлена!</h2>
         <p>Статус увидишь в <a href="/dashboard/applications/">Моих заявках</a>.</p>
       </div>

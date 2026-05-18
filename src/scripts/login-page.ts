@@ -18,6 +18,8 @@ export function setupLoginPage(): void {
   const returnUrl = params.get('return');
   if (returnUrl) saveReturnUrl(returnUrl);
 
+  const emailInput = form.querySelector<HTMLInputElement>('#login-email');
+
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const data = new FormData(form);
@@ -26,6 +28,7 @@ export function setupLoginPage(): void {
 
     if (successEl) successEl.hidden = true;
     if (errorEl) errorEl.hidden = true;
+    if (emailInput) emailInput.setAttribute('aria-invalid', 'false');
     const btn = form.querySelector('button[type="submit"]') as HTMLButtonElement;
     btn.disabled = true;
     btn.textContent = supabaseConfigured ? 'Отправляем…' : 'Входим…';
@@ -40,6 +43,7 @@ export function setupLoginPage(): void {
     if (error) {
       btn.disabled = false;
       btn.textContent = supabaseConfigured ? 'Получить ссылку' : 'Войти';
+      if (emailInput) emailInput.setAttribute('aria-invalid', 'true');
       if (errorEl) {
         errorEl.textContent = `Ошибка: ${error.message}`;
         errorEl.hidden = false;
@@ -57,6 +61,7 @@ export function setupLoginPage(): void {
     // Реальный Supabase: показываем «письмо отправлено»
     btn.disabled = false;
     btn.textContent = 'Получить ссылку';
+    if (emailInput) emailInput.setAttribute('aria-invalid', 'false');
     if (successEl) {
       successEl.querySelector('[data-email]')!.textContent = email;
       successEl.hidden = false;

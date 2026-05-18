@@ -17,19 +17,29 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         </div>
 
         <form class="auth-form" id="login-form">
-          <label class="auth-field">
+          <label class="auth-field" for="login-email">
             <span class="auth-label">Email</span>
-            <input type="email" name="email" required class="auth-input" placeholder="you@example.com" autocomplete="email" />
+            <input
+              type="email"
+              id="login-email"
+              name="email"
+              required
+              class="auth-input"
+              placeholder="you@example.com"
+              autocomplete="email"
+              aria-describedby="login-error login-success"
+              aria-invalid="false"
+            />
           </label>
           <button type="submit" class="btn btn--primary btn--large auth-submit">Получить ссылку</button>
         </form>
 
-        <div class="auth-success" id="login-success" hidden>
+        <div class="auth-success" id="login-success" aria-live="polite" role="status" hidden>
           <p>📨 Письмо отправлено на <strong data-email></strong></p>
           <p style="margin-top:8px">Проверь почту (включая спам) — кликни по ссылке.</p>
         </div>
 
-        <div class="auth-error" id="login-error" hidden></div>
+        <div class="auth-error" id="login-error" aria-live="polite" hidden></div>
 
         <p class="auth-footnote">Регистрация автоматическая — если входишь впервые, аккаунт создастся.</p>
       </div>

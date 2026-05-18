@@ -126,6 +126,7 @@ export async function setupReviewsForm(): Promise<void> {
   // Submit handler
   const form = document.getElementById('review-submit-form') as HTMLFormElement | null;
   const errorEl = document.getElementById('review-error');
+  const textareaEl = document.getElementById('review-text') as HTMLTextAreaElement | null;
   form?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const fd = new FormData(form);
@@ -138,10 +139,12 @@ export async function setupReviewsForm(): Promise<void> {
       return;
     }
     if (text.length < 10) {
+      if (textareaEl) textareaEl.setAttribute('aria-invalid', 'true');
       if (errorEl) { errorEl.textContent = 'Комментарий должен быть от 10 символов.'; errorEl.hidden = false; }
       return;
     }
 
+    if (textareaEl) textareaEl.setAttribute('aria-invalid', 'false');
     const submitBtn = form.querySelector<HTMLButtonElement>('button[type="submit"]');
     if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Сохраняем…'; }
 
@@ -156,6 +159,7 @@ export async function setupReviewsForm(): Promise<void> {
     const { error } = await supabase.from('reviews').insert(newRow);
 
     if (error) {
+      if (textareaEl) textareaEl.setAttribute('aria-invalid', 'true');
       if (errorEl) { errorEl.textContent = translateError(error.message); errorEl.hidden = false; }
       if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Опубликовать'; }
       return;

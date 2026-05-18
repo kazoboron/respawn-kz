@@ -50,7 +50,17 @@ function renderAdminAppCard(app: ClubApplication): string {
 
       ${isPending ? `
         <div class="admin-app-card__actions">
-          <textarea class="auth-input" data-note="${app.id}" placeholder="Комментарий (опционально)" rows="2" style="margin-bottom:12px"></textarea>
+          <label for="note-${app.id}" class="sr-only">Комментарий для заявки ${app.club_name} (опционально)</label>
+          <textarea
+            id="note-${app.id}"
+            class="auth-input"
+            data-note="${app.id}"
+            placeholder="Комментарий (опционально)"
+            rows="2"
+            style="margin-bottom:12px"
+            aria-label="Комментарий модератора (опционально)"
+          ></textarea>
+          <div id="action-status-${app.id}" aria-live="polite" style="display:none"></div>
           <div style="display:flex;gap:8px;flex-wrap:wrap">
             <button type="button" class="btn btn--primary btn--sm" data-action="approve" data-id="${app.id}">Одобрить</button>
             <button type="button" class="btn btn--ghost btn--sm" data-action="reject" data-id="${app.id}">Отклонить</button>
