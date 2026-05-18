@@ -1,0 +1,19 @@
+---
+interface Props {
+  value: number;          // 0..5; may be float for display (e.g., 3.7)
+  interactive?: boolean;  // true → renders buttons with data-rating-value attrs
+  size?: 'sm' | 'md' | 'lg';
+}
+const { value, interactive = false, size = 'md' } = Astro.props;
+const cls = `rating-stars rating-stars--${size}${interactive ? ' rating-stars--interactive' : ''}`;
+const wholeValue = Math.round(value);
+---
+<div class={cls} data-value={value} role={interactive ? 'radiogroup' : 'img'} aria-label={`Рейтинг ${value} из 5`}>
+  {[1, 2, 3, 4, 5].map((n) => (
+    interactive ? (
+      <button type="button" class="rating-stars__btn" data-rating-value={n} aria-label={`Поставить ${n}`}>★</button>
+    ) : (
+      <span class:list={['rating-stars__star', { 'is-filled': n <= wholeValue }]}>★</span>
+    )
+  ))}
+</div>
