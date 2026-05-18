@@ -3,10 +3,14 @@ export function setupMobileMenu(): void {
   const nav = document.getElementById('nav');
   if (!hamburger || !nav) return;
 
-  const close = () => document.body.classList.remove('menu-open');
+  const close = () => {
+    document.body.classList.remove('menu-open');
+    hamburger.setAttribute('aria-expanded', 'false');
+  };
 
   hamburger.addEventListener('click', () => {
-    document.body.classList.toggle('menu-open');
+    const isOpen = document.body.classList.toggle('menu-open');
+    hamburger.setAttribute('aria-expanded', String(isOpen));
   });
 
   nav.addEventListener('click', (e) => {

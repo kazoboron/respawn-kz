@@ -19,15 +19,19 @@ const navItems = [
 <header class="header" id="header">
   <div class="container header__inner">
     <Logo size="md" />
-    <nav class="nav" id="nav">
-      {navItems.map((item) => (
-        <a
-          href={item.href}
-          class:list={['nav__link', { 'nav__link--active': activeRoute === item.key }]}
-        >
-          {item.label}
-        </a>
-      ))}
+    <nav class="nav" id="nav" aria-label="Главная навигация">
+      {navItems.map((item) => {
+        const isActive = activeRoute === item.key;
+        return (
+          <a
+            href={item.href}
+            class:list={['nav__link', { 'nav__link--active': isActive }]}
+            aria-current={isActive ? 'page' : undefined}
+          >
+            {item.label}
+          </a>
+        );
+      })}
       <!-- Role-aware nav slots, populated by setupAuthButton in auth.ts -->
       <a href="/dashboard/" class="nav__link nav__link--cabinet" id="nav-cabinet" hidden>Кабинет</a>
       <a href="/admin/" class="nav__link nav__link--admin" id="nav-admin" hidden>Админка</a>
@@ -36,7 +40,14 @@ const navItems = [
       <div class="header__auth" id="header-auth">
         <a href="/login/" class="btn btn--ghost">Войти</a>
       </div>
-      <button class="hamburger" id="hamburger" aria-label="Меню" type="button">
+      <button
+        class="hamburger"
+        id="hamburger"
+        aria-label="Меню"
+        aria-expanded="false"
+        aria-controls="nav"
+        type="button"
+      >
         <span></span><span></span><span></span>
       </button>
     </div>
