@@ -44,6 +44,15 @@ function renderCard(r: PublicReview): string {
   `;
 }
 
+type SortKey = 'newest' | 'oldest' | 'highest' | 'lowest';
+
+const SORT_CONFIG: Record<SortKey, { column: 'created_at' | 'rating'; ascending: boolean; secondary?: { column: 'created_at'; ascending: boolean } }> = {
+  newest: { column: 'created_at', ascending: false },
+  oldest: { column: 'created_at', ascending: true },
+  highest: { column: 'rating', ascending: false, secondary: { column: 'created_at', ascending: false } },
+  lowest: { column: 'rating', ascending: true, secondary: { column: 'created_at', ascending: false } },
+};
+
 export async function setupClubReviews(): Promise<void> {
   const slug = (window as unknown as { __clubReviewsSlug?: string }).__clubReviewsSlug;
   const listEl = document.getElementById('reviews-list') as HTMLUListElement | null;
@@ -51,12 +60,14 @@ export async function setupClubReviews(): Promise<void> {
   const errorEl = document.getElementById('reviews-error');
   const loadMoreBtn = document.getElementById('reviews-load-more') as HTMLButtonElement | null;
   const emptyEl = document.getElementById('reviews-empty');
+  const sortEl = document.getElementById('reviews-sort') as HTMLSelectElement | null;
   const retryBtn = errorEl?.querySelector<HTMLButtonElement>('[data-retry-reviews]') ?? null;
 
   if (!slug || !listEl) return;
 
   let offset = 0;
   let initialRender = true;
+  let sortKey: SortKey = 'newest';
 
   function showLoading(): void {
     if (loadingEl) loadingEl.hidden = false;
@@ -78,13 +89,17 @@ export async function setupClubReviews(): Promise<void> {
   async function loadPage(): Promise<void> {
     if (initialRender) showLoading();
 
-    const { data, error } = await supabase
+    const cfg = SORT_CONFIG[sortKey];
+    let query = supabase
       .from('reviews')
       .select('id, rating, text, created_at')
       .eq('club_slug', slug!)
       .eq('status', 'published')
-      .order('created_at', { ascending: false })
-      .range(offset, offset + PAGE_SIZE - 1);
+      .order(cfg.column, { ascending: cfg.ascending });
+    if (cfg.secondary) {
+      query = query.order(cfg.secondary.column, { ascending: cfg.secondary.ascending });
+    }
+    const { data, error } = await query.range(offset, offset + PAGE_SIZE - 1);
 
     if (error) {
       console.error('[club-reviews] load failed', error);
@@ -103,6 +118,7 @@ export async function setupClubReviews(): Promise<void> {
         if (loadMoreBtn) loadMoreBtn.hidden = true;
         return;
       }
+      if (emptyEl) emptyEl.hidden = true;
       listEl!.innerHTML = rows.map(renderCard).join('');
     } else {
       listEl!.insertAdjacentHTML('beforeend', rows.map(renderCard).join(''));
@@ -113,13 +129,22 @@ export async function setupClubReviews(): Promise<void> {
     if (loadMoreBtn) loadMoreBtn.hidden = rows.length < PAGE_SIZE;
   }
 
-  retryBtn?.addEventListener('click', () => {
+  function resetAndReload(): void {
     initialRender = true;
     offset = 0;
     listEl!.innerHTML = '';
+    if (loadMoreBtn) loadMoreBtn.hidden = true;
     loadPage();
+  }
+
+  sortEl?.addEventListener('change', () => {
+    const v = sortEl.value as SortKey;
+    if (v === sortKey) return;
+    sortKey = v;
+    resetAndReload();
   });
 
+  retryBtn?.addEventListener('click', resetAndReload);
   loadMoreBtn?.addEventListener('click', loadPage);
   await loadPage();
 }

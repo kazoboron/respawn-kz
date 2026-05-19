@@ -199,7 +199,18 @@ if (topReviews.length > 0) {
       </section>
 
         <section class="club-section" id="reviews-section">
-          <h2 class="club-section__title">Отзывы</h2>
+          <div class="club-section__heading">
+            <h2 class="club-section__title">Отзывы</h2>
+            <label class="reviews-sort">
+              <span class="sr-only">Сортировка отзывов</span>
+              <select id="reviews-sort" class="reviews-sort__select" aria-label="Сортировка отзывов">
+                <option value="newest">Сначала новые</option>
+                <option value="oldest">Сначала старые</option>
+                <option value="highest">Сначала с высокой оценкой</option>
+                <option value="lowest">Сначала с низкой оценкой</option>
+              </select>
+            </label>
+          </div>
           <div id="reviews-loading" class="reviews-loading" aria-live="polite">
             <p>Загрузка отзывов…</p>
           </div>

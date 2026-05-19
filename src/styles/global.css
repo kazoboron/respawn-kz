@@ -3882,3 +3882,33 @@ textarea:focus-visible,
   font-size: 11px;
   font-family: monospace;
 }
+
+/* Reviews sort dropdown (SP6 deferred follow-up — Block 6 era) */
+.club-section__heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-5);
+}
+.club-section__heading .club-section__title {
+  margin-bottom: 0;
+}
+.reviews-sort {
+  display: inline-flex;
+  align-items: center;
+}
+.reviews-sort__select {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  padding: var(--space-2) var(--space-3);
+  font-size: 14px;
+  cursor: pointer;
+}
+.reviews-sort__select:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
