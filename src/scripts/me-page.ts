@@ -28,6 +28,7 @@ function renderReviewFooter(b: Booking, r: Review | undefined, aria: string): st
       <div class="me-booking__review">
         <span class="pill pill--rating" aria-label="Рейтинг ${r.rating} из 5"><span aria-hidden="true">★</span> ${r.rating}</span>
         <span class="me-review-excerpt">${escapeHtml(excerpt)}</span>
+        <button class="btn btn--ghost btn--sm" data-delete-review="${r.id}" aria-label="Удалить отзыв на ${aria}">Удалить отзыв</button>
       </div>
     `;
   }
@@ -166,6 +167,38 @@ export async function setupMePage(): Promise<void> {
       await openRescheduleModal(booking, () => {
         setTimeout(() => window.location.reload(), 2500);
       });
+      return;
+    }
+
+    const deleteReviewBtn = target.closest('[data-delete-review]') as HTMLElement | null;
+    if (deleteReviewBtn) {
+      const reviewId = deleteReviewBtn.getAttribute('data-delete-review');
+      if (!reviewId) return;
+      if (!window.confirm('Точно удалить отзыв?')) return;
+      deleteReviewBtn.setAttribute('disabled', '');
+      deleteReviewBtn.setAttribute('aria-busy', 'true');
+      deleteReviewBtn.textContent = 'Удаляем…';
+      const { error } = await supabase.from('reviews').delete().eq('id', reviewId);
+      if (error) {
+        deleteReviewBtn.removeAttribute('disabled');
+        deleteReviewBtn.removeAttribute('aria-busy');
+        deleteReviewBtn.textContent = 'Удалить отзыв';
+        alert(`Не удалось: ${error.message}`);
+        return;
+      }
+      // Replace the review block in this card with the "Оставить отзыв" CTA again
+      const card = deleteReviewBtn.closest('[data-booking-id]') as HTMLElement;
+      const bookingId = card.getAttribute('data-booking-id');
+      const booking = bookings.find((b) => b.id === bookingId);
+      const reviewBlock = card.querySelector('.me-booking__review') as HTMLElement | null;
+      if (reviewBlock && booking) {
+        const aria = `${booking.club_name} ${formatDate(booking.date)} ${booking.time_slot}`;
+        reviewBlock.outerHTML = `
+          <div class="me-booking__review">
+            <a class="btn btn--sm btn--ghost" href="/reviews/new?booking_id=${booking.id}" aria-label="Оставить отзыв на бронь в ${aria}">Оставить отзыв</a>
+          </div>
+        `;
+      }
       return;
     }
 
