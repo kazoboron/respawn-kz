@@ -74,6 +74,7 @@ const clubs = await loadAllClubs();
             <option value="rating">По рейтингу</option>
             <option value="price-asc">Цена ↑</option>
             <option value="price-desc">Цена ↓</option>
+            <option value="distance">Сначала ближайшие</option>
           </select>
         </label>
 
@@ -86,6 +87,7 @@ const clubs = await loadAllClubs();
         rating: c.rating, reviews: c.reviews_count, tags: c.tags,
         gradient: c.gradient, initial: c.initial,
         working_hours: c.working_hours,
+        latitude: c.latitude, longitude: c.longitude,
       })))} />
 
       <div class="clubs__grid" id="catalog-grid"></div>

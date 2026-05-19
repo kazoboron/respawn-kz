@@ -15,9 +15,29 @@ interface Club {
   gradient: string | null;
   initial: string | null;
   working_hours: Record<string, { open: string; close: string } | null>;
+  latitude: number | null;
+  longitude: number | null;
 }
 
-export type SortMode = 'rating' | 'price-asc' | 'price-desc';
+export type SortMode = 'rating' | 'price-asc' | 'price-desc' | 'distance';
+
+// User's current coords — set by setupCatalogFilters when 'distance' sort
+// is picked + browser geolocation succeeds. Null means we don't know yet.
+let userCoords: { lat: number; lon: number } | null = null;
+
+function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R = 6371;
+  const toRad = (d: number) => (d * Math.PI) / 180;
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(a));
+}
+
+function distanceFromUser(c: Club): number {
+  if (!userCoords || c.latitude == null || c.longitude == null) return Infinity;
+  return haversineKm(userCoords.lat, userCoords.lon, c.latitude, c.longitude);
+}
 
 export interface Filters {
   city: string;
@@ -42,6 +62,7 @@ function priceMatches(price: number, tier: string): boolean {
 function sortFn(mode: SortMode): (a: Club, b: Club) => number {
   if (mode === 'price-asc') return (a, b) => a.price - b.price;
   if (mode === 'price-desc') return (a, b) => b.price - a.price;
+  if (mode === 'distance') return (a, b) => distanceFromUser(a) - distanceFromUser(b);
   return (a, b) => b.rating - a.rating;
 }
 
@@ -207,7 +228,27 @@ export function setupCatalogFilters(): void {
   applyFiltersToUI(queryToFilters(window.location.search.slice(1)));
 
   citySelect?.addEventListener('change', render);
-  sortSelect?.addEventListener('change', render);
+  sortSelect?.addEventListener('change', async () => {
+    // 'distance' requires browser geolocation. Request once on first selection;
+    // cached `userCoords` is reused for subsequent re-renders.
+    if (sortSelect.value === 'distance' && !userCoords) {
+      if (!navigator.geolocation) {
+        alert('Браузер не поддерживает геолокацию. Выбран сорт по рейтингу.');
+        sortSelect.value = 'rating';
+      } else {
+        try {
+          const pos = await new Promise<GeolocationPosition>((resolve, reject) => {
+            navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 8000, maximumAge: 60_000 });
+          });
+          userCoords = { lat: pos.coords.latitude, lon: pos.coords.longitude };
+        } catch {
+          alert('Не удалось определить местоположение. Сортировка по рейтингу.');
+          sortSelect.value = 'rating';
+        }
+      }
+    }
+    render();
+  });
 
   // Debounced search input — re-render 200ms after last keystroke to avoid
   // thrashing the DOM as the user types.

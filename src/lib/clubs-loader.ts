@@ -18,6 +18,8 @@ export interface ClubRow {
   rating: number;
   reviews_count: number;
   is_published: boolean;
+  latitude: number | null;
+  longitude: number | null;
   created_at: string;
   updated_at: string;
 }
