@@ -24,6 +24,7 @@ export interface Filters {
   priceTiers: string[];
   tags: string[];
   sort: SortMode;
+  query: string;
 }
 
 const PRICE_TIERS: Record<string, [number, number]> = {
@@ -44,6 +45,18 @@ function sortFn(mode: SortMode): (a: Club, b: Club) => number {
   return (a, b) => b.rating - a.rating;
 }
 
+function matchesQuery(club: Club, q: string): boolean {
+  const needle = q.toLowerCase().trim();
+  if (!needle) return true;
+  const haystack = [
+    club.name,
+    club.district ?? '',
+    club.address,
+    ...club.tags,
+  ].join(' ').toLowerCase();
+  return haystack.includes(needle);
+}
+
 export function applyFilters(filters: Filters): Club[] {
   return CLUBS.filter((c) => !filters.city || c.city === filters.city)
     .filter(
@@ -56,6 +69,7 @@ export function applyFilters(filters: Filters): Club[] {
         !filters.tags.length ||
         filters.tags.every((t) => c.tags.includes(t))
     )
+    .filter((c) => matchesQuery(c, filters.query))
     .sort(sortFn(filters.sort));
 }
 
@@ -65,6 +79,7 @@ export function filtersToQuery(f: Filters): string {
   if (f.priceTiers.length) params.set('price', f.priceTiers.join(','));
   if (f.tags.length) params.set('tags', f.tags.join(','));
   if (f.sort !== 'rating') params.set('sort', f.sort);
+  if (f.query) params.set('q', f.query);
   return params.toString();
 }
 
@@ -75,6 +90,7 @@ export function queryToFilters(query: string): Filters {
     priceTiers: params.get('price')?.split(',').filter(Boolean) || [],
     tags: params.get('tags')?.split(',').filter(Boolean) || [],
     sort: (params.get('sort') as SortMode) || 'rating',
+    query: params.get('q') || '',
   };
 }
 
@@ -141,6 +157,7 @@ export function setupCatalogFilters(): void {
 
   const citySelect = document.getElementById('city-select') as HTMLSelectElement | null;
   const sortSelect = document.getElementById('sort-select') as HTMLSelectElement | null;
+  const searchInput = document.getElementById('catalog-search') as HTMLInputElement | null;
   const priceChips = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-price-tier]'));
   const tagChecks = Array.from(document.querySelectorAll<HTMLInputElement>('[data-tag]'));
 
@@ -150,6 +167,7 @@ export function setupCatalogFilters(): void {
       priceTiers: priceChips.filter((c) => c.classList.contains('is-active')).map((c) => c.dataset.priceTier!),
       tags: tagChecks.filter((c) => c.checked).map((c) => c.dataset.tag!),
       sort: (sortSelect?.value as SortMode) || 'rating',
+      query: searchInput?.value || '',
     };
   }
 
@@ -160,7 +178,7 @@ export function setupCatalogFilters(): void {
   }
 
   function updateResetVisibility(f: Filters): void {
-    const hasFilters = f.city || f.priceTiers.length || f.tags.length || f.sort !== 'rating';
+    const hasFilters = f.city || f.priceTiers.length || f.tags.length || f.sort !== 'rating' || f.query;
     if (resetBtn) resetBtn.hidden = !hasFilters;
   }
 
@@ -177,6 +195,7 @@ export function setupCatalogFilters(): void {
   function applyFiltersToUI(f: Filters): void {
     if (citySelect) citySelect.value = f.city;
     if (sortSelect) sortSelect.value = f.sort;
+    if (searchInput) searchInput.value = f.query;
     priceChips.forEach((c) => {
       c.classList.toggle('is-active', f.priceTiers.includes(c.dataset.priceTier!));
     });
@@ -189,13 +208,22 @@ export function setupCatalogFilters(): void {
 
   citySelect?.addEventListener('change', render);
   sortSelect?.addEventListener('change', render);
+
+  // Debounced search input — re-render 200ms after last keystroke to avoid
+  // thrashing the DOM as the user types.
+  let queryDebounce: number | undefined;
+  searchInput?.addEventListener('input', () => {
+    window.clearTimeout(queryDebounce);
+    queryDebounce = window.setTimeout(render, 200);
+  });
+
   priceChips.forEach((c) => c.addEventListener('click', () => {
     c.classList.toggle('is-active');
     render();
   }));
   tagChecks.forEach((c) => c.addEventListener('change', render));
   resetBtn?.addEventListener('click', () => {
-    applyFiltersToUI({ city: '', priceTiers: [], tags: [], sort: 'rating' });
+    applyFiltersToUI({ city: '', priceTiers: [], tags: [], sort: 'rating', query: '' });
     render();
   });
 

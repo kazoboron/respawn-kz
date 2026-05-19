@@ -25,6 +25,18 @@ const clubs = await loadAllClubs();
       </header>
 
       <div class="catalog__filters" id="catalog-filters">
+        <label class="filter filter--search">
+          <span class="filter__label">Поиск</span>
+          <input
+            type="search"
+            id="catalog-search"
+            class="filter__input"
+            placeholder="Название, район, адрес, тэги…"
+            autocomplete="off"
+            aria-label="Поиск клубов по названию, району, адресу или тэгу"
+          />
+        </label>
+
         <label class="filter">
           <span class="filter__label">
             Город
