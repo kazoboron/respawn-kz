@@ -25,6 +25,7 @@ import { setupReviewsForm } from './reviews-form';
 import { setupClubReviews } from './club-reviews';
 import { setupAdminReviews } from './admin-reviews';
 import { setupDashboardReviews } from './dashboard-reviews';
+import { setupGalleryLightbox } from './gallery-lightbox';
 
 function init(): void {
   setupHeaderScroll();
@@ -93,6 +94,9 @@ function init(): void {
   }
   if (document.getElementById('dashboard-reviews-root')) {
     setupDashboardReviews();
+  }
+  if (document.getElementById('club-gallery')) {
+    setupGalleryLightbox();
   }
   // Cookie consent — on every page, shows once if not yet answered
   setupCookieBanner();

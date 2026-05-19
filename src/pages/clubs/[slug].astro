@@ -156,15 +156,22 @@ if (topReviews.length > 0) {
         </div>
       </header>
 
-      <div class="club-page__gallery">
+      <div class="club-page__gallery" id="club-gallery" data-photos={JSON.stringify(club.photos ?? [])}>
         {club.photos.length > 0 ? (
           club.photos.map((src, i) => (
-            <img
-              src={src}
-              alt={`${club.name} — фото ${i + 1}`}
-              loading="lazy"
-              class="gallery-item"
-            />
+            <button
+              type="button"
+              class="gallery-item-btn"
+              data-photo-index={i}
+              aria-label={`Открыть фото ${i + 1} в полный размер`}
+            >
+              <img
+                src={src}
+                alt={`${club.name} — фото ${i + 1}`}
+                loading={i === 0 ? 'eager' : 'lazy'}
+                class="gallery-item"
+              />
+            </button>
           ))
         ) : (
           <div class="gallery-item" style={`background: ${club.gradient ?? 'linear-gradient(135deg, #8b5cf6, #ec4899)'};`}>
