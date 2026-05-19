@@ -62,9 +62,21 @@ function transitionClass(to: BookingStatus): string {
 
 function renderBookingCard(b: Booking): string {
   const transitions = availableTransitions(b.status);
-  const buttons = transitions.map((to) =>
+  const transitionBtns = transitions.map((to) =>
     `<button type="button" class="${transitionClass(to)}" data-transition="${to}" data-id="${b.id}">${transitionLabel(to)}</button>`
   ).join('');
+
+  // Reschedule button — only for non-terminal statuses where shifting makes sense.
+  // Guard trigger 0015 allows club_admin/super_admin to reschedule any status, but
+  // rescheduling completed/no_show/cancelled is nonsensical — limit UI to pending+confirmed.
+  const canReschedule = b.status === 'pending' || b.status === 'confirmed';
+  const rescheduleBtn = canReschedule
+    ? `<button type="button" class="btn btn--ghost btn--sm" data-reschedule="${b.id}" aria-label="Изменить бронь ${getClubName(b.club_slug)} ${b.date} ${b.time_slot}">Изменить</button>`
+    : '';
+
+  const actionsHtml = transitionBtns || rescheduleBtn
+    ? `<div class="booking-card__actions">${rescheduleBtn}${transitionBtns}</div>`
+    : '';
 
   return `
     <article class="booking-card" data-booking-id="${b.id}">
@@ -80,7 +92,7 @@ function renderBookingCard(b: Booking): string {
       </div>
       <div class="booking-card__side">
         <span class="pill ${STATUS_COLORS[b.status]}" aria-label="Статус: ${STATUS_LABELS[b.status]}">${STATUS_LABELS[b.status]}</span>
-        ${buttons ? `<div class="booking-card__actions">${buttons}</div>` : ''}
+        ${actionsHtml}
       </div>
     </article>
   `;
@@ -189,6 +201,29 @@ export async function setupDashboardBookings(): Promise<void> {
     (document.getElementById('filter-status') as HTMLSelectElement).value = '';
     (document.getElementById('filter-date-from') as HTMLInputElement).value = '';
     refresh();
+  });
+
+  // Reschedule button handler (event delegation, dynamic import to keep bundle lean)
+  listEl.addEventListener('click', async (e) => {
+    const target = e.target as HTMLElement;
+    const rescheduleBtn = target.closest('[data-reschedule]') as HTMLButtonElement | null;
+    if (!rescheduleBtn) return;
+    const id = rescheduleBtn.getAttribute('data-reschedule');
+    if (!id) return;
+    // Need to refetch the booking from current list since we may have a stale closure
+    const { data: booking } = await supabase
+      .from('bookings')
+      .select('*')
+      .eq('id', id)
+      .maybeSingle();
+    if (!booking) {
+      alert('Бронь не найдена. Обнови страницу.');
+      return;
+    }
+    const { openRescheduleModal } = await import('./booking-reschedule');
+    await openRescheduleModal(booking as Booking, () => {
+      setTimeout(() => refresh(), 2500);
+    });
   });
 
   // Transition button handler (event delegation)
