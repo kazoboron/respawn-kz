@@ -4146,3 +4146,23 @@ textarea:focus-visible,
   color: var(--text-secondary);
   line-height: 1.5;
 }
+
+/* Per-day hours table on /clubs/[slug] */
+.hours-table {
+  border-collapse: collapse;
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-top: var(--space-1);
+}
+.hours-table th,
+.hours-table td {
+  text-align: left;
+  padding: 4px 12px 4px 0;
+  font-weight: 400;
+  vertical-align: top;
+}
+.hours-table th {
+  color: var(--text-muted);
+  width: 32px;
+  font-weight: 600;
+}

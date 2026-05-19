@@ -26,14 +26,52 @@ function formatPrice(value: number): string {
   return value.toLocaleString('ru-RU');
 }
 
-// Working hours summary string for display (use Mon as representative)
-function summarizeHours(wh: ClubRow['working_hours']): string {
-  const mon = wh.mon;
-  if (!mon) return 'По расписанию';
-  if (mon.open === '24h') return 'Круглосуточно';
-  return `${mon.open} – ${mon.close}`;
+// Working hours — per-day table for UI + Schema.org openingHoursSpecification for SEO
+type HoursValue = { open: string; close: string } | null | undefined;
+
+const DAY_KEYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'] as const;
+const DAY_LABELS_SHORT: Record<typeof DAY_KEYS[number], string> = {
+  mon: 'Пн', tue: 'Вт', wed: 'Ср', thu: 'Чт', fri: 'Пт', sat: 'Сб', sun: 'Вс',
+};
+const DAY_LABELS_SCHEMA: Record<typeof DAY_KEYS[number], string> = {
+  mon: 'Monday', tue: 'Tuesday', wed: 'Wednesday', thu: 'Thursday',
+  fri: 'Friday', sat: 'Saturday', sun: 'Sunday',
+};
+
+function describeDayHours(h: HoursValue): string {
+  if (!h) return 'Закрыто';
+  if (h.open === '24h' || h.close === '24h') return 'Круглосуточно';
+  return `${h.open} – ${h.close}`;
 }
-const hoursLabel = summarizeHours(club.working_hours);
+
+const dayRows = DAY_KEYS.map((key) => ({
+  key,
+  label: DAY_LABELS_SHORT[key],
+  hours: describeDayHours(club.working_hours?.[key] as HoursValue),
+}));
+
+// Build Schema.org openingHoursSpecification — one entry per day with hours,
+// or omit closed days entirely (Schema convention).
+const schemaHours = DAY_KEYS
+  .map((key) => {
+    const h = club.working_hours?.[key] as HoursValue;
+    if (!h) return null;
+    if (h.open === '24h' || h.close === '24h') {
+      return {
+        '@type': 'OpeningHoursSpecification',
+        dayOfWeek: DAY_LABELS_SCHEMA[key],
+        opens: '00:00',
+        closes: '23:59',
+      };
+    }
+    return {
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: DAY_LABELS_SCHEMA[key],
+      opens: h.open,
+      closes: h.close,
+    };
+  })
+  .filter(Boolean);
 
 // Compact data-club JSON for booking modal — only fields it needs
 const clubDataAttr = JSON.stringify({
@@ -73,7 +111,7 @@ const jsonLd: Record<string, unknown> = {
     worstRating: 1,
   },
   priceRange: `от ${formatPrice(club.price_per_hour)} ₸/час`,
-  openingHours: hoursLabel === 'Круглосуточно' ? 'Mo-Su 00:00-23:59' : hoursLabel,
+  openingHoursSpecification: schemaHours,
 };
 if (topReviews.length > 0) {
   jsonLd.review = topReviews.map((r) => ({
@@ -154,7 +192,16 @@ if (topReviews.length > 0) {
             <div class="info-grid">
               <div>
                 <div class="info-label">Часы работы</div>
-                <div class="info-value">{hoursLabel}</div>
+                <table class="hours-table" aria-label="Часы работы по дням">
+                  <tbody>
+                    {dayRows.map((d) => (
+                      <tr>
+                        <th scope="row">{d.label}</th>
+                        <td>{d.hours}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
               <div>
                 <div class="info-label">Адрес</div>
