@@ -226,6 +226,33 @@ ${p.review_note ? `Причина: ${p.review_note}\n` : 'Свяжись с по
 Кабинет: ${SITE_URL}/dashboard/bookings/
     `,
   },
+
+  review_replied: {
+    subject: () => `Клуб ответил на твой отзыв — respawn.kz`,
+    bodyHtml: (p) => `
+      <h1>Клуб ответил на твой отзыв</h1>
+      <p>Твой отзыв (★${e(p.review_rating)}/5):</p>
+      <blockquote style="border-left: 3px solid #8a8a95; padding-left: 12px; color: #cfcfd9; margin: 16px 0;">
+        ${e(p.review_text)}
+      </blockquote>
+      <p><strong>Ответ клуба:</strong></p>
+      <blockquote style="border-left: 3px solid #8b5cf6; padding-left: 12px; color: #cfcfd9; margin: 16px 0;">
+        ${e(p.reply_text)}
+      </blockquote>
+      <p><a href="${SITE_URL}/clubs/${e(p.club_slug)}/#reviews-section">Посмотреть на сайте</a></p>
+    `,
+    bodyText: (p) => `
+Клуб ответил на твой отзыв.
+
+Твой отзыв (${p.review_rating}/5):
+«${p.review_text}»
+
+Ответ клуба:
+«${p.reply_text}»
+
+Посмотреть на сайте: ${SITE_URL}/clubs/${p.club_slug}/#reviews-section
+    `,
+  },
 };
 
 export function renderTemplate(
