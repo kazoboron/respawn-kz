@@ -536,3 +536,54 @@
   }
   .hero__ticker-label { display: none; }
 }
+
+/* ============================================
+   HOMEPAGE v4 — hero compact + mobile 2-col club cards
+   ============================================ */
+
+/* Hero — smaller headline, less vertical padding (user feedback 2026-05-20) */
+.hero {
+  min-height: auto;
+  padding-top: 120px;
+  padding-bottom: 60px;
+}
+.hero__title {
+  font-size: clamp(32px, 5vw, 56px);
+  margin-bottom: 16px;
+}
+.hero__subtitle {
+  margin-bottom: 28px;
+  font-size: clamp(15px, 1.2vw, 17px);
+}
+.hero__cta-row { margin-bottom: 24px; }
+.hero__search-block { padding: 16px; }
+@media (max-width: 600px) {
+  .hero { padding-top: 100px; padding-bottom: 40px; }
+  .hero__title {
+    font-size: clamp(28px, 8vw, 42px);
+    line-height: 1.08;
+  }
+  .hero__tagline { font-size: 10px; padding: 5px 10px; margin-bottom: 14px; }
+  .hero__subtitle { margin-bottom: 18px; font-size: 14px; }
+  .hero__ticker { font-size: 11px; gap: 10px; padding: 10px 12px; }
+  .hero__live { top: 76px; right: 12px; font-size: 9px; padding: 3px 8px; }
+  /* Hide search block on small screens — CTAs above are enough */
+  .hero__search-block { display: none; }
+}
+
+/* Club cards on mobile — compact so 2 fit side-by-side */
+@media (max-width: 768px) {
+  .clubs__grid .club-card { border-radius: var(--radius-md); }
+  .clubs__grid .club-card__media { height: 100px; }
+  .clubs__grid .club-card__initial { font-size: 32px; }
+  .clubs__grid .club-card__body { padding: 12px; gap: 8px; }
+  .clubs__grid .club-card__name { font-size: 15px; line-height: 1.2; }
+  .clubs__grid .club-card__meta { font-size: 11px; flex-wrap: wrap; gap: 4px; }
+  .clubs__grid .club-card__meta-sep { display: none; }
+  .clubs__grid .club-card__tags { gap: 4px; }
+  .clubs__grid .club-card__tags .tag { font-size: 10px; padding: 2px 6px; }
+  .clubs__grid .club-card__footer { flex-direction: column; align-items: stretch; gap: 8px; padding-top: 6px; }
+  .clubs__grid .club-card__price { font-size: 13px; }
+  .clubs__grid .club-card__price-value { font-size: 14px; }
+  .clubs__grid .club-card .btn--sm { font-size: 13px; padding: 8px 10px; width: 100%; }
+}

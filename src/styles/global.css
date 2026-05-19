@@ -1463,9 +1463,10 @@ body.menu-open {
     gap: 32px;
   }
 
-  /* Clubs */
+  /* Clubs — 2 columns on mobile (user request 2026-05-20: «хотя бы по два») */
   .clubs__grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
   }
 
   /* Benefits */

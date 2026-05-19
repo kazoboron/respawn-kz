@@ -46,7 +46,7 @@ function clubRowToDisplay(row: ClubRow): Club {
 }
 
 const clubs = await loadAllClubs();
-const topClubs = clubs.slice(0, 6).map(clubRowToDisplay);
+const allClubs = clubs.map(clubRowToDisplay);
 ---
 
 <BaseLayout
@@ -68,13 +68,12 @@ const topClubs = clubs.slice(0, 6).map(clubRowToDisplay);
     </div>
 
     <div class="container hero__inner">
-      <span class="hero__tagline">Бронирование без звонков · 10 городов · 80+ клубов</span>
+      <span class="hero__tagline">Бронь без звонков · 10 городов · 80+ клубов</span>
       <h1 class="hero__title">
-        Забронируй компьютерный клуб <br />
-        в Казахстане за <span class="glitch" data-text="30 секунд">30 секунд</span>
+        Забронируй компьютерный клуб за <span class="glitch" data-text="30 секунд">30 секунд</span>
       </h1>
       <p class="hero__subtitle">
-        Лучшие клубы страны в одном месте. Выбирай слот, оплачивай онлайн, приходи играть.
+        Выбирай слот, оплачивай онлайн, приходи играть.
       </p>
 
       <div class="hero__cta-row">
@@ -122,24 +121,26 @@ const topClubs = clubs.slice(0, 6).map(clubRowToDisplay);
     </div>
   </section>
 
+  <!-- Clubs list — moved up per user request, full catalog right after hero -->
+  <section class="clubs" id="clubs" data-reveal>
+    <div class="container">
+      <h2 class="section__title">Клубы Казахстана</h2>
+      <p class="section__subtitle">{allClubs.length} клубов в 10 городах — выбирай и бронируй</p>
+      <div class="clubs__grid">
+        {allClubs.map((club) => <ClubCard club={club} />)}
+      </div>
+      <div class="clubs__more">
+        <a class="btn btn--ghost btn--large" href="/clubs/">Открыть каталог с фильтрами</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Supporting info — moved BELOW clubs per user request -->
   <CitiesShowcase />
 
   <HowItWorks />
 
   <BookingFlowDemo />
-
-  <section class="clubs" id="clubs" data-reveal>
-    <div class="container">
-      <h2 class="section__title">Топ клубы в Казахстане</h2>
-      <p class="section__subtitle">Проверенные клубы с лучшим рейтингом</p>
-      <div class="clubs__grid">
-        {topClubs.map((club) => <ClubCard club={club} />)}
-      </div>
-      <div class="clubs__more">
-        <a class="btn btn--ghost btn--large" href="/clubs/">Все 80+ клубов</a>
-      </div>
-    </div>
-  </section>
 
   <BenefitsSplit />
 
@@ -162,25 +163,20 @@ const topClubs = clubs.slice(0, 6).map(clubRowToDisplay);
 
   <div class="marquee" aria-hidden="true">
     <div class="marquee__track">
-      <!-- Doubled for seamless loop -->
       <span>Алматы</span><span>Астана</span><span>Шымкент</span><span>Караганда</span><span>Актобе</span><span>Тараз</span><span>Павлодар</span><span>Усть-Каменогорск</span><span>Семей</span><span>Атырау</span>
       <span>Алматы</span><span>Астана</span><span>Шымкент</span><span>Караганда</span><span>Актобе</span><span>Тараз</span><span>Павлодар</span><span>Усть-Каменогорск</span><span>Семей</span><span>Атырау</span>
     </div>
   </div>
 
-  <!-- Desktop cursor glow follower (CSS handles mobile/reduced-motion hide) -->
   <div class="cursor-glow" id="cursor-glow" aria-hidden="true"></div>
 </BaseLayout>
 
 <script>
-  // Wire geolocation button on hero CTA — gracefully fall back to plain /clubs/ link if denied
   import { setupScrollReveal } from '../scripts/scroll-reveal';
   import { setupHeroParticles } from '../scripts/hero-particles';
   setupScrollReveal();
   setupHeroParticles();
 
-  // Cursor glow follower (desktop, fine pointer only). CSS handles
-  // touch and prefers-reduced-motion cases by display:none.
   const glow = document.getElementById('cursor-glow');
   if (glow && window.matchMedia('(hover: hover) and (pointer: fine)').matches
       && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -212,19 +208,12 @@ const topClubs = clubs.slice(0, 6).map(clubRowToDisplay);
   const geoBtn = document.getElementById('hero-geo-cta') as HTMLAnchorElement | null;
   if (geoBtn && navigator.geolocation) {
     geoBtn.addEventListener('click', (e) => {
-      // If user has previously denied, browser doesn't re-prompt — let the link proceed.
-      // Otherwise we request geo and pass coords via query so /clubs can sort by distance.
       e.preventDefault();
-      const originalText = geoBtn.textContent;
       geoBtn.style.opacity = '0.7';
       geoBtn.style.pointerEvents = 'none';
       navigator.geolocation.getCurrentPosition(
+        () => { window.location.href = '/clubs/?sort=distance'; },
         () => {
-          // Permission granted — /clubs/?sort=distance picks up coords from browser API there
-          window.location.href = '/clubs/?sort=distance';
-        },
-        () => {
-          // Denied or timed out — still go to clubs, just without distance sort
           geoBtn.style.opacity = '';
           geoBtn.style.pointerEvents = '';
           window.location.href = '/clubs/';
