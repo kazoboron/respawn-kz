@@ -68,8 +68,10 @@ async function handleBookingClick(btn: HTMLElement): Promise<void> {
         hours: d.hours,
         price_per_hour: club.price_per_hour,
         total_price: d.total_price,
-        redeem_hours: d.redeem_hours,
       };
+      // Only include redeem_hours when > 0. Keeps INSERT compatible with
+      // pre-migration-0019 schemas where the column doesn't exist yet.
+      if (d.redeem_hours > 0) payload.redeem_hours = d.redeem_hours;
       const { error } = await supabase.from('bookings').insert(payload);
       return { ok: !error, error: error?.message };
     },

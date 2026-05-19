@@ -213,8 +213,10 @@ export async function setupReviewsForm(): Promise<void> {
       club_slug: b.club_slug,
       rating,
       text,
-      photo_urls: photoUrls.slice(),
-    };
+      // Only send photo_urls when present. Keeps INSERT working against
+      // pre-migration-0020 schema (where the column doesn't exist yet).
+      ...(photoUrls.length > 0 ? { photo_urls: photoUrls.slice() } : {}),
+    } as NewReview;
 
     const { error } = await supabase.from('reviews').insert(newRow);
 

@@ -7,9 +7,10 @@ interface PublicReview {
   rating: number;
   text: string;
   created_at: string;
-  reply_text: string | null;
-  replied_at: string | null;
-  photo_urls: string[] | null;
+  // Optional fields — present once migrations 0016/0020 apply, undefined before.
+  reply_text?: string | null;
+  replied_at?: string | null;
+  photo_urls?: string[] | null;
 }
 
 function escapeHtml(s: string): string {
@@ -125,16 +126,36 @@ export async function setupClubReviews(): Promise<void> {
     if (initialRender) showLoading();
 
     const cfg = SORT_CONFIG[sortKey];
-    let query = supabase
+    // Defensive query: try modern columns; if migration 0016/0020 not yet applied,
+    // fall back to base columns and synthesize null for missing fields.
+    const baseQuery = () => supabase
       .from('reviews')
       .select('id, rating, text, created_at, reply_text, replied_at, photo_urls')
       .eq('club_slug', slug!)
       .eq('status', 'published')
       .order(cfg.column, { ascending: cfg.ascending });
+    const fallbackQuery = () => supabase
+      .from('reviews')
+      .select('id, rating, text, created_at')
+      .eq('club_slug', slug!)
+      .eq('status', 'published')
+      .order(cfg.column, { ascending: cfg.ascending });
+
+    let query = baseQuery();
     if (cfg.secondary) {
       query = query.order(cfg.secondary.column, { ascending: cfg.secondary.ascending });
     }
-    const { data, error } = await query.range(offset, offset + PAGE_SIZE - 1);
+    let { data, error } = await query.range(offset, offset + PAGE_SIZE - 1);
+
+    // 42703 = column does not exist (migration 0016 or 0020 not applied yet)
+    if (error && error.code === '42703') {
+      let fq = fallbackQuery();
+      if (cfg.secondary) fq = fq.order(cfg.secondary.column, { ascending: cfg.secondary.ascending });
+      const retry = await fq.range(offset, offset + PAGE_SIZE - 1);
+      // Fallback rows don't have the optional fields — cast to widen.
+      data = retry.data as typeof data;
+      error = retry.error;
+    }
 
     if (error) {
       console.error('[club-reviews] load failed', error);

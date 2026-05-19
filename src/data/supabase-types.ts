@@ -15,6 +15,11 @@ export interface Booking {
   hours: number;
   price_per_hour: number;
   total_price: number;
+  /**
+   * Hours redeemed from loyalty balance. Optional in NewBooking so the field
+   * is only sent to Supabase when > 0 — keeps INSERT working against the
+   * pre-migration 0019 schema (where the column doesn't yet exist).
+   */
   redeem_hours: number;
   status: BookingStatus;
   status_changed_at: string;
@@ -22,7 +27,9 @@ export interface Booking {
   created_at: string;
 }
 
-export type NewBooking = Omit<Booking, 'id' | 'status' | 'status_changed_at' | 'status_changed_by' | 'created_at'>;
+export type NewBooking = Omit<Booking, 'id' | 'status' | 'status_changed_at' | 'status_changed_by' | 'created_at' | 'redeem_hours'> & {
+  redeem_hours?: number;
+};
 
 export const STATUS_LABELS: Record<BookingStatus, string> = {
   pending: 'Ожидает подтверждения',
@@ -144,9 +151,14 @@ export type NewReview = Omit<
   | 'reply_text'
   | 'replied_at'
   | 'replied_by'
+  | 'photo_urls'
   | 'created_at'
   | 'updated_at'
->;
+> & {
+  // Optional — included in INSERT only when user attaches photos. Keeps the
+  // insert compatible with pre-migration-0020 schemas.
+  photo_urls?: string[];
+};
 
 export const REVIEW_STATUS_LABELS: Record<ReviewStatus, string> = {
   published: 'Опубликован',
