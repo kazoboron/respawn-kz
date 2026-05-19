@@ -26,6 +26,7 @@ import { setupClubReviews } from './club-reviews';
 import { setupAdminReviews } from './admin-reviews';
 import { setupDashboardReviews } from './dashboard-reviews';
 import { setupGalleryLightbox } from './gallery-lightbox';
+import { setupClubCardClicks } from './club-card-click';
 
 function init(): void {
   setupHeaderScroll();
@@ -97,6 +98,8 @@ function init(): void {
   }
   // Document-level delegation works for both SSG club gallery and dynamically-rendered review photos
   setupGalleryLightbox();
+  // Make whole ClubCard clickable (mouse/touch) — keyboard uses inner anchors
+  setupClubCardClicks();
   // Cookie consent — on every page, shows once if not yet answered
   setupCookieBanner();
 }
