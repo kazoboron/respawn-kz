@@ -1,0 +1,29 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import DashboardNav from '../../components/DashboardNav.astro';
+---
+<BaseLayout
+  title="Отзывы — Кабинет — respawn.kz"
+  description="Отзывы клиентов на твои клубы"
+>
+  <section class="container dashboard-page">
+    <DashboardNav variant="dashboard" active="/dashboard/reviews/" />
+    <header class="dashboard-page__header">
+      <h1>Отзывы на твои клубы</h1>
+      <p class="dashboard-page__sub">Только опубликованные отзывы. Можно ответить — клиент получит email.</p>
+    </header>
+
+    <div id="dashboard-reviews-root">
+      <div id="dashboard-reviews-loading" class="dashboard-loading" aria-live="polite" aria-busy="true" style="padding:24px">
+        <p style="text-align:center;color:var(--text-muted)">Загружаем отзывы…</p>
+      </div>
+      <div id="dashboard-reviews-list" class="admin-reviews-list" aria-busy="true" aria-live="polite"></div>
+      <div id="dashboard-reviews-empty" hidden>
+        <p style="text-align:center;color:var(--text-muted);padding:24px">Пока нет опубликованных отзывов на твои клубы.</p>
+      </div>
+      <div id="dashboard-reviews-error" role="alert" hidden style="padding:16px;color:rgb(248,113,113)">
+        <p>Не удалось загрузить отзывы. <button type="button" class="btn btn--ghost btn--sm" data-retry-dashboard-reviews>Повторить</button></p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

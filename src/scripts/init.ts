@@ -24,6 +24,7 @@ import { setupDashboardClubEdit } from './dashboard-club-edit';
 import { setupReviewsForm } from './reviews-form';
 import { setupClubReviews } from './club-reviews';
 import { setupAdminReviews } from './admin-reviews';
+import { setupDashboardReviews } from './dashboard-reviews';
 
 function init(): void {
   setupHeaderScroll();
@@ -89,6 +90,9 @@ function init(): void {
   }
   if (document.getElementById('admin-reviews-root')) {
     setupAdminReviews();
+  }
+  if (document.getElementById('dashboard-reviews-root')) {
+    setupDashboardReviews();
   }
   // Cookie consent — on every page, shows once if not yet answered
   setupCookieBanner();
