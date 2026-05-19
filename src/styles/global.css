@@ -3917,3 +3917,103 @@ textarea:focus-visible,
 .filter--search {
   grid-column: 1 / -1;
 }
+
+/* Review replies (Migration 0016) — public display on /clubs/[slug] and admin form on /admin/reviews */
+.review-card__reply {
+  margin-top: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  background: rgba(139, 92, 246, 0.06);
+  border-left: 3px solid var(--c-violet-400);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+.review-card__reply-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-2);
+}
+.review-card__reply-label {
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--c-violet-300);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.review-card__reply-text {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+/* Admin reply controls */
+.admin-review__reply {
+  margin-top: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  background: rgba(139, 92, 246, 0.06);
+  border-left: 3px solid var(--c-violet-400);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+.admin-review__reply-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-2);
+  flex-wrap: wrap;
+}
+.admin-review__reply-label {
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--c-violet-300);
+}
+.admin-review__reply-actions {
+  display: flex;
+  gap: var(--space-2);
+}
+.admin-review__reply-text {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+.admin-review__reply-form {
+  margin-top: var(--space-3);
+}
+.admin-review__reply-form > summary {
+  cursor: pointer;
+  display: inline-block;
+}
+.admin-review__reply-form-body {
+  margin-top: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.admin-review__reply-form-body textarea {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  padding: var(--space-2) var(--space-3);
+  font-size: 14px;
+  resize: vertical;
+  min-height: 70px;
+  font-family: inherit;
+}
+.admin-review__reply-form-body textarea:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.admin-review__reply-form-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.admin-review__reply-error {
+  color: var(--danger);
+  font-size: 13px;
+}

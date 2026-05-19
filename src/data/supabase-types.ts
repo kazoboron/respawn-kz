@@ -125,13 +125,25 @@ export interface Review {
   hidden_by: string | null;
   hidden_at: string | null;
   hidden_reason: string | null;
+  reply_text: string | null;
+  replied_at: string | null;
+  replied_by: string | null;
   created_at: string;
   updated_at: string;
 }
 
 export type NewReview = Omit<
   Review,
-  'id' | 'status' | 'hidden_by' | 'hidden_at' | 'hidden_reason' | 'created_at' | 'updated_at'
+  | 'id'
+  | 'status'
+  | 'hidden_by'
+  | 'hidden_at'
+  | 'hidden_reason'
+  | 'reply_text'
+  | 'replied_at'
+  | 'replied_by'
+  | 'created_at'
+  | 'updated_at'
 >;
 
 export const REVIEW_STATUS_LABELS: Record<ReviewStatus, string> = {

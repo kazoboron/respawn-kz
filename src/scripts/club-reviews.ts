@@ -7,6 +7,8 @@ interface PublicReview {
   rating: number;
   text: string;
   created_at: string;
+  reply_text: string | null;
+  replied_at: string | null;
 }
 
 function escapeHtml(s: string): string {
@@ -30,6 +32,19 @@ function renderStars(rating: number): string {
   return `<span class="rating-stars rating-stars--sm">${html}</span>`;
 }
 
+function renderReply(r: PublicReview): string {
+  if (!r.reply_text) return '';
+  return `
+    <div class="review-card__reply" role="region" aria-label="Ответ клуба">
+      <div class="review-card__reply-header">
+        <span class="review-card__reply-label">Ответ клуба</span>
+        ${r.replied_at ? `<span class="review-card__date">${formatDate(r.replied_at)}</span>` : ''}
+      </div>
+      <p class="review-card__reply-text">${escapeHtml(r.reply_text)}</p>
+    </div>
+  `;
+}
+
 function renderCard(r: PublicReview): string {
   return `
     <li>
@@ -39,6 +54,7 @@ function renderCard(r: PublicReview): string {
           <span class="review-card__date">${formatDate(r.created_at)}</span>
         </div>
         <p class="review-card__text">${escapeHtml(r.text)}</p>
+        ${renderReply(r)}
       </article>
     </li>
   `;
@@ -92,7 +108,7 @@ export async function setupClubReviews(): Promise<void> {
     const cfg = SORT_CONFIG[sortKey];
     let query = supabase
       .from('reviews')
-      .select('id, rating, text, created_at')
+      .select('id, rating, text, created_at, reply_text, replied_at')
       .eq('club_slug', slug!)
       .eq('status', 'published')
       .order(cfg.column, { ascending: cfg.ascending });
