@@ -135,6 +135,7 @@ export async function setupDashboardClubEdit(): Promise<void> {
   const slug = url.searchParams.get('slug');
   if (!slug) {
     loadingEl.hidden = true;
+    formEl.hidden = true;
     errorEl.textContent = 'Нужен параметр ?slug=<club-slug> в URL.';
     errorEl.hidden = false;
     return;
@@ -149,6 +150,7 @@ export async function setupDashboardClubEdit(): Promise<void> {
   const isAuthorized = roles.isSuperAdmin || roles.clubSlugs.includes(slug);
   if (!isAuthorized) {
     loadingEl.hidden = true;
+    formEl.hidden = true;
     errorEl.textContent = 'Нет доступа к редактированию этого клуба.';
     errorEl.hidden = false;
     return;
@@ -162,6 +164,7 @@ export async function setupDashboardClubEdit(): Promise<void> {
     .maybeSingle();
   if (loadErr || !club) {
     loadingEl.hidden = true;
+    formEl.hidden = true;
     errorEl.textContent = `Клуб не найден: ${loadErr?.message ?? 'no data'}`;
     errorEl.hidden = false;
     return;
@@ -295,7 +298,11 @@ export async function setupDashboardClubEdit(): Promise<void> {
   }
 
   loadingEl.hidden = true;
-  formEl.hidden = false;
+  formEl.removeAttribute('aria-busy');
+  // Enable all form controls (were disabled during skeleton state)
+  formEl.querySelectorAll<HTMLElement>('input, select, textarea, button').forEach((el) => {
+    (el as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | HTMLButtonElement).disabled = false;
+  });
 
   // Submit
   formEl.addEventListener('submit', async (e) => {
