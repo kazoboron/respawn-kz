@@ -4056,3 +4056,10 @@ textarea:focus-visible,
   font-size: 12px;
   color: var(--text-muted);
 }
+
+/* Photo row move-up/down buttons in /dashboard/club/edit */
+.photos-list__move {
+  padding: 4px 8px;
+  font-size: 14px;
+  line-height: 1;
+}

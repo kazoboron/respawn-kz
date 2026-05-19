@@ -80,6 +80,13 @@ function attachDayHandlers(container: HTMLElement): void {
   });
 }
 
+function reorderButtons(): string {
+  return `
+    <button type="button" class="btn btn--ghost btn--sm photos-list__move" data-move="up" aria-label="Передвинуть фото выше">↑</button>
+    <button type="button" class="btn btn--ghost btn--sm photos-list__move" data-move="down" aria-label="Передвинуть фото ниже">↓</button>
+  `;
+}
+
 function renderPhotoRow(url: string): string {
   if (url && isUploadedUrl(url)) {
     const filename = url.split('/').pop() ?? 'photo';
@@ -87,6 +94,7 @@ function renderPhotoRow(url: string): string {
       <div class="photos-list__row photos-list__row--uploaded" data-url="${url}">
         <img src="${url}" class="photos-list__thumb" alt="" loading="lazy" />
         <span class="photos-list__name">${filename}</span>
+        ${reorderButtons()}
         <button type="button" class="btn btn--ghost btn--sm photos-list__remove" aria-label="× Удалить фото">×</button>
       </div>
     `;
@@ -94,6 +102,7 @@ function renderPhotoRow(url: string): string {
   return `
     <div class="photos-list__row photos-list__row--url">
       <input type="url" class="auth-input" value="${url}" placeholder="https://..." />
+      ${reorderButtons()}
       <button type="button" class="btn btn--ghost btn--sm photos-list__remove" aria-label="× Удалить фото">×</button>
     </div>
   `;
@@ -276,9 +285,28 @@ export async function setupDashboardClubEdit(): Promise<void> {
 
   // Remove handler: delete from Storage if uploaded
   photosList.addEventListener('click', async (e) => {
-    const btn = (e.target as HTMLElement).closest('.photos-list__remove');
+    const target = e.target as HTMLElement;
+
+    // Reorder (move up/down) handler
+    const moveBtn = target.closest('[data-move]') as HTMLButtonElement | null;
+    if (moveBtn) {
+      const row = moveBtn.closest('.photos-list__row') as HTMLElement | null;
+      if (!row) return;
+      const direction = moveBtn.getAttribute('data-move');
+      if (direction === 'up' && row.previousElementSibling) {
+        photosList.insertBefore(row, row.previousElementSibling);
+      } else if (direction === 'down' && row.nextElementSibling) {
+        photosList.insertBefore(row.nextElementSibling, row);
+      }
+      // Refocus the same button after reorder so keyboard nav stays put
+      const refocus = row.querySelector(`[data-move="${direction}"]`) as HTMLElement | null;
+      refocus?.focus();
+      return;
+    }
+
+    const btn = target.closest('.photos-list__remove');
     if (!btn) return;
-    const row = btn.parentElement;
+    const row = btn.closest('.photos-list__row') as HTMLElement | null;
     if (!row) return;
     const uploadedUrl = row.getAttribute('data-url');
     row.remove();
