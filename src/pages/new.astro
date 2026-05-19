@@ -454,8 +454,25 @@ function fmtPrice(n: number): string {
       const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
 
       const setStaticMode = () => {
-        if (video) video.style.display = 'none';
-        if (poster) poster.removeAttribute('hidden');
+        // Mobile / reduced-motion: video autoplay-loops, no scrub
+        if (poster) poster.setAttribute('hidden', '');
+        if (video) {
+          video.style.display = 'block';
+          if (reduced.matches) {
+            // True reduced motion: pause + show poster
+            video.style.display = 'none';
+            if (poster) poster.removeAttribute('hidden');
+            try { video.pause(); } catch (_) {}
+          } else {
+            // Mobile: loop+autoplay (no scrub)
+            video.loop = true;
+            video.muted = true;
+            const playPromise = video.play();
+            if (playPromise && typeof playPromise.catch === 'function') {
+              playPromise.catch(() => { /* autoplay may be blocked; ignore */ });
+            }
+          }
+        }
         beats.forEach((b) => {
           b.classList.toggle('is-active', b.dataset.beat === '1');
         });
@@ -464,7 +481,12 @@ function fmtPrice(n: number): string {
       };
 
       const setInteractiveMode = () => {
-        if (video) video.style.display = 'block';
+        // Desktop: scroll-scrub mode — pause autoplay, reset, scrub controls time
+        if (video) {
+          video.style.display = 'block';
+          video.loop = false;
+          try { video.pause(); video.currentTime = 0; } catch (_) {}
+        }
         if (poster) poster.setAttribute('hidden', '');
       };
 
