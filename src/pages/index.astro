@@ -1,5 +1,6 @@
 ---
 import '../styles/homepage-v2.css';
+import '../styles/homepage-v3.css';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import SearchForm from '../components/SearchForm.astro';
 import HowItWorks from '../components/HowItWorks.astro';
@@ -129,12 +130,55 @@ const topClubs = clubs.slice(0, 6).map(clubRowToDisplay);
       </div>
     </div>
   </section>
+
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee__track">
+      <!-- Doubled for seamless loop -->
+      <span>Алматы</span><span>Астана</span><span>Шымкент</span><span>Караганда</span><span>Актобе</span><span>Тараз</span><span>Павлодар</span><span>Усть-Каменогорск</span><span>Семей</span><span>Атырау</span>
+      <span>Алматы</span><span>Астана</span><span>Шымкент</span><span>Караганда</span><span>Актобе</span><span>Тараз</span><span>Павлодар</span><span>Усть-Каменогорск</span><span>Семей</span><span>Атырау</span>
+    </div>
+  </div>
+
+  <!-- Desktop cursor glow follower (CSS handles mobile/reduced-motion hide) -->
+  <div class="cursor-glow" id="cursor-glow" aria-hidden="true"></div>
 </BaseLayout>
 
 <script>
   // Wire geolocation button on hero CTA — gracefully fall back to plain /clubs/ link if denied
   import { setupScrollReveal } from '../scripts/scroll-reveal';
+  import { setupHeroParticles } from '../scripts/hero-particles';
   setupScrollReveal();
+  setupHeroParticles();
+
+  // Cursor glow follower (desktop, fine pointer only). CSS handles
+  // touch and prefers-reduced-motion cases by display:none.
+  const glow = document.getElementById('cursor-glow');
+  if (glow && window.matchMedia('(hover: hover) and (pointer: fine)').matches
+      && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    let activated = false;
+    let rafPending = false;
+    let lastX = 0;
+    let lastY = 0;
+    document.addEventListener('mousemove', (e) => {
+      lastX = e.clientX;
+      lastY = e.clientY;
+      if (!activated) {
+        glow.classList.add('is-active');
+        activated = true;
+      }
+      if (!rafPending) {
+        rafPending = true;
+        requestAnimationFrame(() => {
+          glow.style.transform = `translate(${lastX}px, ${lastY}px) translate(-50%, -50%)`;
+          rafPending = false;
+        });
+      }
+    });
+    document.addEventListener('mouseleave', () => {
+      glow.classList.remove('is-active');
+      activated = false;
+    });
+  }
 
   const geoBtn = document.getElementById('hero-geo-cta') as HTMLAnchorElement | null;
   if (geoBtn && navigator.geolocation) {

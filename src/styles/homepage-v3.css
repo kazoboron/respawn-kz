@@ -1,0 +1,386 @@
+/* ============================================
+   HOMEPAGE V3 — neon-cyberpunk overhaul
+   Brighter palette · canvas particles · SVG circuit traces
+   ============================================ */
+
+/* --- Override accent palette to brighter, more saturated neon --- */
+:root {
+  /* Hot, saturated neon — pushes brand into clear gaming/cyberpunk territory */
+  --neon-cyan-hot: #00e5ff;
+  --neon-magenta-hot: #ff0080;
+  --neon-lime: #39ff14;
+  --neon-violet-hot: #bc13fe;
+
+  /* Heavier glow shadows for hero CTAs / cards */
+  --glow-cyan-hot: 0 0 24px rgba(0, 229, 255, 0.55), 0 0 48px rgba(0, 229, 255, 0.25);
+  --glow-magenta-hot: 0 0 24px rgba(255, 0, 128, 0.55), 0 0 48px rgba(255, 0, 128, 0.25);
+}
+
+/* --- Hero FX layer (canvas particles + SVG circuit) --- */
+.hero-fx {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.hero-fx__canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.7;
+}
+.hero-fx__circuits {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.55;
+}
+.hero-fx__vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 70% 60% at 50% 50%, transparent 30%, rgba(7, 6, 26, 0.65) 100%);
+  pointer-events: none;
+}
+
+/* SVG circuit traces — pulsing current via stroke-dashoffset */
+.trace {
+  stroke-dasharray: 200 1200;
+  filter: drop-shadow(0 0 4px currentColor);
+}
+.trace--cyan {
+  animation: trace-flow-1 6s linear infinite;
+}
+.trace--magenta {
+  animation: trace-flow-2 8s linear infinite;
+}
+.trace--cyan-2 {
+  animation: trace-flow-3 7s linear infinite;
+}
+.trace--magenta-2 {
+  animation: trace-flow-4 9s linear infinite;
+}
+@keyframes trace-flow-1 {
+  from { stroke-dashoffset: 1400; }
+  to   { stroke-dashoffset: 0; }
+}
+@keyframes trace-flow-2 {
+  from { stroke-dashoffset: 0; }
+  to   { stroke-dashoffset: 1400; }
+}
+@keyframes trace-flow-3 {
+  from { stroke-dashoffset: 1400; }
+  to   { stroke-dashoffset: 0; }
+}
+@keyframes trace-flow-4 {
+  from { stroke-dashoffset: 0; }
+  to   { stroke-dashoffset: 1400; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trace { animation: none !important; }
+}
+
+/* --- Override primary button glow to be more dramatic --- */
+.hero__cta-row .btn--primary {
+  background: linear-gradient(135deg, var(--neon-cyan-hot) 0%, var(--neon-magenta-hot) 100%);
+  color: #07061a;
+  border: 0;
+  box-shadow: var(--glow-cyan-hot);
+  position: relative;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  transition: transform var(--t-base), box-shadow var(--t-base);
+}
+.hero__cta-row .btn--primary:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--glow-cyan-hot), var(--glow-magenta-hot);
+}
+.hero__cta-row .btn--primary::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, var(--neon-cyan-hot), var(--neon-magenta-hot));
+  filter: blur(12px);
+  opacity: 0.5;
+  z-index: -1;
+}
+
+/* Secondary ghost button with cyan border glow */
+.hero__cta-row .btn--ghost {
+  border: 1.5px solid rgba(0, 229, 255, 0.4);
+  color: var(--neon-cyan-hot);
+  background: rgba(0, 229, 255, 0.04);
+  transition: all var(--t-base);
+}
+.hero__cta-row .btn--ghost:hover {
+  border-color: var(--neon-cyan-hot);
+  background: rgba(0, 229, 255, 0.1);
+  box-shadow: var(--glow-cyan-hot);
+  color: #fff;
+}
+
+/* --- Hero tagline — punchier with cyan accent dot --- */
+.hero__tagline {
+  background: rgba(0, 229, 255, 0.06);
+  border: 1px solid rgba(0, 229, 255, 0.3);
+  color: var(--neon-cyan-hot);
+  text-shadow: 0 0 8px rgba(0, 229, 255, 0.4);
+}
+
+/* --- Glitch headline word — hot magenta + cyan split --- */
+.glitch {
+  background: linear-gradient(135deg, var(--neon-cyan-hot) 0%, var(--neon-magenta-hot) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  position: relative;
+  display: inline-block;
+}
+.glitch::before,
+.glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+.glitch::before {
+  color: var(--neon-cyan-hot);
+  -webkit-text-fill-color: var(--neon-cyan-hot);
+  text-shadow: 2px 0 var(--neon-magenta-hot);
+  clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
+  animation: glitch-top 4s infinite linear alternate-reverse;
+}
+.glitch::after {
+  color: var(--neon-magenta-hot);
+  -webkit-text-fill-color: var(--neon-magenta-hot);
+  text-shadow: -2px 0 var(--neon-cyan-hot);
+  clip-path: polygon(0 55%, 100% 55%, 100% 100%, 0 100%);
+  animation: glitch-bottom 4s infinite linear alternate-reverse;
+}
+@keyframes glitch-top {
+  0%, 86%, 100% { transform: translate(0); }
+  87% { transform: translate(2px, -2px); }
+  88% { transform: translate(-2px, 1px); }
+  89% { transform: translate(0); }
+}
+@keyframes glitch-bottom {
+  0%, 86%, 100% { transform: translate(0); }
+  87% { transform: translate(-2px, 2px); }
+  88% { transform: translate(2px, -1px); }
+  89% { transform: translate(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .glitch::before,
+  .glitch::after { animation: none !important; }
+}
+
+/* --- Hero search block — neon ring on focus-within --- */
+.hero__search-block {
+  border: 1px solid rgba(0, 229, 255, 0.18);
+  background: rgba(20, 20, 28, 0.55);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  transition: border-color var(--t-base), box-shadow var(--t-base);
+}
+.hero__search-block:focus-within {
+  border-color: var(--neon-cyan-hot);
+  box-shadow: 0 0 0 4px rgba(0, 229, 255, 0.08), var(--glow-cyan-hot);
+}
+
+/* --- Section titles get a neon underline --- */
+.section__title {
+  position: relative;
+  padding-bottom: 18px;
+}
+.section__title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 64px;
+  height: 3px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--neon-cyan-hot), var(--neon-magenta-hot));
+  box-shadow: 0 0 12px rgba(0, 229, 255, 0.6);
+}
+
+/* --- CitiesShowcase — animated city pill border --- */
+.cities-showcase__pill {
+  position: relative;
+  overflow: hidden;
+}
+.cities-showcase__pill::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(90deg, transparent, var(--neon-cyan-hot), transparent);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  opacity: 0;
+  transition: opacity var(--t-base);
+}
+.cities-showcase__pill:hover::before {
+  opacity: 1;
+}
+.cities-showcase__pin {
+  animation: pin-pulse-hot 2.4s ease-in-out infinite;
+}
+@keyframes pin-pulse-hot {
+  0%, 100% { text-shadow: 0 0 4px var(--neon-cyan-hot); opacity: 0.8; }
+  50%      { text-shadow: 0 0 12px var(--neon-cyan-hot), 0 0 24px var(--neon-cyan-hot); opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cities-showcase__pin { animation: none !important; }
+}
+
+/* Stat values — gradient text + count-up styling */
+.cities-showcase__stat-value {
+  background: linear-gradient(135deg, var(--neon-cyan-hot), var(--neon-magenta-hot));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 6px rgba(0, 229, 255, 0.35));
+}
+
+/* --- ClubCard 3D tilt on hover (desktop only) --- */
+@media (hover: hover) and (pointer: fine) {
+  .clubs__grid .club-card {
+    transform-style: preserve-3d;
+    transition: transform var(--t-base), box-shadow var(--t-base), border-color var(--t-base);
+    perspective: 800px;
+  }
+  .clubs__grid .club-card:hover {
+    transform: perspective(800px) rotateX(2deg) rotateY(-3deg) translateY(-6px);
+    box-shadow:
+      0 24px 48px rgba(0, 0, 0, 0.5),
+      0 0 32px rgba(0, 229, 255, 0.25),
+      0 0 64px rgba(255, 0, 128, 0.15);
+    border-color: rgba(0, 229, 255, 0.4);
+  }
+}
+
+/* --- BookingFlowDemo screens — accent borders with cyan --- */
+.flow-demo__screen:hover {
+  border-color: var(--neon-cyan-hot);
+  box-shadow: var(--shadow-xl), 0 0 24px rgba(0, 229, 255, 0.3);
+}
+.flow-demo__result-card--highlight {
+  border-color: var(--neon-cyan-hot);
+}
+.flow-demo__slot--active {
+  background: linear-gradient(135deg, var(--neon-cyan-hot), var(--neon-magenta-hot));
+  box-shadow: 0 0 16px rgba(0, 229, 255, 0.5);
+  color: #07061a;
+  font-weight: 700;
+}
+.flow-demo__total-value {
+  color: var(--neon-cyan-hot);
+  text-shadow: 0 0 8px rgba(0, 229, 255, 0.5);
+}
+.flow-demo__check {
+  color: var(--neon-cyan-hot);
+  filter: drop-shadow(0 0 18px rgba(0, 229, 255, 0.7));
+}
+
+/* --- Final CTA buttons get the hot gradient too --- */
+.cta__buttons .btn--primary {
+  background: linear-gradient(135deg, var(--neon-cyan-hot) 0%, var(--neon-magenta-hot) 100%);
+  color: #07061a;
+  border: 0;
+  box-shadow: var(--glow-cyan-hot);
+  font-weight: 700;
+}
+.cta__buttons .btn--primary:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--glow-cyan-hot), var(--glow-magenta-hot);
+}
+
+/* --- Marquee strip with city names scrolling (subtle, just above footer) --- */
+.marquee {
+  padding: 16px 0;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(0, 229, 255, 0.04) 50%,
+    transparent 100%);
+  border-top: 1px solid rgba(0, 229, 255, 0.12);
+  border-bottom: 1px solid rgba(0, 229, 255, 0.12);
+  overflow: hidden;
+  white-space: nowrap;
+  position: relative;
+}
+.marquee__track {
+  display: inline-block;
+  animation: marquee 32s linear infinite;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  color: var(--neon-cyan-hot);
+  text-shadow: 0 0 6px rgba(0, 229, 255, 0.35);
+}
+.marquee__track span {
+  margin: 0 32px;
+}
+.marquee__track span::before {
+  content: '◆';
+  margin-right: 12px;
+  color: var(--neon-magenta-hot);
+}
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee__track { animation: none !important; }
+}
+
+/* --- Count-up stat animation: value scrambles briefly when revealed --- */
+[data-count-up] {
+  display: inline-block;
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- HowItWorks step gets neon number + glow --- */
+.how .step__num {
+  background: linear-gradient(135deg, var(--neon-cyan-hot), var(--neon-magenta-hot));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 8px rgba(0, 229, 255, 0.4));
+  font-family: var(--font-mono);
+}
+.how .step__icon {
+  color: var(--neon-cyan-hot);
+  filter: drop-shadow(0 0 10px rgba(0, 229, 255, 0.5));
+}
+
+/* --- Cursor glow follower (desktop, optional opt-in via JS) --- */
+.cursor-glow {
+  position: fixed;
+  width: 320px;
+  height: 320px;
+  pointer-events: none;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0, 229, 255, 0.08) 0%, transparent 70%);
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  mix-blend-mode: screen;
+  transition: opacity 200ms;
+  opacity: 0;
+  will-change: transform;
+}
+.cursor-glow.is-active { opacity: 1; }
+@media (hover: none) {
+  .cursor-glow { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cursor-glow { display: none; }
+}

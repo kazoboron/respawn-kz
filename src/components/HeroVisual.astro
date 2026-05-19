@@ -1,57 +1,72 @@
 ---
 /**
- * Decorative animated visual for the hero section.
- * Floating mock club cards with a glowing map pin in the middle.
- * Pure CSS — no JS, no WebGL, no external libraries.
- * Respects prefers-reduced-motion (animations disabled, static composition).
+ * Hero visual layer v2: canvas particle network + animated SVG circuit traces.
+ *
+ * The canvas (hero-particles.ts) draws drifting nodes with packets of light
+ * traveling along the connecting lines — "data flowing through cyberspace".
+ *
+ * The SVG layer renders 4 stylized circuit-board traces that loop with
+ * stroke-dashoffset animation, simulating current pulsing along wires.
+ *
+ * Both layers respect prefers-reduced-motion (canvas renders one static frame,
+ * SVG animations disabled via CSS media query).
  */
 ---
 
-<div class="hero-visual" aria-hidden="true">
-  <!-- Glowing map pin in center -->
-  <div class="hero-visual__pin">
-    <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M32 4 C20 4 10 14 10 26 C10 42 32 60 32 60 C32 60 54 42 54 26 C54 14 44 4 32 4 Z"/>
-      <circle cx="32" cy="26" r="7"/>
-    </svg>
-    <div class="hero-visual__pin-glow"></div>
-    <div class="hero-visual__pin-pulse"></div>
-  </div>
+<div class="hero-fx" aria-hidden="true">
+  <!-- Layer 1: canvas particle network -->
+  <canvas id="hero-particles" class="hero-fx__canvas"></canvas>
 
-  <!-- Floating mock club cards drifting around -->
-  <div class="hero-visual__card hero-visual__card--1">
-    <div class="hero-visual__card-thumb" style="background: linear-gradient(135deg, #8b5cf6, #ec4899)"></div>
-    <div class="hero-visual__card-body">
-      <div class="hero-visual__card-line hero-visual__card-line--name"></div>
-      <div class="hero-visual__card-line hero-visual__card-line--meta"></div>
-      <div class="hero-visual__card-pill">
-        <span aria-hidden="true">★</span> 4.9
-      </div>
-    </div>
-  </div>
+  <!-- Layer 2: SVG circuit traces with pulsing current -->
+  <svg class="hero-fx__circuits" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice">
+    <defs>
+      <linearGradient id="trace-cyan" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="rgba(0, 229, 255, 0)" />
+        <stop offset="50%" stop-color="rgba(0, 229, 255, 1)" />
+        <stop offset="100%" stop-color="rgba(0, 229, 255, 0)" />
+      </linearGradient>
+      <linearGradient id="trace-magenta" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="rgba(255, 0, 128, 0)" />
+        <stop offset="50%" stop-color="rgba(255, 0, 128, 1)" />
+        <stop offset="100%" stop-color="rgba(255, 0, 128, 0)" />
+      </linearGradient>
+      <filter id="trace-glow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="3" result="blur" />
+        <feMerge>
+          <feMergeNode in="blur" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
+      </filter>
+    </defs>
 
-  <div class="hero-visual__card hero-visual__card--2">
-    <div class="hero-visual__card-thumb" style="background: linear-gradient(135deg, #22d3ee, #3b82f6)"></div>
-    <div class="hero-visual__card-body">
-      <div class="hero-visual__card-line hero-visual__card-line--name"></div>
-      <div class="hero-visual__card-line hero-visual__card-line--meta"></div>
-      <div class="hero-visual__card-pill">
-        <span aria-hidden="true">★</span> 4.8
-      </div>
-    </div>
-  </div>
+    <!-- Static faint trace grid (always visible) -->
+    <g stroke="rgba(168, 85, 247, 0.12)" stroke-width="1" fill="none">
+      <path d="M0 200 L300 200 L350 250 L600 250 L650 200 L900 200 L950 250 L1440 250" />
+      <path d="M0 450 L200 450 L250 400 L500 400 L550 450 L800 450 L850 400 L1440 400" />
+      <path d="M0 680 L400 680 L450 730 L750 730 L800 680 L1440 680" />
+      <path d="M720 0 L720 150 L770 200 L770 350 L720 400 L720 550 L770 600 L770 900" />
+      <path d="M300 0 L300 100 L350 150 L350 320 L300 370 L300 900" />
+      <path d="M1100 0 L1100 180 L1050 230 L1050 400 L1100 450 L1100 900" />
+      <!-- nodes at junctions -->
+      <circle cx="300" cy="200" r="4" fill="rgba(168, 85, 247, 0.25)" />
+      <circle cx="650" cy="200" r="4" fill="rgba(168, 85, 247, 0.25)" />
+      <circle cx="950" cy="250" r="4" fill="rgba(168, 85, 247, 0.25)" />
+      <circle cx="250" cy="400" r="4" fill="rgba(168, 85, 247, 0.25)" />
+      <circle cx="550" cy="450" r="4" fill="rgba(168, 85, 247, 0.25)" />
+      <circle cx="850" cy="400" r="4" fill="rgba(168, 85, 247, 0.25)" />
+      <circle cx="450" cy="730" r="4" fill="rgba(168, 85, 247, 0.25)" />
+      <circle cx="800" cy="680" r="4" fill="rgba(168, 85, 247, 0.25)" />
+    </g>
 
-  <div class="hero-visual__card hero-visual__card--3">
-    <div class="hero-visual__card-thumb" style="background: linear-gradient(135deg, #f472b6, #facc15)"></div>
-    <div class="hero-visual__card-body">
-      <div class="hero-visual__card-line hero-visual__card-line--name"></div>
-      <div class="hero-visual__card-line hero-visual__card-line--meta"></div>
-      <div class="hero-visual__card-pill">
-        <span aria-hidden="true">★</span> 4.7
-      </div>
-    </div>
-  </div>
+    <!-- Pulsing traces — animated stroke-dashoffset gives "current flowing" -->
+    <g fill="none" stroke-width="2" stroke-linecap="round" filter="url(#trace-glow)">
+      <path class="trace trace--cyan" d="M0 200 L300 200 L350 250 L600 250 L650 200 L900 200 L950 250 L1440 250" stroke="url(#trace-cyan)" />
+      <path class="trace trace--magenta" d="M0 450 L200 450 L250 400 L500 400 L550 450 L800 450 L850 400 L1440 400" stroke="url(#trace-magenta)" />
+      <path class="trace trace--cyan-2" d="M720 0 L720 150 L770 200 L770 350 L720 400 L720 550 L770 600 L770 900" stroke="url(#trace-cyan)" />
+      <path class="trace trace--magenta-2" d="M300 0 L300 100 L350 150 L350 320 L300 370 L300 900" stroke="url(#trace-magenta)" />
+    </g>
+  </svg>
 
-  <!-- Decorative ring around pin -->
-  <div class="hero-visual__ring"></div>
+  <!-- Vignette to soften edges and improve text contrast -->
+  <div class="hero-fx__vignette"></div>
 </div>
