@@ -4096,3 +4096,53 @@ textarea:focus-visible,
   color: var(--c-violet-300);
   font-size: 13px;
 }
+
+/* Club replies summary card on /me (uses migration 0016 reply_text) */
+.replies-card {
+  margin: var(--space-5) 0;
+  padding: var(--space-4) var(--space-5);
+  background: rgba(139, 92, 246, 0.04);
+  border: 1px solid rgba(139, 92, 246, 0.15);
+  border-radius: var(--radius-md);
+}
+.replies-card__title {
+  font-size: 16px;
+  margin: 0 0 var(--space-3) 0;
+  color: var(--text-primary);
+}
+.replies-card__list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.replies-card__item {
+  padding: var(--space-3);
+  background: var(--bg-surface-1);
+  border-radius: var(--radius-sm);
+}
+.replies-card__link {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  text-decoration: none;
+  color: var(--text-primary);
+  font-weight: 600;
+  margin-bottom: var(--space-2);
+}
+.replies-card__link:hover .replies-card__club {
+  text-decoration: underline;
+}
+.replies-card__date {
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 400;
+}
+.replies-card__text {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}

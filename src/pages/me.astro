@@ -28,6 +28,11 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         </div>
       </aside>
 
+      <aside class="replies-card" id="replies-card" hidden aria-labelledby="replies-card-title">
+        <h2 class="replies-card__title" id="replies-card-title">Клубы ответили на твои отзывы</h2>
+        <ul class="replies-card__list" id="replies-card-list"></ul>
+      </aside>
+
       <div class="me-loading" id="me-loading" aria-live="polite" aria-busy="true">
         <p style="text-align:center;color:var(--text-muted)">Загружаем брони…</p>
       </div>

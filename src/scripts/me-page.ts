@@ -124,6 +124,57 @@ async function loadLoyaltyBalance(userId: string): Promise<{ balance: number; ea
   };
 }
 
+interface ReviewWithReply {
+  id: string;
+  club_slug: string;
+  rating: number;
+  text: string;
+  reply_text: string;
+  replied_at: string;
+  clubs: { name: string } | null;
+}
+
+async function loadRepliesForUser(userId: string): Promise<ReviewWithReply[]> {
+  const { data, error } = await supabase
+    .from('reviews')
+    .select('id, club_slug, rating, text, reply_text, replied_at, clubs(name)')
+    .eq('user_id', userId)
+    .not('reply_text', 'is', null)
+    .order('replied_at', { ascending: false })
+    .limit(5);
+  if (error) {
+    // Migration 0016 not applied — column missing. Fail soft.
+    console.warn('[me] replies load failed (migration 0016 may not be applied)', error.message);
+    return [];
+  }
+  return (data ?? []) as unknown as ReviewWithReply[];
+}
+
+function renderRepliesCard(replies: ReviewWithReply[]): void {
+  const cardEl = document.getElementById('replies-card');
+  const listEl = document.getElementById('replies-card-list');
+  if (!cardEl || !listEl) return;
+  if (replies.length === 0) {
+    cardEl.hidden = true;
+    return;
+  }
+  listEl.innerHTML = replies.map((r) => {
+    const clubName = r.clubs?.name ?? r.club_slug;
+    const excerpt = r.reply_text.length > 120 ? r.reply_text.slice(0, 120) + '…' : r.reply_text;
+    const escaped = excerpt.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return `
+      <li class="replies-card__item">
+        <a class="replies-card__link" href="/clubs/${r.club_slug}/#reviews-section">
+          <span class="replies-card__club">${clubName}</span>
+          <span class="replies-card__date">${formatDate(r.replied_at)}</span>
+        </a>
+        <p class="replies-card__text">${escaped}</p>
+      </li>
+    `;
+  }).join('');
+  cardEl.hidden = false;
+}
+
 function renderLoyaltyCard(balance: number, earned: number, redeemed: number): void {
   const cardEl = document.getElementById('loyalty-card');
   const balanceEl = document.getElementById('loyalty-balance');
@@ -168,6 +219,9 @@ export async function setupMePage(): Promise<void> {
   loadLoyaltyBalance(user.id).then((loyalty) => {
     if (loyalty) renderLoyaltyCard(loyalty.balance, loyalty.earned, loyalty.redeemed);
   });
+
+  // Club replies on user's reviews — load in parallel (independent query)
+  loadRepliesForUser(user.id).then(renderRepliesCard);
 
   const bookings = await loadBookings();
   if (loadingEl) loadingEl.hidden = true;
