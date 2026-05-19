@@ -384,3 +384,155 @@
 @media (prefers-reduced-motion: reduce) {
   .cursor-glow { display: none; }
 }
+
+/* ============================================
+   HERO VIDEO BACKGROUND (v3.1)
+   ============================================ */
+.hero-fx__video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -1;
+  opacity: 0.42;
+  filter: saturate(1.4) contrast(1.05) hue-rotate(-15deg);
+  pointer-events: none;
+}
+.hero-fx__overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 70% 60% at 50% 40%, transparent 0%, rgba(7, 6, 26, 0.5) 70%, rgba(7, 6, 26, 0.85) 100%),
+    linear-gradient(180deg, rgba(7, 6, 26, 0.35) 0%, rgba(7, 6, 26, 0.6) 100%);
+  pointer-events: none;
+}
+
+/* Saturate the visible canvas particles a touch more so they pop over video */
+.hero-fx__canvas { opacity: 0.85; }
+
+/* Suppress video for users that prefer reduced motion or are on slow data */
+@media (prefers-reduced-motion: reduce) {
+  .hero-fx__video {
+    display: none;
+  }
+}
+@media (max-width: 600px) {
+  /* On mobile, the video is heavy + adds bandwidth — show poster only */
+  .hero-fx__video {
+    display: none;
+  }
+}
+
+/* ============================================
+   GIANT HERO HEADLINE TREATMENT (v3.1)
+   ============================================ */
+.hero__title {
+  text-shadow:
+    0 0 24px rgba(0, 229, 255, 0.18),
+    0 0 60px rgba(255, 0, 128, 0.12);
+}
+.hero__title br + span,
+.glitch {
+  font-weight: 900;
+}
+
+/* ============================================
+   LIVE BADGE (top-right of hero, esports-style)
+   ============================================ */
+.hero__live {
+  position: absolute;
+  top: 100px;
+  right: 24px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: rgba(7, 6, 26, 0.72);
+  border: 1px solid rgba(255, 0, 128, 0.4);
+  border-radius: var(--radius-pill);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--neon-magenta-hot);
+  text-shadow: 0 0 6px rgba(255, 0, 128, 0.5);
+  z-index: 3;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  animation: live-glow 2s ease-in-out infinite;
+}
+.hero__live-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--neon-magenta-hot);
+  box-shadow: 0 0 10px var(--neon-magenta-hot);
+  animation: live-blink 1.4s ease-in-out infinite;
+}
+@keyframes live-glow {
+  0%, 100% { border-color: rgba(255, 0, 128, 0.4); }
+  50%      { border-color: rgba(255, 0, 128, 0.85); }
+}
+@keyframes live-blink {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.3; }
+}
+@media (max-width: 600px) {
+  .hero__live { top: 88px; right: 16px; font-size: 10px; padding: 4px 10px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero__live, .hero__live-dot { animation: none !important; }
+}
+
+/* ============================================
+   STAT TICKER OVERLAY (bottom of hero, esports-style)
+   ============================================ */
+.hero__ticker {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 3;
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+  padding: 16px 24px;
+  background: linear-gradient(180deg,
+    transparent 0%,
+    rgba(7, 6, 26, 0.85) 70%,
+    rgba(7, 6, 26, 0.95) 100%);
+  border-top: 1px solid rgba(0, 229, 255, 0.18);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  pointer-events: none;
+  flex-wrap: wrap;
+}
+.hero__ticker-item {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.hero__ticker-label {
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 11px;
+}
+.hero__ticker-value {
+  color: var(--neon-cyan-hot);
+  font-weight: 700;
+  text-shadow: 0 0 6px rgba(0, 229, 255, 0.5);
+}
+.hero__ticker-sep {
+  color: rgba(196, 181, 253, 0.2);
+}
+@media (max-width: 600px) {
+  .hero__ticker {
+    gap: 16px;
+    font-size: 11px;
+    padding: 12px 16px;
+  }
+  .hero__ticker-label { display: none; }
+}

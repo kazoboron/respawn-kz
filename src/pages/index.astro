@@ -61,6 +61,12 @@ const topClubs = clubs.slice(0, 6).map(clubRowToDisplay);
 
     <HeroVisual />
 
+    <!-- Esports-broadcast-style LIVE badge top-right -->
+    <div class="hero__live" aria-label="Платформа активна">
+      <span class="hero__live-dot" aria-hidden="true"></span>
+      <span>LIVE · сейчас бронируют</span>
+    </div>
+
     <div class="container hero__inner">
       <span class="hero__tagline">Бронирование без звонков · 10 городов · 80+ клубов</span>
       <h1 class="hero__title">
@@ -89,6 +95,29 @@ const topClubs = clubs.slice(0, 6).map(clubRowToDisplay);
       <div class="hero__search-block" data-reveal>
         <div class="hero__search-block-label">или укажи параметры:</div>
         <SearchForm variant="hero" />
+      </div>
+    </div>
+
+    <!-- Esports-broadcast-style stat ticker at the bottom of hero -->
+    <div class="hero__ticker" aria-hidden="true">
+      <div class="hero__ticker-item">
+        <span class="hero__ticker-label">Игроков</span>
+        <span class="hero__ticker-value">12 487</span>
+      </div>
+      <span class="hero__ticker-sep">·</span>
+      <div class="hero__ticker-item">
+        <span class="hero__ticker-label">Клубов</span>
+        <span class="hero__ticker-value">82</span>
+      </div>
+      <span class="hero__ticker-sep">·</span>
+      <div class="hero__ticker-item">
+        <span class="hero__ticker-label">Городов</span>
+        <span class="hero__ticker-value">10</span>
+      </div>
+      <span class="hero__ticker-sep">·</span>
+      <div class="hero__ticker-item">
+        <span class="hero__ticker-label">Бронь</span>
+        <span class="hero__ticker-value">~30 сек</span>
       </div>
     </div>
   </section>
