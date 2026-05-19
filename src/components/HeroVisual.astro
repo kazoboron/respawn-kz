@@ -17,34 +17,6 @@
 ---
 
 <div class="hero-fx" aria-hidden="true">
-  <!-- Layer 0: looping background video. preload="metadata" + lazy=true keeps
-       the initial render light; muted+playsinline is mandatory for autoplay
-       on iOS/Safari. -->
-  <video
-    class="hero-fx__video"
-    autoplay
-    muted
-    loop
-    playsinline
-    preload="metadata"
-    poster="/img/club-rows.webp"
-    aria-hidden="true"
-  >
-    <!-- Pexels-hosted royalty-free neon-night loop. If unreachable, the
-         poster image renders in its place. -->
-    <source
-      src="https://videos.pexels.com/video-files/3045163/3045163-uhd_2560_1440_30fps.mp4"
-      type="video/mp4"
-    />
-    <source
-      src="https://videos.pexels.com/video-files/856148/856148-hd_1920_1080_30fps.mp4"
-      type="video/mp4"
-    />
-  </video>
-
-  <!-- Layer 0.5: heavy gradient overlay over the video so text reads -->
-  <div class="hero-fx__overlay"></div>
-
   <!-- Layer 1: canvas particle network -->
   <canvas id="hero-particles" class="hero-fx__canvas"></canvas>
 
