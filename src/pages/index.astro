@@ -26,6 +26,7 @@ interface Club {
   tags: string[];
   gradient: string | null;
   initial: string | null;
+  photos: string[];
 }
 
 function clubRowToDisplay(row: ClubRow): Club {
@@ -42,6 +43,7 @@ function clubRowToDisplay(row: ClubRow): Club {
     tags: row.tags,
     gradient: row.gradient,
     initial: row.initial,
+    photos: row.photos ?? [],
   };
 }
 

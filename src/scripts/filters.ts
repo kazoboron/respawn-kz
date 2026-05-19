@@ -17,6 +17,7 @@ interface Club {
   working_hours: Record<string, { open: string; close: string } | null>;
   latitude: number | null;
   longitude: number | null;
+  photos?: string[];
 }
 
 export type SortMode = 'rating' | 'price-asc' | 'price-desc' | 'distance';
@@ -121,12 +122,19 @@ function formatPrice(value: number): string {
 
 function renderCard(club: Club): string {
   const cityLabel = CITY_LABELS[club.city] ?? club.city;
+  const hasPhoto = club.photos && club.photos.length > 0 && club.photos[0];
+  const mediaHtml = hasPhoto
+    ? `<div class="club-card__media club-card__media--photo">
+         <img src="${club.photos![0]}" alt="" loading="lazy" />
+         <span class="club-card__initial-overlay">${club.initial}</span>
+       </div>`
+    : `<div class="club-card__media" style="background: ${club.gradient};">
+         <span class="club-card__initial">${club.initial}</span>
+       </div>`;
   return `
-    <article class="club-card" data-club="${club.slug}">
-      <a href="/clubs/${club.slug}/" class="club-card__media-link">
-        <div class="club-card__media" style="background: ${club.gradient};">
-          <span class="club-card__initial">${club.initial}</span>
-        </div>
+    <article class="club-card" data-club="${club.slug}" data-href="/clubs/${club.slug}/" style="cursor:pointer">
+      <a href="/clubs/${club.slug}/" class="club-card__media-link" tabindex="-1">
+        ${mediaHtml}
       </a>
       <div class="club-card__body">
         <div class="club-card__header">

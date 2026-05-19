@@ -88,6 +88,7 @@ const clubs = await loadAllClubs();
         gradient: c.gradient, initial: c.initial,
         working_hours: c.working_hours,
         latitude: c.latitude, longitude: c.longitude,
+        photos: c.photos ?? [],
       })))} />
 
       <div class="clubs__grid" id="catalog-grid"></div>

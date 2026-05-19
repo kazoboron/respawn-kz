@@ -438,6 +438,34 @@ update public.clubs set latitude = 51.1280, longitude = 71.4300 where city = 'as
 update public.clubs set latitude = 43.2380, longitude = 76.9450 where city = 'almaty' and latitude is null;
 
 -- ============================================================
+-- 0022: club photos seed (placeholder Unsplash photos so cards aren't empty)
+-- ============================================================
+update public.clubs
+set photos = case abs(hashtext(slug)) % 4
+  when 0 then array[
+    'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=1200&q=80&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1593305841991-05c297ba4575?w=1200&q=80&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1556438064-2d7646166914?w=1200&q=80&auto=format&fit=crop'
+  ]
+  when 1 then array[
+    'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=1200&q=80&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=1200&q=80&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?w=1200&q=80&auto=format&fit=crop'
+  ]
+  when 2 then array[
+    'https://images.unsplash.com/photo-1593305841991-05c297ba4575?w=1200&q=80&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=1200&q=80&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=1200&q=80&auto=format&fit=crop'
+  ]
+  else array[
+    'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=1200&q=80&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1556438064-2d7646166914?w=1200&q=80&auto=format&fit=crop'  ,
+    'https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?w=1200&q=80&auto=format&fit=crop'
+  ]
+end
+where photos is null or cardinality(photos) = 0;
+
+-- ============================================================
 -- DONE. After this runs successfully, redeploy Edge Function:
 --   supabase functions deploy send-notification --project-ref qfuhtvtietnldeqklxdo
 -- (or wait — current Edge Function still works for non-review_replied events)
