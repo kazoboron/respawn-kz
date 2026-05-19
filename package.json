@@ -11,6 +11,7 @@
     "optimize-images": "node scripts/optimize-images.mjs",
     "audit-a11y": "node scripts/audit-a11y.mjs",
     "audit-perf": "node scripts/audit-perf.mjs",
+    "apply-pending": "node scripts/apply-pending.mjs",
     "deploy": "npm run build && wrangler pages deploy dist --project-name respawn-kz --branch main --commit-dirty=true"
   },
   "dependencies": {
