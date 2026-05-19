@@ -156,10 +156,7 @@ function renderCard(club: Club): string {
 
 function loadClubsFromInline(): Club[] {
   const el = document.getElementById('catalog-data');
-  if (!el) {
-    console.error('[filters] #catalog-data script tag not found');
-    return [];
-  }
+  if (!el) return []; // Non-catalog page — silently bail. setupCatalogFilters() gates by #catalog-grid anyway.
   try {
     return JSON.parse(el.textContent ?? '[]') as Club[];
   } catch (err) {
@@ -167,7 +164,8 @@ function loadClubsFromInline(): Club[] {
     return [];
   }
 }
-const CLUBS = loadClubsFromInline();
+// Lazy-loaded inside setupCatalogFilters so non-catalog pages don't run this on import
+let CLUBS: Club[] = [];
 
 export function setupCatalogFilters(): void {
   const grid = document.getElementById('catalog-grid');
@@ -175,6 +173,9 @@ export function setupCatalogFilters(): void {
   const emptyEl = document.getElementById('catalog-empty');
   const resetBtn = document.getElementById('catalog-reset');
   if (!grid || !countEl || !emptyEl) return;
+
+  // Load inline data only when actually entering the catalog page
+  CLUBS = loadClubsFromInline();
 
   const citySelect = document.getElementById('city-select') as HTMLSelectElement | null;
   const sortSelect = document.getElementById('sort-select') as HTMLSelectElement | null;

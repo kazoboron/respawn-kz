@@ -5,16 +5,45 @@ import { openBookingFormModal } from './booking-form';
 
 function parseClubData(btn: HTMLElement): ClubRow | null {
   const raw = btn.getAttribute('data-club');
-  if (!raw) {
-    console.error('[booking] missing data-club on button', btn);
-    return null;
-  }
+  if (!raw) return null;
+  // If data-club is just a slug (set on ClubCard), this won't be valid JSON.
+  // The caller falls back to a Supabase fetch via slug in that case.
+  if (!raw.startsWith('{')) return null;
   try {
     return JSON.parse(raw) as ClubRow;
   } catch (err) {
     console.error('[booking] invalid data-club JSON', err);
     return null;
   }
+}
+
+/**
+ * Find the slug to use for a booking click:
+ * - Prefer button's own data-book attribute (set on every booking button)
+ * - Fall back to data-club on an ancestor (ClubCard wraps article with data-club=slug)
+ */
+function findClubSlug(btn: HTMLElement): string | null {
+  const direct = btn.getAttribute('data-book');
+  if (direct) return direct;
+  const ancestor = btn.closest('[data-club]') as HTMLElement | null;
+  const fromAncestor = ancestor?.getAttribute('data-club');
+  // Skip if ancestor's data-club is the inline JSON used on club detail page
+  if (fromAncestor && !fromAncestor.startsWith('{')) return fromAncestor;
+  return null;
+}
+
+async function loadClubBySlug(slug: string): Promise<ClubRow | null> {
+  const { data, error } = await supabase
+    .from('clubs')
+    .select('*')
+    .eq('slug', slug)
+    .eq('is_published', true)
+    .maybeSingle();
+  if (error || !data) {
+    console.error('[booking] loadClubBySlug failed', slug, error);
+    return null;
+  }
+  return data as ClubRow;
 }
 
 function formatPrice(value: number): string {
@@ -32,8 +61,22 @@ async function loadLoyaltyBalance(userId: string): Promise<number> {
 }
 
 async function handleBookingClick(btn: HTMLElement): Promise<void> {
-  const club = parseClubData(btn);
-  if (!club) return;
+  // First try to read full club JSON embedded on the button (club detail page pattern).
+  // If absent (ClubCard pattern — button only has data-book=slug), fetch the row from
+  // Supabase by slug before opening the modal.
+  let club = parseClubData(btn);
+  if (!club) {
+    const slug = findClubSlug(btn);
+    if (!slug) {
+      console.error('[booking] no slug found on button', btn);
+      return;
+    }
+    club = await loadClubBySlug(slug);
+    if (!club) {
+      alert('Не удалось загрузить данные клуба. Попробуй обновить страницу.');
+      return;
+    }
+  }
 
   const user = await getCurrentUser();
   if (!user) {
