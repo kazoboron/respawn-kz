@@ -29,7 +29,7 @@ export async function openRescheduleModal(b: Booking, onSuccess?: () => void): P
   await openBookingFormModal({
     club,
     mode: 'edit',
-    initial: { date: b.date, time_slot: b.time_slot, hours: b.hours },
+    initial: { date: b.date, time_slot: b.time_slot, hours: b.hours, redeem_hours: b.redeem_hours ?? 0 },
     excludeBookingId: b.id,
     title: `Изменить бронь — ${club.name}`,
     intro: `Текущая бронь: <span class="modal__highlight">${b.date}</span> · ${b.time_slot} · ${b.hours} ч`,

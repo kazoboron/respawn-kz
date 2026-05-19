@@ -21,6 +21,16 @@ function formatPrice(value: number): string {
   return value.toLocaleString('ru-RU');
 }
 
+async function loadLoyaltyBalance(userId: string): Promise<number> {
+  const { data, error } = await supabase
+    .from('loyalty_balance')
+    .select('hours_balance')
+    .eq('user_id', userId)
+    .maybeSingle();
+  if (error || !data) return 0; // soft-fail if migration 0018 not applied yet
+  return Number(data.hours_balance ?? 0);
+}
+
 async function handleBookingClick(btn: HTMLElement): Promise<void> {
   const club = parseClubData(btn);
   if (!club) return;
@@ -32,16 +42,19 @@ async function handleBookingClick(btn: HTMLElement): Promise<void> {
     return;
   }
 
+  const loyaltyBalance = await loadLoyaltyBalance(user.id);
+
   await openBookingFormModal({
     club,
     mode: 'create',
+    loyaltyBalance,
     title: `Забронировать — ${club.name}`,
     intro: `<strong>${club.name}</strong> · ${club.district ?? ''} · ${club.address}`,
     submitLabel: 'Забронировать',
     successTitle: 'Бронь сохранена!',
     successBody: (d) => `
       <p>Запись о брони добавлена.</p>
-      <p style="margin-top:12px">Клуб <strong>${club.name}</strong>, дата <span class="modal__highlight">${d.date}</span>, время <span class="modal__highlight">${d.time_slot}</span>, <span class="modal__highlight">${d.hours} ч</span> · итого <span class="modal__highlight">${formatPrice(d.total_price)} ₸</span>.</p>
+      <p style="margin-top:12px">Клуб <strong>${club.name}</strong>, дата <span class="modal__highlight">${d.date}</span>, время <span class="modal__highlight">${d.time_slot}</span>, <span class="modal__highlight">${d.hours} ч</span> · итого <span class="modal__highlight">${formatPrice(d.total_price)} ₸</span>${d.redeem_hours > 0 ? ` · кэшбэк <span class="modal__highlight">${d.redeem_hours.toFixed(2)} ч</span>` : ''}.</p>
       <p style="margin-top:12px;color:var(--text-secondary)">Статус: ожидает подтверждения. Управление: <a href="/me/" style="color:var(--neon-cyan)">личный кабинет</a>.</p>
     `,
     onSubmit: async (d) => {
@@ -55,6 +68,7 @@ async function handleBookingClick(btn: HTMLElement): Promise<void> {
         hours: d.hours,
         price_per_hour: club.price_per_hour,
         total_price: d.total_price,
+        redeem_hours: d.redeem_hours,
       };
       const { error } = await supabase.from('bookings').insert(payload);
       return { ok: !error, error: error?.message };

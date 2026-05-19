@@ -56,6 +56,7 @@ function renderBookingCard(b: Booking, r: Review | undefined): string {
           <span>${formatDate(b.date)}</span>
           <span class="club-card__meta-sep">·</span>
           <span>${b.time_slot}, ${b.hours} ч</span>
+          ${b.redeem_hours > 0 ? `<span class="club-card__meta-sep">·</span><span class="me-booking__cashback" aria-label="Использовано часов кэшбэка">🎁 кэшбэк ${b.redeem_hours.toFixed(2)} ч</span>` : ''}
         </div>
       </div>
       <div class="me-booking__side">

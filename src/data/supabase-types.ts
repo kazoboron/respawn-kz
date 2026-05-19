@@ -15,6 +15,7 @@ export interface Booking {
   hours: number;
   price_per_hour: number;
   total_price: number;
+  redeem_hours: number;
   status: BookingStatus;
   status_changed_at: string;
   status_changed_by: string | null;

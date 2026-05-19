@@ -4063,3 +4063,36 @@ textarea:focus-visible,
   font-size: 14px;
   line-height: 1;
 }
+
+/* Loyalty redemption toggle in booking form (Migration 0019) */
+.booking-form__redeem {
+  margin: var(--space-3) 0;
+  padding: var(--space-3) var(--space-4);
+  background: rgba(139, 92, 246, 0.06);
+  border: 1px solid rgba(139, 92, 246, 0.18);
+  border-radius: var(--radius-sm);
+}
+.booking-form__redeem-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--text-primary);
+}
+.booking-form__redeem-toggle input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+.booking-form__redeem-hint {
+  margin-top: var(--space-2);
+  font-size: 13px;
+  color: var(--c-violet-300);
+}
+
+/* Cashback badge on /me booking cards */
+.me-booking__cashback {
+  color: var(--c-violet-300);
+  font-size: 13px;
+}

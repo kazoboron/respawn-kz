@@ -12,6 +12,13 @@ export interface BookingFormInitial {
   date: string;
   time_slot: string;
   hours: number;
+  /**
+   * Cashback hours already redeemed on this booking. Preserved across reschedule
+   * (can't change redemption after creation). When set in 'edit' mode, the total
+   * is calculated as (hours - redeem_hours) * price so it stays consistent with
+   * the original booking's economics.
+   */
+  redeem_hours?: number;
 }
 
 export interface BookingFormSubmitData {
@@ -19,6 +26,7 @@ export interface BookingFormSubmitData {
   time_slot: string;
   hours: number;
   total_price: number;
+  redeem_hours: number;
 }
 
 export interface BookingFormSubmitResult {
@@ -31,6 +39,13 @@ export interface BookingFormOptions {
   mode: BookingFormMode;
   initial?: BookingFormInitial;
   excludeBookingId?: string;
+  /**
+   * User's current loyalty hours_balance. When > 0 AND mode='create', the form
+   * shows a "use cashback" toggle that lets the customer redeem up to
+   * min(balance, hours) hours from their cashback. Skipped in 'edit' mode
+   * (redeem_hours is fixed at creation).
+   */
+  loyaltyBalance?: number;
   title: string;
   intro: string;
   submitLabel: string;
@@ -120,7 +135,13 @@ function translateError(msg: string): string {
 // Form render + reactive picker
 // =====================================================================
 
-function renderForm(club: ClubRow, initial: BookingFormInitial | undefined, submitLabel: string): string {
+function renderForm(
+  club: ClubRow,
+  initial: BookingFormInitial | undefined,
+  submitLabel: string,
+  mode: BookingFormMode,
+  loyaltyBalance?: number,
+): string {
   const today = new Date();
   const yyyy = today.getFullYear();
   const mm = String(today.getMonth() + 1).padStart(2, '0');
@@ -132,6 +153,20 @@ function renderForm(club: ClubRow, initial: BookingFormInitial | undefined, subm
   const dateValue = initial?.date ?? todayStr;
   const hoursValue = initial?.hours ?? 2;
   const initialTotal = club.price_per_hour * hoursValue;
+
+  const showRedeem = (loyaltyBalance ?? 0) > 0 && mode === 'create';
+  const redeemBlock = showRedeem ? `
+    <div class="booking-form__redeem">
+      <label class="booking-form__redeem-toggle">
+        <input type="checkbox" id="booking-redeem-toggle" />
+        <span>
+          Использовать кэшбэк
+          (доступно: <strong>${(loyaltyBalance ?? 0).toFixed(2)} ч</strong>)
+        </span>
+      </label>
+      <div class="booking-form__redeem-hint" id="booking-redeem-hint" hidden></div>
+    </div>
+  ` : '';
 
   return `
     <form id="booking-form" class="booking-form">
@@ -156,6 +191,7 @@ function renderForm(club: ClubRow, initial: BookingFormInitial | undefined, subm
                  aria-describedby="booking-notice booking-error" aria-invalid="false" />
         </label>
       </div>
+      ${redeemBlock}
       <div class="booking-form__notice" id="booking-notice" aria-live="polite" hidden></div>
       <div class="booking-form__total" id="booking-total">
         Итого: <strong>${formatPrice(initialTotal)} ₸</strong>
@@ -241,14 +277,14 @@ async function rebuildTimeSelect(
 // =====================================================================
 
 export async function openBookingFormModal(opts: BookingFormOptions): Promise<void> {
-  const { club, initial, excludeBookingId, title, intro, submitLabel, successTitle, successBody, onSubmit } = opts;
+  const { club, mode, initial, excludeBookingId, loyaltyBalance, title, intro, submitLabel, successTitle, successBody, onSubmit } = opts;
 
   openModal({
     title,
     body: `
       <p style="margin-bottom:16px">${intro}</p>
       <p style="margin-bottom:16px;color:var(--text-secondary)">Цена: <span class="modal__highlight">${formatPrice(club.price_per_hour)} ₸/час</span></p>
-      ${renderForm(club, initial, submitLabel)}
+      ${renderForm(club, initial, submitLabel, mode, loyaltyBalance)}
     `,
   });
 
@@ -261,8 +297,24 @@ export async function openBookingFormModal(opts: BookingFormOptions): Promise<vo
   const dateInput = form.querySelector('input[name="date"]') as HTMLInputElement;
   const timeSelect = form.querySelector('select[name="time_slot"]') as HTMLSelectElement;
   const hoursInput = form.querySelector('input[name="hours"]') as HTMLInputElement;
+  const redeemToggle = document.getElementById('booking-redeem-toggle') as HTMLInputElement | null;
+  const redeemHintEl = document.getElementById('booking-redeem-hint') as HTMLElement | null;
 
   let preferredTime: string | undefined = initial?.time_slot;
+
+  function effectiveRedeem(): number {
+    // Edit mode: preserve the original redemption — toggle is hidden in that flow.
+    if (opts.mode === 'edit') {
+      const original = initial?.redeem_hours ?? 0;
+      const h = Math.max(1, Math.min(12, Number(hoursInput.value) || 1));
+      // Cap at new hours value so user reducing hours doesn't end up with negative paid hours.
+      return Math.round(Math.min(original, h) * 100) / 100;
+    }
+    if (!redeemToggle?.checked) return 0;
+    const h = Math.max(1, Math.min(12, Number(hoursInput.value) || 1));
+    // Cap at min(balance, hours). Round to 2 decimals (DB column is numeric(10,2)).
+    return Math.round(Math.min(loyaltyBalance ?? 0, h) * 100) / 100;
+  }
 
   async function refreshSlots(): Promise<void> {
     const dur = Math.max(1, Math.min(12, Number(hoursInput.value) || 1));
@@ -272,11 +324,29 @@ export async function openBookingFormModal(opts: BookingFormOptions): Promise<vo
 
   function updateTotal(): void {
     const h = Math.max(1, Math.min(12, Number(hoursInput.value) || 1));
-    if (totalEl) totalEl.innerHTML = `Итого: <strong>${formatPrice(club.price_per_hour * h)} ₸</strong>`;
+    const redeem = effectiveRedeem();
+    const paidHours = Math.max(0, h - redeem);
+    const total = club.price_per_hour * paidHours;
+    if (totalEl) {
+      if (redeem > 0) {
+        totalEl.innerHTML = `Итого: <strong>${formatPrice(total)} ₸</strong> <span style="color:var(--text-secondary);font-size:14px">(вместо ${formatPrice(club.price_per_hour * h)} ₸, кэшбэк ${redeem.toFixed(2)} ч)</span>`;
+      } else {
+        totalEl.innerHTML = `Итого: <strong>${formatPrice(total)} ₸</strong>`;
+      }
+    }
+    if (redeemHintEl) {
+      if (redeem > 0) {
+        redeemHintEl.textContent = `Спишется ${redeem.toFixed(2)} часов с твоего кэшбэка.`;
+        redeemHintEl.hidden = false;
+      } else {
+        redeemHintEl.hidden = true;
+      }
+    }
   }
 
   dateInput.addEventListener('change', refreshSlots);
   hoursInput.addEventListener('input', () => { updateTotal(); refreshSlots(); });
+  redeemToggle?.addEventListener('change', updateTotal);
   await refreshSlots();
   updateTotal();
 
@@ -284,11 +354,14 @@ export async function openBookingFormModal(opts: BookingFormOptions): Promise<vo
     e.preventDefault();
     const fd = new FormData(form);
     const hours = Math.max(1, Math.min(12, Number(fd.get('hours') || 1)));
+    const redeem = effectiveRedeem();
+    const paidHours = Math.max(0, hours - redeem);
     const data: BookingFormSubmitData = {
       date: String(fd.get('date') ?? ''),
       time_slot: String(fd.get('time_slot') ?? ''),
       hours,
-      total_price: club.price_per_hour * hours,
+      total_price: club.price_per_hour * paidHours,
+      redeem_hours: redeem,
     };
 
     if (!data.time_slot) {
