@@ -104,6 +104,44 @@ async function cancelBooking(id: string): Promise<boolean> {
   return !error;
 }
 
+async function loadLoyaltyBalance(userId: string): Promise<{ balance: number; earned: number; redeemed: number } | null> {
+  const { data, error } = await supabase
+    .from('loyalty_balance')
+    .select('hours_balance, hours_earned_lifetime, hours_redeemed_lifetime')
+    .eq('user_id', userId)
+    .maybeSingle();
+  if (error) {
+    // Migration 0018 not applied yet — column or table missing. Fail soft.
+    console.warn('[loyalty] load failed (migration 0018 may not be applied)', error.message);
+    return null;
+  }
+  if (!data) return { balance: 0, earned: 0, redeemed: 0 };
+  return {
+    balance: Number(data.hours_balance ?? 0),
+    earned: Number(data.hours_earned_lifetime ?? 0),
+    redeemed: Number(data.hours_redeemed_lifetime ?? 0),
+  };
+}
+
+function renderLoyaltyCard(balance: number, earned: number, redeemed: number): void {
+  const cardEl = document.getElementById('loyalty-card');
+  const balanceEl = document.getElementById('loyalty-balance');
+  const earnedEl = document.getElementById('loyalty-earned');
+  const metaEl = document.getElementById('loyalty-meta');
+  if (!cardEl || !balanceEl || !earnedEl || !metaEl) return;
+  // Don't show the card for users with no completed bookings yet — avoids noise on day 1
+  if (earned <= 0) {
+    cardEl.hidden = true;
+    return;
+  }
+  balanceEl.textContent = balance.toFixed(2);
+  earnedEl.textContent = earned.toFixed(2);
+  metaEl.innerHTML = redeemed > 0
+    ? `Заработано всего: <span>${earned.toFixed(2)}</span> ч · Использовано: <span>${redeemed.toFixed(2)}</span> ч`
+    : `Заработано всего: <span>${earned.toFixed(2)}</span> ч`;
+  cardEl.hidden = false;
+}
+
 export async function setupMePage(): Promise<void> {
   const root = document.getElementById('me-root');
   const listEl = document.getElementById('me-bookings');
@@ -124,6 +162,11 @@ export async function setupMePage(): Promise<void> {
     const banner = document.getElementById('me-demo-banner');
     if (banner) banner.hidden = false;
   }
+
+  // Loyalty balance — load in parallel with bookings (independent query)
+  loadLoyaltyBalance(user.id).then((loyalty) => {
+    if (loyalty) renderLoyaltyCard(loyalty.balance, loyalty.earned, loyalty.redeemed);
+  });
 
   const bookings = await loadBookings();
   if (loadingEl) loadingEl.hidden = true;

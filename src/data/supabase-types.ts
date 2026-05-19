@@ -150,3 +150,15 @@ export const REVIEW_STATUS_LABELS: Record<ReviewStatus, string> = {
   published: 'Опубликован',
   hidden: 'Скрыт',
 };
+
+// =====================================================================
+// Loyalty balance (Block 7 — cashback)
+// =====================================================================
+
+export interface LoyaltyBalance {
+  user_id: string;
+  hours_balance: number;
+  hours_earned_lifetime: number;
+  hours_redeemed_lifetime: number;
+  updated_at: string;
+}

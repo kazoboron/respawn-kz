@@ -13,6 +13,21 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         </div>
       </header>
 
+      <aside class="loyalty-card" id="loyalty-card" hidden aria-labelledby="loyalty-card-title">
+        <div class="loyalty-card__icon" aria-hidden="true">🎁</div>
+        <div class="loyalty-card__body">
+          <div class="loyalty-card__title" id="loyalty-card-title">
+            Бонусные часы: <strong id="loyalty-balance">0.00</strong>
+          </div>
+          <div class="loyalty-card__meta" id="loyalty-meta">
+            Заработано всего: <span id="loyalty-earned">0</span> ч
+          </div>
+          <div class="loyalty-card__hint">
+            5% часов возвращается бонусами после каждой завершённой брони.
+          </div>
+        </div>
+      </aside>
+
       <div class="me-loading" id="me-loading" aria-live="polite" aria-busy="true">
         <p style="text-align:center;color:var(--text-muted)">Загружаем брони…</p>
       </div>
