@@ -89,6 +89,7 @@ if (topReviews.length > 0) {
   title={`${club.name} — ${cityLabel} — respawn.kz`}
   description={`${club.name}, ${cityLabel}, ${club.district ?? ''}. От ${formatPrice(club.price_per_hour)} ₸/час. ${club.tags.join(', ')}.`}
   activeRoute="clubs"
+  lcpImage={club.photos?.[0]}
   ogImage={club.photos?.[0] ?? '/img/club-hero.webp'}
 >
   <script type="application/ld+json" slot="head" set:html={JSON.stringify(jsonLd)} />

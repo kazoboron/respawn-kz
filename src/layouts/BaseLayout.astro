@@ -10,6 +10,13 @@ interface Props {
   description?: string;
   activeRoute?: 'index' | 'clubs' | 'for-clubs' | 'about';
   ogImage?: string;
+  /**
+   * When set, emits a `<link rel="preload" as="image" fetchpriority="high">` in <head>
+   * so the browser fetches this image early — useful when the page's LCP is a known
+   * hero image. Pass the same URL (or shape) the page renders. Leave undefined when
+   * the LCP is text or unknown.
+   */
+  lcpImage?: string;
 }
 
 const {
@@ -17,6 +24,7 @@ const {
   description = 'respawn.kz — онлайн-бронирование компьютерных клубов в Казахстане. Найди клуб, забронируй слот, оплати картой.',
   activeRoute,
   ogImage = '/img/club-hero.webp',
+  lcpImage,
 } = Astro.props;
 
 const ogImageAbs = new URL(ogImage, Astro.site ?? 'https://respawn.kz').toString();
@@ -52,6 +60,8 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site ?? 'https://respawn.
     <meta name="twitter:image" content={ogImageAbs} />
 
     <meta name="theme-color" content="#0a0a0f" />
+
+    {lcpImage && <link rel="preload" as="image" href={lcpImage} fetchpriority="high" />}
 
     <slot name="head" />
 
