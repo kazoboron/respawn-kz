@@ -75,20 +75,28 @@ function openLightbox(photos: string[], startIndex: number): void {
   document.addEventListener('keydown', onKey);
 }
 
+/**
+ * Set up lightbox for any element with `data-photos` attribute. Uses document-level
+ * delegation so dynamically-rendered review galleries (added after page load) work
+ * the same way as the SSG'd club gallery.
+ *
+ * Each photo-set container needs:
+ * - data-photos='["url1", "url2", ...]' JSON-encoded URL array
+ * - children with data-photo-index="N" attribute (typically a <button>)
+ */
 export function setupGalleryLightbox(): void {
-  const gallery = document.getElementById('club-gallery');
-  if (!gallery) return;
-  let photos: string[] = [];
-  try {
-    photos = JSON.parse(gallery.getAttribute('data-photos') ?? '[]');
-  } catch {
-    return;
-  }
-  if (photos.length === 0) return;
-
-  gallery.addEventListener('click', (e) => {
+  document.addEventListener('click', (e) => {
     const btn = (e.target as HTMLElement).closest('[data-photo-index]') as HTMLElement | null;
     if (!btn) return;
+    const container = btn.closest('[data-photos]') as HTMLElement | null;
+    if (!container) return;
+    let photos: string[] = [];
+    try {
+      photos = JSON.parse(container.getAttribute('data-photos') ?? '[]');
+    } catch {
+      return;
+    }
+    if (photos.length === 0) return;
     const idx = Number(btn.getAttribute('data-photo-index'));
     if (Number.isNaN(idx)) return;
     openLightbox(photos, idx);

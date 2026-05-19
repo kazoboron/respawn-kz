@@ -45,6 +45,16 @@ import RatingStars from '../../components/RatingStars.astro';
 
           <div class="review-form__counter" id="review-char-counter" aria-live="polite"><span id="char-count">0</span> / 1000</div>
 
+          <div class="review-form__photos">
+            <span class="auth-label">Фото (опционально, до 3)</span>
+            <input type="file" id="review-photo-input" accept="image/jpeg,image/png,image/webp" multiple hidden aria-label="Выбрать фотографии для отзыва" />
+            <div class="review-form__photo-actions">
+              <button type="button" class="btn btn--ghost btn--sm" id="review-photo-pick" aria-controls="review-photo-thumbs">+ Добавить фото</button>
+              <span id="review-photo-status" class="review-form__photo-status" aria-live="polite"></span>
+            </div>
+            <ul class="review-form__photo-thumbs" id="review-photo-thumbs" role="list"></ul>
+          </div>
+
           <div class="auth-error" id="review-error" aria-live="polite" hidden></div>
 
           <button type="submit" class="btn btn--primary btn--large" style="width:100%">Опубликовать</button>

@@ -68,31 +68,50 @@ async function compressImage(file: File): Promise<File> {
   return new File([blob], `${base}.webp`, { type: 'image/webp' });
 }
 
-export async function uploadClubPhoto(slug: string, file: File): Promise<UploadResult> {
+/** Internal: validate, compress, upload to given bucket+path. Shared by club + review photo uploads. */
+async function uploadToBucket(
+  bucket: string,
+  pathFn: (compressedName: string) => string,
+  file: File,
+): Promise<UploadResult> {
   if (!ALLOWED_MIME.includes(file.type)) {
     return { ok: false, error: 'Только JPEG, PNG или WebP.' };
   }
-
-  // Compress first — a 5 MB phone photo often shrinks to 300-600 KB WebP, fitting under MAX_BYTES.
   const compressed = await compressImage(file);
-
   if (compressed.size > MAX_BYTES) {
     return { ok: false, error: 'Фото больше 3 МБ даже после сжатия. Попробуй файл поменьше.' };
   }
-
   const safeName = compressed.name.toLowerCase().replace(/[^a-z0-9.]+/g, '_');
-  const ext = safeName.split('.').pop() ?? 'jpg';
-  const base = safeName.replace(/\.[^.]+$/, '');
-  const path = `${slug}/${Date.now()}-${base}.${ext}`;
+  const path = pathFn(safeName);
 
   const { data, error } = await supabase.storage
-    .from(BUCKET)
+    .from(bucket)
     .upload(path, compressed, { contentType: compressed.type, upsert: false });
-
   if (error || !data) return { ok: false, error: error?.message ?? 'upload failed' };
 
-  const { data: urlData } = supabase.storage.from(BUCKET).getPublicUrl(data.path);
+  const { data: urlData } = supabase.storage.from(bucket).getPublicUrl(data.path);
   return { ok: true, publicUrl: urlData.publicUrl, storagePath: data.path };
+}
+
+export async function uploadClubPhoto(slug: string, file: File): Promise<UploadResult> {
+  return uploadToBucket(BUCKET, (name) => {
+    const ext = name.split('.').pop() ?? 'jpg';
+    const base = name.replace(/\.[^.]+$/, '');
+    return `${slug}/${Date.now()}-${base}.${ext}`;
+  }, file);
+}
+
+/**
+ * Upload a photo attached to a review. Stored in `review-photos` bucket under
+ * `<userId>/<timestamp>-<filename>` so RLS gates writes to the user's own
+ * folder (see migration 0020). Returns public URL on success.
+ */
+export async function uploadReviewPhoto(userId: string, file: File): Promise<UploadResult> {
+  return uploadToBucket('review-photos', (name) => {
+    const ext = name.split('.').pop() ?? 'webp';
+    const base = name.replace(/\.[^.]+$/, '');
+    return `${userId}/${Date.now()}-${base}.${ext}`;
+  }, file);
 }
 
 /** Extract the storage path from a public URL, or null if not a Storage URL. */

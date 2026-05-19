@@ -129,6 +129,7 @@ export interface Review {
   reply_text: string | null;
   replied_at: string | null;
   replied_by: string | null;
+  photo_urls: string[];
   created_at: string;
   updated_at: string;
 }

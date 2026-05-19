@@ -1,6 +1,9 @@
 import { supabase } from '../lib/supabase';
 import { requireLogin } from '../lib/route-guards';
+import { uploadReviewPhoto } from '../lib/photo-upload';
 import type { Booking, NewReview } from '../data/supabase-types';
+
+const MAX_REVIEW_PHOTOS = 3;
 
 function show(id: string) {
   const el = document.getElementById(id);
@@ -123,6 +126,62 @@ export async function setupReviewsForm(): Promise<void> {
     if (counter) counter.textContent = String(textarea.value.length);
   });
 
+  // Photo picker — uploads to review-photos bucket, accumulates URL list
+  const photoInput = document.getElementById('review-photo-input') as HTMLInputElement | null;
+  const photoPickBtn = document.getElementById('review-photo-pick') as HTMLButtonElement | null;
+  const photoThumbs = document.getElementById('review-photo-thumbs') as HTMLUListElement | null;
+  const photoStatus = document.getElementById('review-photo-status') as HTMLElement | null;
+  const photoUrls: string[] = [];
+
+  function renderThumbs(): void {
+    if (!photoThumbs) return;
+    photoThumbs.innerHTML = photoUrls.map((url, i) => `
+      <li class="review-form__photo-thumb">
+        <img src="${url}" alt="" loading="lazy" />
+        <button type="button" class="btn btn--ghost btn--sm" data-remove-photo="${i}" aria-label="Удалить фото ${i + 1}">×</button>
+      </li>
+    `).join('');
+    if (photoPickBtn) photoPickBtn.disabled = photoUrls.length >= MAX_REVIEW_PHOTOS;
+  }
+
+  photoPickBtn?.addEventListener('click', () => photoInput?.click());
+
+  photoInput?.addEventListener('change', async () => {
+    const files = Array.from(photoInput.files ?? []);
+    photoInput.value = ''; // allow re-pick of same file
+    for (const file of files) {
+      if (photoUrls.length >= MAX_REVIEW_PHOTOS) {
+        if (photoStatus) photoStatus.textContent = `Максимум ${MAX_REVIEW_PHOTOS} фото.`;
+        break;
+      }
+      if (photoStatus) photoStatus.textContent = `Загружаем ${file.name}…`;
+      const result = await uploadReviewPhoto(user.id, file);
+      if (!result.ok || !result.publicUrl) {
+        if (photoStatus) photoStatus.textContent = `Не удалось загрузить ${file.name}: ${result.error ?? 'unknown'}`;
+        continue;
+      }
+      photoUrls.push(result.publicUrl);
+      renderThumbs();
+    }
+    if (photoStatus && photoUrls.length === MAX_REVIEW_PHOTOS) {
+      photoStatus.textContent = `Загружено ${photoUrls.length} из ${MAX_REVIEW_PHOTOS}.`;
+    } else if (photoStatus && photoUrls.length > 0) {
+      photoStatus.textContent = `Загружено ${photoUrls.length}.`;
+    }
+  });
+
+  photoThumbs?.addEventListener('click', (e) => {
+    const btn = (e.target as HTMLElement).closest('[data-remove-photo]') as HTMLButtonElement | null;
+    if (!btn) return;
+    const idx = Number(btn.getAttribute('data-remove-photo'));
+    if (Number.isNaN(idx)) return;
+    photoUrls.splice(idx, 1);
+    renderThumbs();
+    if (photoStatus) {
+      photoStatus.textContent = photoUrls.length > 0 ? `Загружено ${photoUrls.length}.` : '';
+    }
+  });
+
   // Submit handler
   const form = document.getElementById('review-submit-form') as HTMLFormElement | null;
   const errorEl = document.getElementById('review-error');
@@ -154,6 +213,7 @@ export async function setupReviewsForm(): Promise<void> {
       club_slug: b.club_slug,
       rating,
       text,
+      photo_urls: photoUrls.slice(),
     };
 
     const { error } = await supabase.from('reviews').insert(newRow);

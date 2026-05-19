@@ -9,6 +9,7 @@ interface PublicReview {
   created_at: string;
   reply_text: string | null;
   replied_at: string | null;
+  photo_urls: string[] | null;
 }
 
 function escapeHtml(s: string): string {
@@ -45,6 +46,23 @@ function renderReply(r: PublicReview): string {
   `;
 }
 
+function renderPhotos(r: PublicReview): string {
+  if (!r.photo_urls || r.photo_urls.length === 0) return '';
+  // photo-index/data-photos pattern is what gallery-lightbox.ts expects for #club-gallery.
+  // For reviews we use a different wrapper id per review so each review's photos form
+  // an independent lightbox set.
+  const photos = JSON.stringify(r.photo_urls);
+  return `
+    <div class="review-card__photos" id="review-gallery-${r.id}" data-photos='${photos.replace(/'/g, "&apos;")}'>
+      ${r.photo_urls.map((url, i) => `
+        <button type="button" class="review-card__photo-btn" data-photo-index="${i}" aria-label="Открыть фото ${i + 1} к отзыву">
+          <img src="${url}" alt="" loading="lazy" />
+        </button>
+      `).join('')}
+    </div>
+  `;
+}
+
 function renderCard(r: PublicReview): string {
   return `
     <li>
@@ -54,6 +72,7 @@ function renderCard(r: PublicReview): string {
           <span class="review-card__date">${formatDate(r.created_at)}</span>
         </div>
         <p class="review-card__text">${escapeHtml(r.text)}</p>
+        ${renderPhotos(r)}
         ${renderReply(r)}
       </article>
     </li>
@@ -108,7 +127,7 @@ export async function setupClubReviews(): Promise<void> {
     const cfg = SORT_CONFIG[sortKey];
     let query = supabase
       .from('reviews')
-      .select('id, rating, text, created_at, reply_text, replied_at')
+      .select('id, rating, text, created_at, reply_text, replied_at, photo_urls')
       .eq('club_slug', slug!)
       .eq('status', 'published')
       .order(cfg.column, { ascending: cfg.ascending });

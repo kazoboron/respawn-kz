@@ -95,9 +95,8 @@ function init(): void {
   if (document.getElementById('dashboard-reviews-root')) {
     setupDashboardReviews();
   }
-  if (document.getElementById('club-gallery')) {
-    setupGalleryLightbox();
-  }
+  // Document-level delegation works for both SSG club gallery and dynamically-rendered review photos
+  setupGalleryLightbox();
   // Cookie consent — on every page, shows once if not yet answered
   setupCookieBanner();
 }
