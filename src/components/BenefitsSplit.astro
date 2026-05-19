@@ -1,0 +1,127 @@
+---
+/**
+ * Two-column benefits section: one for players (B2C), one for club owners (B2B).
+ * Replaces the single-column Benefits component.
+ */
+
+const players = [
+  {
+    title: 'Сравнение клубов',
+    desc: 'Цены, оборудование, рейтинги и отзывы — на одной странице. Без звонков по каждому клубу.',
+    icon: `<svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="3" width="22" height="22" rx="3"/>
+      <path d="M3 11 H25 M11 3 V25"/>
+    </svg>`,
+  },
+  {
+    title: 'Бронь за 30 секунд',
+    desc: 'Выбери дату, время, количество часов — и оплати картой. Слот закреплён за тобой.',
+    icon: `<svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="5" width="22" height="20" rx="3"/>
+      <path d="M3 11 H25"/>
+      <path d="M9 2 V8 M19 2 V8"/>
+      <path d="M9 17 L13 21 L21 13"/>
+    </svg>`,
+  },
+  {
+    title: 'Кэшбэк 5% часами',
+    desc: 'Завершил бронь — получил часы на следующую. Бонусы не сгорают.',
+    icon: `<svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="14" cy="14" r="11"/>
+      <path d="M14 7 L16 12 L22 12 L17 15 L19 21 L14 17 L9 21 L11 15 L6 12 L12 12 Z" fill="currentColor" stroke="none"/>
+    </svg>`,
+  },
+  {
+    title: 'Без сюрпризов',
+    desc: 'Оплата картой Visa/Mastercard/Kaspi. Возврат на ту же карту, если что.',
+    icon: `<svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="2" y="6" width="24" height="16" rx="3"/>
+      <path d="M2 11 H26"/>
+      <path d="M6 17 H10 M14 17 H18"/>
+    </svg>`,
+  },
+];
+
+const clubs = [
+  {
+    title: 'Поток клиентов',
+    desc: 'Тысячи игроков ищут клубы в твоём районе. Мы доставляем — ты обслуживаешь.',
+    icon: `<svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M14 3 L22 8 V18 L14 23 L6 18 V8 Z"/>
+      <path d="M14 13 V23 M6 8 L14 13 L22 8"/>
+    </svg>`,
+  },
+  {
+    title: 'Онлайн-платежи',
+    desc: 'Деньги приходят на счёт клуба сразу. Без наличных, без админских споров.',
+    icon: `<svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 17 V21 C3 22 4 23 5 23 H23 C24 23 25 22 25 21 V17"/>
+      <path d="M14 3 V17 M9 12 L14 17 L19 12"/>
+    </svg>`,
+  },
+  {
+    title: 'Аналитика и календарь',
+    desc: 'Видишь загрузку по часам и дням. Понимаешь когда поднять цену, когда сделать акцию.',
+    icon: `<svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 21 V5 M3 21 H25"/>
+      <path d="M7 17 V13 M12 17 V8 M17 17 V11 M22 17 V6"/>
+    </svg>`,
+  },
+  {
+    title: 'Без подписки',
+    desc: 'Платишь только комиссию с реальных броней. Если игроков нет — ты ничего не платишь.',
+    icon: `<svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="14" cy="14" r="11"/>
+      <path d="M9 14 H19 M14 9 V19"/>
+    </svg>`,
+  },
+];
+---
+
+<section class="benefits-split" id="benefits">
+  <div class="container">
+    <div class="benefits-split__intro">
+      <h2 class="section__title">Кому это полезно</h2>
+    </div>
+
+    <div class="benefits-split__columns">
+      <div class="benefits-split__column benefits-split__column--players">
+        <div class="benefits-split__head">
+          <span class="benefits-split__chip">Игрокам</span>
+          <h3 class="benefits-split__title">Бронируй и играй без головняка</h3>
+        </div>
+        <div class="benefits-split__list">
+          {players.map((b) => (
+            <div class="benefit benefit--compact">
+              <div class="benefit__icon" set:html={b.icon}></div>
+              <div class="benefit__content">
+                <h4 class="benefit__title">{b.title}</h4>
+                <p class="benefit__desc">{b.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+        <a class="btn btn--primary btn--large" href="/clubs/">Найти клуб</a>
+      </div>
+
+      <div class="benefits-split__column benefits-split__column--owners">
+        <div class="benefits-split__head">
+          <span class="benefits-split__chip benefits-split__chip--owners">Клубам</span>
+          <h3 class="benefits-split__title">Подключайся и принимай брони</h3>
+        </div>
+        <div class="benefits-split__list">
+          {clubs.map((b) => (
+            <div class="benefit benefit--compact">
+              <div class="benefit__icon" set:html={b.icon}></div>
+              <div class="benefit__content">
+                <h4 class="benefit__title">{b.title}</h4>
+                <p class="benefit__desc">{b.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+        <a class="btn btn--ghost btn--large" href="/for-clubs/">Подключить клуб</a>
+      </div>
+    </div>
+  </div>
+</section>

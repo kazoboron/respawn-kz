@@ -1,0 +1,57 @@
+---
+/**
+ * Decorative animated visual for the hero section.
+ * Floating mock club cards with a glowing map pin in the middle.
+ * Pure CSS — no JS, no WebGL, no external libraries.
+ * Respects prefers-reduced-motion (animations disabled, static composition).
+ */
+---
+
+<div class="hero-visual" aria-hidden="true">
+  <!-- Glowing map pin in center -->
+  <div class="hero-visual__pin">
+    <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M32 4 C20 4 10 14 10 26 C10 42 32 60 32 60 C32 60 54 42 54 26 C54 14 44 4 32 4 Z"/>
+      <circle cx="32" cy="26" r="7"/>
+    </svg>
+    <div class="hero-visual__pin-glow"></div>
+    <div class="hero-visual__pin-pulse"></div>
+  </div>
+
+  <!-- Floating mock club cards drifting around -->
+  <div class="hero-visual__card hero-visual__card--1">
+    <div class="hero-visual__card-thumb" style="background: linear-gradient(135deg, #8b5cf6, #ec4899)"></div>
+    <div class="hero-visual__card-body">
+      <div class="hero-visual__card-line hero-visual__card-line--name"></div>
+      <div class="hero-visual__card-line hero-visual__card-line--meta"></div>
+      <div class="hero-visual__card-pill">
+        <span aria-hidden="true">★</span> 4.9
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-visual__card hero-visual__card--2">
+    <div class="hero-visual__card-thumb" style="background: linear-gradient(135deg, #22d3ee, #3b82f6)"></div>
+    <div class="hero-visual__card-body">
+      <div class="hero-visual__card-line hero-visual__card-line--name"></div>
+      <div class="hero-visual__card-line hero-visual__card-line--meta"></div>
+      <div class="hero-visual__card-pill">
+        <span aria-hidden="true">★</span> 4.8
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-visual__card hero-visual__card--3">
+    <div class="hero-visual__card-thumb" style="background: linear-gradient(135deg, #f472b6, #facc15)"></div>
+    <div class="hero-visual__card-body">
+      <div class="hero-visual__card-line hero-visual__card-line--name"></div>
+      <div class="hero-visual__card-line hero-visual__card-line--meta"></div>
+      <div class="hero-visual__card-pill">
+        <span aria-hidden="true">★</span> 4.7
+      </div>
+    </div>
+  </div>
+
+  <!-- Decorative ring around pin -->
+  <div class="hero-visual__ring"></div>
+</div>

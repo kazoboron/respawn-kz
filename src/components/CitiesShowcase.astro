@@ -1,0 +1,59 @@
+---
+/**
+ * Trust band — cities + stat counters.
+ * 10 Kazakhstan cities pinned around a stylized country shape, with stat
+ * counters running below. Pure CSS, animated on viewport entry via
+ * scroll-reveal.
+ */
+const cities = [
+  'Алматы',
+  'Астана',
+  'Шымкент',
+  'Караганда',
+  'Актобе',
+  'Тараз',
+  'Павлодар',
+  'Усть-Каменогорск',
+  'Семей',
+  'Атырау',
+];
+---
+
+<section class="cities-showcase" id="cities">
+  <div class="container">
+    <div class="cities-showcase__heading">
+      <h2 class="section__title">10 городов Казахстана</h2>
+      <p class="section__subtitle">
+        От Алматы до Атырау — клубы из всех крупных городов в одном каталоге
+      </p>
+    </div>
+
+    <div class="cities-showcase__pills">
+      {cities.map((city) => (
+        <span class="cities-showcase__pill">
+          <span class="cities-showcase__pin" aria-hidden="true">●</span>
+          {city}
+        </span>
+      ))}
+    </div>
+
+    <div class="cities-showcase__stats">
+      <div class="cities-showcase__stat">
+        <span class="cities-showcase__stat-value">80+</span>
+        <span class="cities-showcase__stat-label">проверенных клубов</span>
+      </div>
+      <div class="cities-showcase__stat">
+        <span class="cities-showcase__stat-value">12 000+</span>
+        <span class="cities-showcase__stat-label">активных игроков</span>
+      </div>
+      <div class="cities-showcase__stat">
+        <span class="cities-showcase__stat-value">30 сек</span>
+        <span class="cities-showcase__stat-label">занимает бронь</span>
+      </div>
+      <div class="cities-showcase__stat">
+        <span class="cities-showcase__stat-value">5%</span>
+        <span class="cities-showcase__stat-label">кэшбэк часами</span>
+      </div>
+    </div>
+  </div>
+</section>

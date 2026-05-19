@@ -1,0 +1,92 @@
+---
+/**
+ * Animated visual demonstration of the booking experience.
+ * Three-step ribbon showing: club discovery → slot pick → instant confirm.
+ * Pure CSS animations, reduced-motion-aware.
+ */
+---
+
+<section class="flow-demo" id="flow-demo">
+  <div class="container">
+    <div class="flow-demo__heading">
+      <h2 class="section__title">Как выглядит бронь</h2>
+      <p class="section__subtitle">Три экрана — и ты уже в клубе</p>
+    </div>
+
+    <div class="flow-demo__stage" aria-hidden="true">
+      <!-- Step 1: Discover -->
+      <div class="flow-demo__screen flow-demo__screen--1">
+        <div class="flow-demo__screen-label">01 · Поиск</div>
+        <div class="flow-demo__discover">
+          <div class="flow-demo__search-bar">
+            <span class="flow-demo__search-icon">⌕</span>
+            <span class="flow-demo__search-text">Алмалинский · 24h · PC</span>
+          </div>
+          <div class="flow-demo__results">
+            <div class="flow-demo__result-card flow-demo__result-card--highlight">
+              <div class="flow-demo__result-thumb" style="background: linear-gradient(135deg, #8b5cf6, #ec4899)"></div>
+              <div class="flow-demo__result-info">
+                <div class="flow-demo__result-name"></div>
+                <div class="flow-demo__result-meta"></div>
+              </div>
+            </div>
+            <div class="flow-demo__result-card">
+              <div class="flow-demo__result-thumb" style="background: linear-gradient(135deg, #22d3ee, #3b82f6)"></div>
+              <div class="flow-demo__result-info">
+                <div class="flow-demo__result-name"></div>
+                <div class="flow-demo__result-meta"></div>
+              </div>
+            </div>
+            <div class="flow-demo__result-card">
+              <div class="flow-demo__result-thumb" style="background: linear-gradient(135deg, #f472b6, #facc15)"></div>
+              <div class="flow-demo__result-info">
+                <div class="flow-demo__result-name"></div>
+                <div class="flow-demo__result-meta"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Arrow connector -->
+      <div class="flow-demo__arrow flow-demo__arrow--1">→</div>
+
+      <!-- Step 2: Pick slot -->
+      <div class="flow-demo__screen flow-demo__screen--2">
+        <div class="flow-demo__screen-label">02 · Слот</div>
+        <div class="flow-demo__slots">
+          <div class="flow-demo__slot-grid">
+            <div class="flow-demo__slot">14:00</div>
+            <div class="flow-demo__slot">15:00</div>
+            <div class="flow-demo__slot flow-demo__slot--active">16:00</div>
+            <div class="flow-demo__slot">17:00</div>
+            <div class="flow-demo__slot">18:00</div>
+            <div class="flow-demo__slot flow-demo__slot--blocked">19:00</div>
+          </div>
+          <div class="flow-demo__total">
+            <span class="flow-demo__total-label">Итого</span>
+            <span class="flow-demo__total-value">3 600 ₸</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Arrow connector -->
+      <div class="flow-demo__arrow flow-demo__arrow--2">→</div>
+
+      <!-- Step 3: Confirm -->
+      <div class="flow-demo__screen flow-demo__screen--3">
+        <div class="flow-demo__screen-label">03 · Подтверждение</div>
+        <div class="flow-demo__success">
+          <div class="flow-demo__check">
+            <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="32" cy="32" r="28"/>
+              <path d="M20 32 L28 40 L44 24"/>
+            </svg>
+          </div>
+          <div class="flow-demo__success-title">Бронь подтверждена</div>
+          <div class="flow-demo__success-meta">QR-код придёт в Telegram</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
