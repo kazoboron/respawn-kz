@@ -102,7 +102,22 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site ?? 'https://respawn.
     </script>
     <script>
       import { registerSW } from 'virtual:pwa-register';
-      registerSW({ immediate: true });
+      const updateSW = registerSW({
+        immediate: true,
+        // When a new SW activates after a deploy, force the page to reload
+        // so users see the latest code without manual hard-refresh.
+        // Guarded by sessionStorage so we only auto-reload once per session
+        // (avoids reload loops if anything goes sideways).
+        onNeedRefresh() {
+          if (sessionStorage.getItem('sw-reloaded') === '1') return;
+          sessionStorage.setItem('sw-reloaded', '1');
+          updateSW(true); // installs the waiting SW, then auto-reloads
+        },
+        onOfflineReady() {
+          // Optional: console hint, nothing user-facing for now
+          console.info('[respawn.kz] Готов к работе офлайн');
+        },
+      });
     </script>
   </body>
 </html>

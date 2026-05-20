@@ -28,6 +28,13 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,svg,webp,woff2,ico}'],
         // Skip pre-caching auth/admin/dashboard/me HTML pages
         globIgnores: ['**/me/**', '**/admin/**', '**/dashboard/**', '**/auth/**'],
+        // New SW takes control immediately — users see the latest deploy on
+        // next page load without manual refresh / closing all tabs.
+        skipWaiting: true,
+        clientsClaim: true,
+        // Nuke any leftover Workbox precache from older deploys so we don't
+        // serve stale assets after activate.
+        cleanupOutdatedCaches: true,
         runtimeCaching: [
           {
             // HTML pages: try network, fall back to cache
