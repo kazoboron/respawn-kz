@@ -17,6 +17,32 @@
 ---
 
 <div class="hero-fx" aria-hidden="true">
+  <!-- Layer 0: looping gaming-with-person video background.
+       Royalty-free Pexels CDN. Two sources for redundancy.
+       autoplay + muted + playsinline = iOS/Safari autoplay-friendly.
+       Hidden on small screens + prefers-reduced-motion via CSS. -->
+  <video
+    class="hero-fx__video"
+    autoplay
+    muted
+    loop
+    playsinline
+    preload="metadata"
+    poster="/img/club-rows.webp"
+  >
+    <source
+      src="https://videos.pexels.com/video-files/7991452/7991452-uhd_2732_1440_25fps.mp4"
+      type="video/mp4"
+    />
+    <source
+      src="https://videos.pexels.com/video-files/4434286/4434286-uhd_2560_1440_24fps.mp4"
+      type="video/mp4"
+    />
+  </video>
+
+  <!-- Layer 0.5: dark overlay so headline text stays readable over the video -->
+  <div class="hero-fx__overlay"></div>
+
   <!-- Layer 1: canvas particle network -->
   <canvas id="hero-particles" class="hero-fx__canvas"></canvas>
 
