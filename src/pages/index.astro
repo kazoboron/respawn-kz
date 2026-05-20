@@ -183,26 +183,6 @@ function fmtPrice(n: number): string {
       </div>
     </section>
 
-    <!-- THREE STEPS -->
-    <section id="how" class="v4-section" aria-label="Три шага до игры">
-      <div class="v4-container">
-        <div class="v4-section-head v4-fade-up">
-          <span class="v4-eyebrow">Как это работает</span>
-          <h2 class="v4-h-section">Три шага до игры</h2>
-        </div>
-        <div class="v4-steps">
-          {steps.map((s) => (
-            <article class="v4-step v4-fade-up">
-              <div class="v4-step__num">{s.num}</div>
-              <div class="v4-step__icon" set:html={s.icon}></div>
-              <h3 class="v4-step__title">{s.title}</h3>
-              <p class="v4-step__desc">{s.desc}</p>
-            </article>
-          ))}
-        </div>
-      </div>
-    </section>
-
     <!-- CATALOG TEASER (real clubs from Supabase) -->
     <section id="catalog" class="v4-section" aria-label="Каталог клубов">
       <div class="v4-container">
@@ -242,6 +222,26 @@ function fmtPrice(n: number): string {
               <path d="M5 12h14"/><path d="M13 6l6 6-6 6"/>
             </svg>
           </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- THREE STEPS -->
+    <section id="how" class="v4-section" aria-label="Три шага до игры">
+      <div class="v4-container">
+        <div class="v4-section-head v4-fade-up">
+          <span class="v4-eyebrow">Как это работает</span>
+          <h2 class="v4-h-section">Три шага до игры</h2>
+        </div>
+        <div class="v4-steps">
+          {steps.map((s) => (
+            <article class="v4-step v4-fade-up">
+              <div class="v4-step__num">{s.num}</div>
+              <div class="v4-step__icon" set:html={s.icon}></div>
+              <h3 class="v4-step__title">{s.title}</h3>
+              <p class="v4-step__desc">{s.desc}</p>
+            </article>
+          ))}
         </div>
       </div>
     </section>
@@ -461,29 +461,15 @@ function fmtPrice(n: number): string {
       const dots = hero.querySelectorAll('[data-dot]');
       const cue = hero.querySelector('[data-cue]');
 
-      const isMobile = window.matchMedia('(max-width: 640px)');
       const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
 
       const setStaticMode = () => {
-        // Mobile / reduced-motion: video autoplay-loops, no scrub
-        if (poster) poster.setAttribute('hidden', '');
+        // Reduced-motion only: pause video, show static poster, freeze beats
         if (video) {
-          video.style.display = 'block';
-          if (reduced.matches) {
-            // True reduced motion: pause + show poster
-            video.style.display = 'none';
-            if (poster) poster.removeAttribute('hidden');
-            try { video.pause(); } catch (_) {}
-          } else {
-            // Mobile: loop+autoplay (no scrub)
-            video.loop = true;
-            video.muted = true;
-            const playPromise = video.play();
-            if (playPromise && typeof playPromise.catch === 'function') {
-              playPromise.catch(() => { /* autoplay may be blocked; ignore */ });
-            }
-          }
+          video.style.display = 'none';
+          try { video.pause(); } catch (_) {}
         }
+        if (poster) poster.removeAttribute('hidden');
         beats.forEach((b) => {
           b.classList.toggle('is-active', b.dataset.beat === '1');
         });
@@ -492,21 +478,38 @@ function fmtPrice(n: number): string {
       };
 
       const setInteractiveMode = () => {
-        // Desktop: scroll-scrub mode — pause autoplay, reset, scrub controls time
+        // Scroll-scrub mode (desktop + mobile): pause autoplay, reset, scrub
+        // controls currentTime as user scrolls.
+        // iOS Safari quirk: setting currentTime before loadedmetadata is a no-op.
+        // We "prime" the video by attempting play()+pause() once muted+playsinline
+        // are set so the browser allocates the decoder. From there, subsequent
+        // currentTime writes update frames inline.
+        if (poster) poster.setAttribute('hidden', '');
         if (video) {
           video.style.display = 'block';
           video.loop = false;
-          try { video.pause(); video.currentTime = 0; } catch (_) {}
+          video.muted = true;
+          const prime = () => {
+            try {
+              const p = video.play();
+              if (p && typeof p.then === 'function') {
+                p.then(() => { try { video.pause(); video.currentTime = 0; } catch (_) {} })
+                 .catch(() => { /* autoplay blocked; scrub may still work after first user gesture */ });
+              } else {
+                try { video.pause(); video.currentTime = 0; } catch (_) {}
+              }
+            } catch (_) {}
+          };
+          if (video.readyState >= 1) prime();
+          else video.addEventListener('loadedmetadata', prime, { once: true });
         }
-        if (poster) poster.setAttribute('hidden', '');
       };
 
       const onStateChange = () => {
-        if (isMobile.matches || reduced.matches) setStaticMode();
+        if (reduced.matches) setStaticMode();
         else setInteractiveMode();
       };
       onStateChange();
-      isMobile.addEventListener('change', onStateChange);
       reduced.addEventListener('change', onStateChange);
 
       // Lerp video.currentTime toward target every animation frame.
@@ -540,7 +543,7 @@ function fmtPrice(n: number): string {
       let lastProgress = -1;
       const update = () => {
         rafPending = false;
-        if (isMobile.matches || reduced.matches) return;
+        if (reduced.matches) return;
         const rect = hero.getBoundingClientRect();
         const total = hero.offsetHeight - window.innerHeight;
         const passed = Math.min(Math.max(-rect.top, 0), total);

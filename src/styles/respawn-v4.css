@@ -279,36 +279,28 @@
   box-shadow: 0 0 12px rgba(139,92,246,0.6);
 }
 
-/* Mobile hero — single-screen with autoplay-loop video instead of scroll-scrub.
-   Pinned sticky + currentTime scrubbing is unreliable on iOS Safari, so we
-   ship a different but equally cinematic experience: the portal video plays
-   in a continuous loop, with the headline overlayed on top. */
+/* Mobile hero — scroll-scrub kept (per user request), but with a shorter
+   total scroll length (250vh vs desktop 400vh) so mobile users don't have
+   to scroll forever to clear the hero. iOS Safari 15+ supports inline
+   currentTime scrubbing on muted+playsinline videos; the JS primes the
+   decoder once via play()+pause() then writes currentTime each rAF. */
 @media (max-width: 640px) {
-  .v4-hero { height: 100vh; }
-  .v4-hero__sticky {
-    position: relative;
-    top: auto;
-    height: 100vh;
-    padding: 0;
-  }
-  /* Keep video visible — JS will autoplay+loop on mobile */
-  .v4-hero__video { display: block; }
-  .v4-hero__beat--3 { display: none; }
-  .v4-hero__beat--1 {
-    opacity: 1 !important;
-    transform: none !important;
-    pointer-events: auto !important;
-    justify-content: flex-end;
-    padding-bottom: 12vh;
-  }
+  .v4-hero { height: 250vh; }
   .v4-hero__beat--1 .v4-h-hero {
-    font-size: clamp(36px, 9vw, 56px);
+    font-size: clamp(32px, 8vw, 48px);
   }
+  .v4-hero__beat--3 .v4-h-section {
+    font-size: clamp(26px, 7vw, 40px);
+  }
+  /* Tighter side padding so headline fits comfortably */
+  .v4-hero__beat { padding: 0 20px; }
   /* Stronger vignette on mobile so text reads over video */
   .v4-hero__vignette {
-    background: radial-gradient(ellipse at center top, transparent 20%, rgba(0,0,0,0.85) 100%);
+    background: radial-gradient(ellipse at center, transparent 25%, rgba(0,0,0,0.7) 100%);
   }
-  .v4-hero__dots, .v4-hero__cue { display: none; }
+  /* Right-side dot rail is cramped on phones — hide; cue stays for scroll hint */
+  .v4-hero__dots { display: none; }
+  .v4-hero__cue { bottom: 24px; }
 }
 
 /* Sections */
@@ -399,6 +391,22 @@
   display: grid;
   gap: 24px;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+}
+/* Mobile catalog — 2 columns with compacter cards (per user request) */
+@media (max-width: 640px) {
+  .v4-catalog__grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  .v4-card { border-radius: 14px; }
+  .v4-card__body { padding: 12px 12px 14px; }
+  .v4-card__title { font-size: 14px; line-height: 1.2; }
+  .v4-card__meta { font-size: 11px; margin: 4px 0 8px; }
+  .v4-card__rating { font-size: 11px; gap: 5px; margin-bottom: 6px; }
+  .v4-card__rating svg { width: 12px; height: 12px; }
+  .v4-card__price { font-size: 11px; }
+  /* Hide "(N отзывов)" on tiny screens — keep just the rating number */
+  .v4-card__rating .v4-muted { display: none; }
 }
 .v4-catalog__cta-row {
   margin-top: 56px;
