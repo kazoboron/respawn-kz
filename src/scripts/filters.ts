@@ -70,8 +70,11 @@ function sortFn(mode: SortMode): (a: Club, b: Club) => number {
 function matchesQuery(club: Club, q: string): boolean {
   const needle = q.toLowerCase().trim();
   if (!needle) return true;
+  const cityLabel = CITY_LABELS[club.city] ?? '';
   const haystack = [
     club.name,
+    club.city,        // raw slug, lets "astana" match
+    cityLabel,        // Russian label "Астана"
     club.district ?? '',
     club.address,
     ...club.tags,
