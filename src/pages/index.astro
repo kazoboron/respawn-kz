@@ -133,6 +133,11 @@ function fmtPrice(n: number): string {
           preload="auto"
           poster="/videos/hero-portal-poster.jpg"
           aria-hidden="true">
+          <!-- 1080p upscaled-with-lanczos+unsharp source (9.4 MB) for sharp
+               rendering on desktop/retina. 720p fallback (5.4 MB) listed
+               second so older mobile browsers without HEVC concerns still
+               work, and CDN/connection-aware preload pickers can shrink. -->
+          <source src="/videos/hero-portal-1080.mp4" type="video/mp4" />
           <source src="/videos/hero-portal.mp4" type="video/mp4" />
         </video>
         <img
