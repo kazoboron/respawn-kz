@@ -1,227 +1,600 @@
 ---
-import '../styles/homepage-v2.css';
-import '../styles/homepage-v3.css';
-import BaseLayout from '../layouts/BaseLayout.astro';
-import SearchForm from '../components/SearchForm.astro';
-import HowItWorks from '../components/HowItWorks.astro';
-import ClubCard from '../components/ClubCard.astro';
-import BenefitsSplit from '../components/BenefitsSplit.astro';
-import BookingFlowDemo from '../components/BookingFlowDemo.astro';
-import CitiesShowcase from '../components/CitiesShowcase.astro';
-import HeroVisual from '../components/HeroVisual.astro';
-import FAQ from '../components/FAQ.astro';
+import '../styles/respawn-v4.css';
+import { loadAllClubs } from '../lib/clubs-loader';
 import { LANDING_FAQ } from '../data/content';
-import { loadAllClubs, type ClubRow } from '../lib/clubs-loader';
 
-interface Club {
-  slug: string;
-  name: string;
-  city: string;
-  district: string | null;
-  address: string;
-  phone: string | null;
-  price: number;
-  rating: number;
-  reviews: number;
-  tags: string[];
-  gradient: string | null;
-  initial: string | null;
-  photos: string[];
+const allClubs = await loadAllClubs();
+// Show ALL clubs on the homepage (user request 2026-05-20: «давай сразу
+// список всех клубов»). Catalog page /clubs/ has filters/search.
+const topClubs = allClubs;
+
+const steps = [
+  {
+    num: '01',
+    title: 'Выбери клуб',
+    desc: 'Фильтруй по району, цене и оборудованию. Сравнивай рейтинги и отзывы.',
+    icon: `<svg viewBox="0 0 56 56" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M28 6 C20 6 14 12 14 20 C14 30 28 48 28 48 C28 48 42 30 42 20 C42 12 36 6 28 6 Z"/><circle cx="28" cy="20" r="5"/></svg>`,
+  },
+  {
+    num: '02',
+    title: 'Забронируй слот',
+    desc: 'Выбери дату, время и количество часов. Оплачивай картой — Visa, Mastercard, Kaspi.',
+    icon: `<svg viewBox="0 0 56 56" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="12" width="40" height="38" rx="4"/><path d="M8 22 H48"/><path d="M19 6 V18 M37 6 V18"/><path d="M19 32 H27 M19 40 H37"/></svg>`,
+  },
+  {
+    num: '03',
+    title: 'Приходи и играй',
+    desc: 'Покажи QR-код на ресепшене — твоё место уже готово. Без очередей и звонков.',
+    icon: `<svg viewBox="0 0 56 56" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="20" width="44" height="26" rx="13"/><circle cx="18" cy="33" r="2.5" fill="currentColor" stroke="none"/><circle cx="40" cy="29" r="2" fill="currentColor" stroke="none"/><circle cx="44" cy="37" r="2" fill="currentColor" stroke="none"/><path d="M14 27 V39 M10 33 H18"/></svg>`,
+  },
+];
+
+const playerBenefits = [
+  { title: 'Сравнение клубов', desc: 'Цены, оборудование, рейтинги и отзывы — на одной странице. Без звонков по каждому клубу.', icon: `<svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="22" height="22" rx="3"/><path d="M3 11 H25 M11 3 V25"/></svg>` },
+  { title: 'Бронь за 30 секунд', desc: 'Выбери дату, время, количество часов — и оплати картой. Слот закреплён за тобой.', icon: `<svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="22" height="20" rx="3"/><path d="M3 11 H25"/><path d="M9 2 V8 M19 2 V8"/><path d="M9 17 L13 21 L21 13"/></svg>` },
+  { title: 'Кэшбэк 5% часами', desc: 'Завершил бронь — получил часы на следующую. Бонусы не сгорают.', icon: `<svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="14" cy="14" r="11"/><path d="M14 7 L16 12 L22 12 L17 15 L19 21 L14 17 L9 21 L11 15 L6 12 L12 12 Z" fill="currentColor" stroke="none"/></svg>` },
+  { title: 'Без сюрпризов', desc: 'Оплата картой Visa/Mastercard/Kaspi. Возврат на ту же карту, если что.', icon: `<svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="24" height="16" rx="3"/><path d="M2 11 H26"/><path d="M6 17 H10 M14 17 H18"/></svg>` },
+];
+
+const clubBenefits = [
+  { title: 'Поток клиентов', desc: 'Тысячи игроков ищут клубы в твоём районе. Мы доставляем — ты обслуживаешь.', icon: `<svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3 L22 8 V18 L14 23 L6 18 V8 Z"/><path d="M14 13 V23 M6 8 L14 13 L22 8"/></svg>` },
+  { title: 'Онлайн-платежи', desc: 'Деньги приходят на счёт клуба сразу. Без наличных, без админских споров.', icon: `<svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17 V21 C3 22 4 23 5 23 H23 C24 23 25 22 25 21 V17"/><path d="M14 3 V17 M9 12 L14 17 L19 12"/></svg>` },
+  { title: 'Аналитика и календарь', desc: 'Видишь загрузку по часам и дням. Понимаешь когда поднять цену, когда сделать акцию.', icon: `<svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21 V5 M3 21 H25"/><path d="M7 17 V13 M12 17 V8 M17 17 V11 M22 17 V6"/></svg>` },
+  { title: 'Без подписки', desc: 'Платишь только комиссию с реальных броней. Если игроков нет — ты ничего не платишь.', icon: `<svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="14" cy="14" r="11"/><path d="M9 14 H19 M14 9 V19"/></svg>` },
+];
+
+const cities = [
+  'Алматы', 'Астана', 'Шымкент', 'Караганда', 'Актобе',
+  'Тараз', 'Павлодар', 'Усть-Каменогорск', 'Семей', 'Атырау',
+];
+
+function fmtPrice(n: number): string {
+  return new Intl.NumberFormat('ru-RU').format(n);
 }
-
-function clubRowToDisplay(row: ClubRow): Club {
-  return {
-    slug: row.slug,
-    name: row.name,
-    city: row.city,
-    district: row.district,
-    address: row.address,
-    phone: row.phone,
-    price: row.price_per_hour,
-    rating: row.rating,
-    reviews: row.reviews_count,
-    tags: row.tags,
-    gradient: row.gradient,
-    initial: row.initial,
-    photos: row.photos ?? [],
-  };
-}
-
-const clubs = await loadAllClubs();
-const allClubs = clubs.map(clubRowToDisplay);
 ---
 
-<BaseLayout
-  title="respawn.kz — Бронируй компьютерные клубы в Казахстане"
-  description="respawn.kz — онлайн-бронирование компьютерных клубов в Казахстане. Найди клуб, забронируй слот, оплати картой."
-  activeRoute="index"
-  lcpImage="/img/club-rows.webp"
->
-  <section class="hero" id="hero">
-    <div class="hero__grid" aria-hidden="true"></div>
-    <div class="hero__scanline" aria-hidden="true"></div>
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>respawn.kz — Бронируй компьютерные клубы в Казахстане</title>
+  <meta name="description" content="respawn.kz — онлайн-бронирование компьютерных клубов в Казахстане. 80+ клубов в 10 городах. Выбирай слот, оплачивай онлайн, приходи играть." />
+  <link rel="canonical" href="https://respawn.kz/" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <meta name="theme-color" content="#0a0a0f" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="respawn.kz" />
+  <meta property="og:title" content="respawn.kz — Бронируй компьютерные клубы в Казахстане" />
+  <meta property="og:description" content="80+ клубов в 10 городах. Выбирай слот, оплачивай онлайн, приходи играть." />
+  <meta property="og:image" content="https://respawn.kz/img/club-hero.webp" />
+  <meta property="og:url" content="https://respawn.kz/" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body class="v4-root">
 
-    <HeroVisual />
-
-    <!-- Esports-broadcast-style LIVE badge top-right -->
-    <div class="hero__live" aria-label="Платформа активна">
-      <span class="hero__live-dot" aria-hidden="true"></span>
-      <span>LIVE · сейчас бронируют</span>
+  <header class="v4-header" id="v4-header">
+    <div class="v4-header__inner">
+      <a href="#top" class="v4-logo" aria-label="respawn.kz home">respawn.kz</a>
+      <nav class="v4-nav" aria-label="Главная навигация">
+        <a href="#catalog" class="v4-nav-link">Клубы</a>
+        <a href="#cities" class="v4-nav-link">Города</a>
+        <a href="#owners" class="v4-nav-link">Для клубов</a>
+        <a href="#help" class="v4-nav-link">Помощь</a>
+      </nav>
+      <div class="v4-header__actions">
+        <a href="/login/" class="v4-btn v4-btn--ghost v4-btn--sm">Войти</a>
+        <a href="#catalog" class="v4-btn v4-btn--primary v4-btn--sm">Найти клуб</a>
+      </div>
+      <button class="v4-hamburger" id="v4-hamburger" aria-label="Открыть меню" aria-expanded="false" aria-controls="v4-drawer">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/>
+        </svg>
+      </button>
     </div>
+  </header>
 
-    <div class="container hero__inner">
-      <span class="hero__tagline">Бронь без звонков · 10 городов · 80+ клубов</span>
-      <h1 class="hero__title">
-        Забронируй компьютерный клуб за <span class="glitch" data-text="30 секунд">30 секунд</span>
-      </h1>
-      <p class="hero__subtitle">
-        Выбирай слот, оплачивай онлайн, приходи играть.
-      </p>
-
-      <div class="hero__cta-row">
-        <a class="btn btn--primary btn--xl" href="/clubs/?sort=distance" id="hero-geo-cta">
-          <span class="hero__cta-icon" aria-hidden="true">
-            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M10 2 C6 2 3 5 3 9 C3 14 10 18 10 18 C10 18 17 14 17 9 C17 5 14 2 10 2 Z"/>
-              <circle cx="10" cy="9" r="2.5"/>
-            </svg>
-          </span>
-          Найти ближайший клуб
-        </a>
-        <a class="btn btn--ghost btn--xl" href="/clubs/">
-          Все клубы
-        </a>
+  <div class="v4-drawer-root" id="v4-drawer" hidden>
+    <div class="v4-drawer__backdrop" data-drawer-close></div>
+    <aside class="v4-drawer__panel" role="dialog" aria-modal="true" aria-label="Меню">
+      <div class="v4-drawer__top">
+        <span class="v4-logo">respawn.kz</span>
+        <button class="v4-hamburger" aria-label="Закрыть меню" data-drawer-close>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M6 6l12 12"/><path d="M18 6L6 18"/>
+          </svg>
+        </button>
       </div>
-
-      <div class="hero__search-block" data-reveal>
-        <div class="hero__search-block-label">или укажи параметры:</div>
-        <SearchForm variant="hero" />
+      <nav class="v4-drawer__nav" aria-label="Мобильная навигация">
+        <a href="#catalog" class="v4-drawer__nav-link" data-drawer-close>Клубы</a>
+        <a href="#cities" class="v4-drawer__nav-link" data-drawer-close>Города</a>
+        <a href="#owners" class="v4-drawer__nav-link" data-drawer-close>Для клубов</a>
+        <a href="#help" class="v4-drawer__nav-link" data-drawer-close>Помощь</a>
+      </nav>
+      <div class="v4-drawer__actions">
+        <a href="/login/" class="v4-btn v4-btn--ghost">Войти</a>
+        <a href="#catalog" class="v4-btn v4-btn--primary">Найти клуб</a>
       </div>
-    </div>
-
-    <!-- Esports-broadcast-style stat ticker at the bottom of hero -->
-    <div class="hero__ticker" aria-hidden="true">
-      <div class="hero__ticker-item">
-        <span class="hero__ticker-label">Игроков</span>
-        <span class="hero__ticker-value">12 487</span>
-      </div>
-      <span class="hero__ticker-sep">·</span>
-      <div class="hero__ticker-item">
-        <span class="hero__ticker-label">Клубов</span>
-        <span class="hero__ticker-value">82</span>
-      </div>
-      <span class="hero__ticker-sep">·</span>
-      <div class="hero__ticker-item">
-        <span class="hero__ticker-label">Городов</span>
-        <span class="hero__ticker-value">10</span>
-      </div>
-      <span class="hero__ticker-sep">·</span>
-      <div class="hero__ticker-item">
-        <span class="hero__ticker-label">Бронь</span>
-        <span class="hero__ticker-value">~30 сек</span>
-      </div>
-    </div>
-  </section>
-
-  <!-- Clubs list — moved up per user request, full catalog right after hero -->
-  <section class="clubs" id="clubs" data-reveal>
-    <div class="container">
-      <h2 class="section__title">Клубы Казахстана</h2>
-      <p class="section__subtitle">{allClubs.length} клубов в 10 городах — выбирай и бронируй</p>
-      <div class="clubs__grid">
-        {allClubs.map((club) => <ClubCard club={club} />)}
-      </div>
-      <div class="clubs__more">
-        <a class="btn btn--ghost btn--large" href="/clubs/">Открыть каталог с фильтрами</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- Supporting info — moved BELOW clubs per user request -->
-  <CitiesShowcase />
-
-  <HowItWorks />
-
-  <BookingFlowDemo />
-
-  <BenefitsSplit />
-
-  <FAQ items={LANDING_FAQ} />
-
-  <section class="cta" id="for-clubs-cta">
-    <div class="container cta__inner">
-      <div class="cta__visual" aria-hidden="true">
-        <div class="cta__visual-orb"></div>
-        <div class="cta__visual-orb cta__visual-orb--2"></div>
-      </div>
-      <h2 class="cta__title">Готов играть?</h2>
-      <p class="cta__subtitle">Найди свой клуб и забронируй слот прямо сейчас</p>
-      <div class="cta__buttons">
-        <a href="/clubs/" class="btn btn--primary btn--xl">Найти клуб</a>
-        <a href="/login/" class="btn btn--ghost btn--xl">Войти</a>
-      </div>
-    </div>
-  </section>
-
-  <div class="marquee" aria-hidden="true">
-    <div class="marquee__track">
-      <span>Алматы</span><span>Астана</span><span>Шымкент</span><span>Караганда</span><span>Актобе</span><span>Тараз</span><span>Павлодар</span><span>Усть-Каменогорск</span><span>Семей</span><span>Атырау</span>
-      <span>Алматы</span><span>Астана</span><span>Шымкент</span><span>Караганда</span><span>Актобе</span><span>Тараз</span><span>Павлодар</span><span>Усть-Каменогорск</span><span>Семей</span><span>Атырау</span>
-    </div>
+    </aside>
   </div>
 
-  <div class="cursor-glow" id="cursor-glow" aria-hidden="true"></div>
-</BaseLayout>
+  <main>
+    <!-- HERO: pinned 300vh with scroll-scrub portal video -->
+    <section id="top" class="v4-hero" aria-label="Hero" data-v4-hero>
+      <div class="v4-hero__sticky">
+        <video
+          class="v4-hero__video"
+          id="v4-hero-video"
+          muted
+          playsinline
+          preload="auto"
+          poster="/videos/hero-portal-poster.jpg"
+          aria-hidden="true">
+          <source src="/videos/hero-portal.mp4" type="video/mp4" />
+        </video>
+        <img
+          class="v4-hero__poster-img"
+          src="/videos/hero-portal-poster.jpg"
+          alt=""
+          aria-hidden="true"
+          data-v4-poster
+          hidden
+        />
+        <div class="v4-hero__vignette" aria-hidden="true"></div>
 
-<script>
-  import { setupScrollReveal } from '../scripts/scroll-reveal';
-  import { setupHeroParticles } from '../scripts/hero-particles';
-  setupScrollReveal();
-  setupHeroParticles();
+        <!-- Beat 1: opening — pre-portal -->
+        <div class="v4-hero__beat v4-hero__beat--1" data-beat="1">
+          <div class="v4-hero__beat-inner">
+            <h1 class="v4-h-hero">
+              Лучшие клубы Казахстана.<br />
+              <span class="v4-secondary">Один тап до игры.</span>
+            </h1>
+            <div class="v4-hero__cta-stack">
+              <a href="#catalog" class="v4-btn v4-btn--primary v4-btn--lg">Найти клуб</a>
+            </div>
+          </div>
+        </div>
 
-  const glow = document.getElementById('cursor-glow');
-  if (glow && window.matchMedia('(hover: hover) and (pointer: fine)').matches
-      && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    let activated = false;
-    let rafPending = false;
-    let lastX = 0;
-    let lastY = 0;
-    document.addEventListener('mousemove', (e) => {
-      lastX = e.clientX;
-      lastY = e.clientY;
-      if (!activated) {
-        glow.classList.add('is-active');
-        activated = true;
-      }
-      if (!rafPending) {
-        rafPending = true;
-        requestAnimationFrame(() => {
-          glow.style.transform = `translate(${lastX}px, ${lastY}px) translate(-50%, -50%)`;
-          rafPending = false;
+        <!-- Beat 3: post-portal — promise -->
+        <div class="v4-hero__beat v4-hero__beat--3" data-beat="3">
+          <div class="v4-hero__beat-inner">
+            <h2 class="v4-h-section">
+              Забронируй слот за <span class="v4-mono v4-accent">30</span>&nbsp;секунд.<br />
+              <span class="v4-secondary">Без звонков, без очередей.</span>
+            </h2>
+          </div>
+        </div>
+
+        <div class="v4-hero__cue" data-cue>
+          <span class="v4-eyebrow">↓ Прокрути ↓</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M6 9l6 6 6-6"/>
+          </svg>
+        </div>
+
+        <div class="v4-hero__dots" aria-hidden="true">
+          <span class="v4-hero__dot is-active" data-dot="0"></span>
+          <span class="v4-hero__dot" data-dot="1"></span>
+          <span class="v4-hero__dot" data-dot="2"></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- THREE STEPS -->
+    <section id="how" class="v4-section" aria-label="Три шага до игры">
+      <div class="v4-container">
+        <div class="v4-section-head v4-fade-up">
+          <span class="v4-eyebrow">Как это работает</span>
+          <h2 class="v4-h-section">Три шага до игры</h2>
+        </div>
+        <div class="v4-steps">
+          {steps.map((s) => (
+            <article class="v4-step v4-fade-up">
+              <div class="v4-step__num">{s.num}</div>
+              <div class="v4-step__icon" set:html={s.icon}></div>
+              <h3 class="v4-step__title">{s.title}</h3>
+              <p class="v4-step__desc">{s.desc}</p>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- CATALOG TEASER (real clubs from Supabase) -->
+    <section id="catalog" class="v4-section" aria-label="Каталог клубов">
+      <div class="v4-container">
+        <div class="v4-section-head v4-fade-up">
+          <span class="v4-eyebrow">Каталог</span>
+          <h2 class="v4-h-section">Где играть прямо сейчас</h2>
+        </div>
+        <div class="v4-catalog__grid">
+          {topClubs.map((club) => (
+            <a href={`/clubs/${club.slug}/`} class="v4-card v4-fade-up" style="text-decoration:none;color:inherit;">
+              <div class="v4-card__photo" style={club.photos?.[0] ? `background-image:url(${club.photos[0]});background-size:cover;background-position:center;` : ''}>
+                {!club.photos?.[0] && (
+                  <div class="v4-card__photo-caption">{club.initial || club.name.charAt(0).toUpperCase()}</div>
+                )}
+              </div>
+              <div class="v4-card__divider"></div>
+              <div class="v4-card__body">
+                <h3 class="v4-card__title">{club.name}</h3>
+                <p class="v4-card__meta">{club.city}{club.district ? ` · ${club.district}` : ''}</p>
+                <div class="v4-card__rating v4-mono">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path d="M12 2l2.9 6.9L22 10l-5.5 4.8L18 22l-6-3.6L6 22l1.5-7.2L2 10l7.1-1.1L12 2z"/>
+                  </svg>
+                  <span class="v4-accent">{club.rating.toFixed(1)}</span>
+                  <span class="v4-muted">({club.reviews_count}&nbsp;отзывов)</span>
+                </div>
+                <p class="v4-card__price v4-mono">от <span class="v4-accent">{fmtPrice(club.price_per_hour)} ₸</span> /час</p>
+              </div>
+            </a>
+          ))}
+        </div>
+
+        <div class="v4-catalog__cta-row">
+          <a href="/clubs/" class="v4-catalog__all v4-fade-up">
+            Все <span class="v4-mono">{allClubs.length}+</span> клубов
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M5 12h14"/><path d="M13 6l6 6-6 6"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- BENEFITS SPLIT (Players + Clubs) -->
+    <section id="benefits" class="v4-section" aria-label="Кому это полезно">
+      <div class="v4-container">
+        <div class="v4-section-head v4-fade-up" style="text-align:center;margin-inline:auto;align-items:center;">
+          <span class="v4-eyebrow">Аудитория</span>
+          <h2 class="v4-h-section">Кому это полезно</h2>
+        </div>
+        <div class="v4-benefits">
+          <div class="v4-benefits__column v4-fade-up">
+            <span class="v4-benefits__chip">Игрокам</span>
+            <h3 class="v4-benefits__title">Бронируй и играй без головняка</h3>
+            <div class="v4-benefits__list">
+              {playerBenefits.map((b) => (
+                <div class="v4-benefit">
+                  <div class="v4-benefit__icon" set:html={b.icon}></div>
+                  <div>
+                    <h4 class="v4-benefit__title">{b.title}</h4>
+                    <p class="v4-benefit__desc">{b.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <a href="/clubs/" class="v4-btn v4-btn--primary">Найти клуб</a>
+          </div>
+
+          <div class="v4-benefits__column v4-fade-up">
+            <span class="v4-benefits__chip v4-benefits__chip--owners">Клубам</span>
+            <h3 class="v4-benefits__title">Подключайся и принимай брони</h3>
+            <div class="v4-benefits__list">
+              {clubBenefits.map((b) => (
+                <div class="v4-benefit">
+                  <div class="v4-benefit__icon" set:html={b.icon}></div>
+                  <div>
+                    <h4 class="v4-benefit__title">{b.title}</h4>
+                    <p class="v4-benefit__desc">{b.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <a href="/for-clubs/" class="v4-btn v4-btn--ghost">Подключить клуб</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CITIES + STATS -->
+    <section id="cities" class="v4-section" aria-label="География">
+      <div class="v4-container">
+        <div class="v4-cities__heading v4-fade-up">
+          <h2 class="v4-h-section">10 городов Казахстана</h2>
+          <p>От Алматы до Атырау — клубы из всех крупных городов в одном каталоге</p>
+        </div>
+        <div class="v4-cities__pills v4-fade-up">
+          {cities.map((city) => (
+            <a href={`/clubs/?city=${encodeURIComponent(city)}`} class="v4-cities__pill">
+              <span class="v4-cities__pin" aria-hidden="true"></span>
+              {city}
+            </a>
+          ))}
+        </div>
+        <div class="v4-stats v4-fade-up">
+          <div class="v4-stat">
+            <span class="v4-stat__value">{allClubs.length}+</span>
+            <span class="v4-stat__label">проверенных клубов</span>
+          </div>
+          <div class="v4-stat">
+            <span class="v4-stat__value">12 000+</span>
+            <span class="v4-stat__label">активных игроков</span>
+          </div>
+          <div class="v4-stat">
+            <span class="v4-stat__value">30 сек</span>
+            <span class="v4-stat__label">занимает бронь</span>
+          </div>
+          <div class="v4-stat">
+            <span class="v4-stat__value">5%</span>
+            <span class="v4-stat__label">кэшбэк часами</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section id="faq" class="v4-section" aria-label="Частые вопросы">
+      <div class="v4-container">
+        <div class="v4-section-head v4-fade-up">
+          <span class="v4-eyebrow">Помощь</span>
+          <h2 class="v4-h-section">Частые вопросы</h2>
+        </div>
+        <div class="v4-faq__list">
+          {LANDING_FAQ.map((item) => (
+            <details class="v4-faq__item v4-fade-up" name="v4-faq-group">
+              <summary class="v4-faq__question">
+                <span>{item.q}</span>
+                <span class="v4-faq__icon" aria-hidden="true">+</span>
+              </summary>
+              <div class="v4-faq__answer">{item.a}</div>
+            </details>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- FINAL CTA -->
+    <section class="v4-final-cta" aria-label="Готов играть?">
+      <div class="v4-bloom" aria-hidden="true"></div>
+      <div class="v4-container" style="max-width:1200px;position:relative;">
+        <h2 class="v4-h-hero v4-final-cta__h v4-fade-up">Готов играть?</h2>
+        <a href="#catalog" class="v4-btn v4-btn--primary v4-btn--lg v4-final-cta__btn v4-fade-up">Найти свой клуб</a>
+        <p class="v4-mono v4-final-cta__stats v4-fade-up">
+          <span class="v4-accent">12 000+</span> игроков
+          &nbsp;·&nbsp;
+          <span class="v4-accent">80+</span> клубов
+          &nbsp;·&nbsp;
+          <span class="v4-accent">10</span> городов
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="v4-footer">
+    <div class="v4-container">
+      <div class="v4-footer__top-divider"></div>
+      <div class="v4-footer__grid">
+        <div>
+          <div class="v4-footer__col-heading">Каталог</div>
+          <ul class="v4-footer__col-list">
+            <li><a href="/clubs/?city=Алматы" class="v4-footer__col-link">Алматы</a></li>
+            <li><a href="/clubs/?city=Астана" class="v4-footer__col-link">Астана</a></li>
+            <li><a href="/clubs/?city=Шымкент" class="v4-footer__col-link">Шымкент</a></li>
+            <li><a href="/clubs/" class="v4-footer__col-link">Все города</a></li>
+          </ul>
+        </div>
+        <div>
+          <div class="v4-footer__col-heading">Для клубов</div>
+          <ul class="v4-footer__col-list">
+            <li><a href="/for-clubs/" class="v4-footer__col-link">Подключиться</a></li>
+            <li><a href="/for-clubs/#pricing" class="v4-footer__col-link">Тарифы</a></li>
+            <li><a href="/for-clubs/#support" class="v4-footer__col-link">Поддержка</a></li>
+          </ul>
+        </div>
+        <div>
+          <div class="v4-footer__col-heading">Помощь</div>
+          <ul class="v4-footer__col-list">
+            <li><a href="/#faq" class="v4-footer__col-link">FAQ</a></li>
+            <li><a href="/about/" class="v4-footer__col-link">Контакты</a></li>
+            <li><a href="https://t.me/respawn_kz_support" class="v4-footer__col-link">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M22 3L2 11l6 2 2 7 4-5 7 5 1-17z"/><path d="M8 13l8-5"/>
+              </svg>
+              Telegram @respawn_kz_support
+            </a></li>
+          </ul>
+        </div>
+        <div>
+          <div class="v4-footer__col-heading">Юр.</div>
+          <ul class="v4-footer__col-list">
+            <li><a href="/privacy/" class="v4-footer__col-link">Политика конфиденциальности</a></li>
+            <li><a href="/terms/" class="v4-footer__col-link">Условия использования</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="v4-footer__bottom">
+        <span class="v4-logo">respawn.kz</span>
+        <span class="v4-footer__copyright v4-mono">© 2026 respawn.kz · Алматы, Казахстан</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Header scrolled state
+    (() => {
+      const header = document.getElementById('v4-header');
+      if (!header) return;
+      const onScroll = () => {
+        if (window.scrollY > 80) header.classList.add('is-scrolled');
+        else header.classList.remove('is-scrolled');
+      };
+      onScroll();
+      window.addEventListener('scroll', onScroll, { passive: true });
+    })();
+
+    // Mobile drawer
+    (() => {
+      const drawer = document.getElementById('v4-drawer');
+      const hamburger = document.getElementById('v4-hamburger');
+      if (!drawer || !hamburger) return;
+      const open = () => {
+        drawer.hidden = false;
+        hamburger.setAttribute('aria-expanded', 'true');
+        document.body.style.overflow = 'hidden';
+      };
+      const close = () => {
+        drawer.hidden = true;
+        hamburger.setAttribute('aria-expanded', 'false');
+        document.body.style.overflow = '';
+      };
+      hamburger.addEventListener('click', open);
+      drawer.querySelectorAll('[data-drawer-close]').forEach((el) => {
+        el.addEventListener('click', close);
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !drawer.hidden) close();
+      });
+    })();
+
+    // Hero scroll-scrub + beat overlays
+    (() => {
+      const hero = document.querySelector('[data-v4-hero]');
+      if (!hero) return;
+      const video = /** @type {HTMLVideoElement|null} */ (document.getElementById('v4-hero-video'));
+      const poster = hero.querySelector('[data-v4-poster]');
+      const beats = hero.querySelectorAll('[data-beat]');
+      const dots = hero.querySelectorAll('[data-dot]');
+      const cue = hero.querySelector('[data-cue]');
+
+      const isMobile = window.matchMedia('(max-width: 640px)');
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+      const setStaticMode = () => {
+        // Mobile / reduced-motion: video autoplay-loops, no scrub
+        if (poster) poster.setAttribute('hidden', '');
+        if (video) {
+          video.style.display = 'block';
+          if (reduced.matches) {
+            // True reduced motion: pause + show poster
+            video.style.display = 'none';
+            if (poster) poster.removeAttribute('hidden');
+            try { video.pause(); } catch (_) {}
+          } else {
+            // Mobile: loop+autoplay (no scrub)
+            video.loop = true;
+            video.muted = true;
+            const playPromise = video.play();
+            if (playPromise && typeof playPromise.catch === 'function') {
+              playPromise.catch(() => { /* autoplay may be blocked; ignore */ });
+            }
+          }
+        }
+        beats.forEach((b) => {
+          b.classList.toggle('is-active', b.dataset.beat === '1');
         });
-      }
-    });
-    document.addEventListener('mouseleave', () => {
-      glow.classList.remove('is-active');
-      activated = false;
-    });
-  }
+        if (cue) cue.classList.remove('is-active');
+        dots.forEach((d, i) => d.classList.toggle('is-active', i === 0));
+      };
 
-  const geoBtn = document.getElementById('hero-geo-cta') as HTMLAnchorElement | null;
-  if (geoBtn && navigator.geolocation) {
-    geoBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      geoBtn.style.opacity = '0.7';
-      geoBtn.style.pointerEvents = 'none';
-      navigator.geolocation.getCurrentPosition(
-        () => { window.location.href = '/clubs/?sort=distance'; },
-        () => {
-          geoBtn.style.opacity = '';
-          geoBtn.style.pointerEvents = '';
-          window.location.href = '/clubs/';
-        },
-        { timeout: 8000, maximumAge: 60_000 },
-      );
-    });
-  }
-</script>
+      const setInteractiveMode = () => {
+        // Desktop: scroll-scrub mode — pause autoplay, reset, scrub controls time
+        if (video) {
+          video.style.display = 'block';
+          video.loop = false;
+          try { video.pause(); video.currentTime = 0; } catch (_) {}
+        }
+        if (poster) poster.setAttribute('hidden', '');
+      };
+
+      const onStateChange = () => {
+        if (isMobile.matches || reduced.matches) setStaticMode();
+        else setInteractiveMode();
+      };
+      onStateChange();
+      isMobile.addEventListener('change', onStateChange);
+      reduced.addEventListener('change', onStateChange);
+
+      // Lerp video.currentTime toward target every animation frame.
+      // Even when scroll stops, the video keeps easing into its final
+      // frame, which removes the "stepping" feel of raw scroll-scrub.
+      let targetTime = 0;
+      let currentTime = 0;
+      let tickActive = false;
+      const ease = 0.22; // 0.18-0.30 sweet spot — lower = smoother but laggy
+
+      const tick = () => {
+        const diff = targetTime - currentTime;
+        if (Math.abs(diff) < 0.004) {
+          currentTime = targetTime;
+          if (video) { try { video.currentTime = currentTime; } catch (_) {} }
+          tickActive = false;
+          return;
+        }
+        currentTime += diff * ease;
+        if (video) { try { video.currentTime = currentTime; } catch (_) {} }
+        requestAnimationFrame(tick);
+      };
+
+      const startTick = () => {
+        if (tickActive) return;
+        tickActive = true;
+        requestAnimationFrame(tick);
+      };
+
+      let rafPending = false;
+      let lastProgress = -1;
+      const update = () => {
+        rafPending = false;
+        if (isMobile.matches || reduced.matches) return;
+        const rect = hero.getBoundingClientRect();
+        const total = hero.offsetHeight - window.innerHeight;
+        const passed = Math.min(Math.max(-rect.top, 0), total);
+        const progress = total > 0 ? passed / total : 0;
+        if (Math.abs(progress - lastProgress) < 0.0005) return;
+        lastProgress = progress;
+
+        if (video && video.duration && isFinite(video.duration)) {
+          targetTime = Math.min(Math.max(progress, 0), 0.9999) * video.duration;
+          startTick();
+        }
+
+        const beat1Active = progress < 0.33;
+        const beat3Active = progress >= 0.66;
+        beats.forEach((b) => {
+          const which = b.dataset.beat;
+          if (which === '1') b.classList.toggle('is-active', beat1Active);
+          else if (which === '3') b.classList.toggle('is-active', beat3Active);
+        });
+        dots.forEach((d, i) => {
+          const active =
+            (i === 0 && beat1Active) ||
+            (i === 1 && !beat1Active && !beat3Active) ||
+            (i === 2 && beat3Active);
+          d.classList.toggle('is-active', active);
+        });
+        if (cue) cue.classList.toggle('is-active', beat1Active && progress < 0.15);
+      };
+
+      const onScroll = () => {
+        if (rafPending) return;
+        rafPending = true;
+        requestAnimationFrame(update);
+      };
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', onScroll);
+      // Initial paint synchronously (rAF is paused on hidden tabs).
+      update();
+      requestAnimationFrame(update);
+    })();
+
+    // Fade-up reveal
+    (() => {
+      const els = document.querySelectorAll('.v4-fade-up');
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add('is-in');
+            io.unobserve(e.target);
+          }
+        });
+      }, { threshold: 0.15 });
+      els.forEach((el) => io.observe(el));
+    })();
+  </script>
+</body>
+</html>
