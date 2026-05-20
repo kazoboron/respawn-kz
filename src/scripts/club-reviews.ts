@@ -90,7 +90,11 @@ const SORT_CONFIG: Record<SortKey, { column: 'created_at' | 'rating'; ascending:
 };
 
 export async function setupClubReviews(): Promise<void> {
-  const slug = (window as unknown as { __clubReviewsSlug?: string }).__clubReviewsSlug;
+  // Prefer data-club-slug attribute on the section (no module-timing races).
+  // Fall back to legacy window global for any cached HTML.
+  const section = document.getElementById('reviews-section');
+  const slug = section?.dataset?.clubSlug
+    || (window as unknown as { __clubReviewsSlug?: string }).__clubReviewsSlug;
   const listEl = document.getElementById('reviews-list') as HTMLUListElement | null;
   const loadingEl = document.getElementById('reviews-loading');
   const errorEl = document.getElementById('reviews-error');
