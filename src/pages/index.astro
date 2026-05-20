@@ -133,33 +133,8 @@ function fmtPrice(n: number): string {
           preload="auto"
           poster="/videos/hero-portal-poster.jpg"
           aria-hidden="true">
-          <!-- Default = 1080p all-keyframe (14.4 MB). Hero inline-script
-               below replaces this with the 720p (5.4 MB) variant for
-               viewports < 769px before the video starts buffering, so
-               mobile gets the smaller file. Both variants are encoded
-               with -g 1 so every frame is a keyframe → scroll-scrub
-               seeks land instantly without forward-decoding from a
-               distant GOP root. -->
-          <source id="v4-hero-source" src="/videos/hero-portal-1080.mp4" type="video/mp4" />
+          <source src="/videos/hero-portal.mp4" type="video/mp4" />
         </video>
-        <script is:inline>
-          // Source swap before main scrub init. Runs synchronously inline
-          // so the browser sees the correct src as soon as the video parses
-          // (not after end-of-body modules). Worst case on mobile: ~50KB of
-          // 1080p TCP handshake before swap — negligible.
-          (() => {
-            try {
-              if (window.innerWidth < 769) {
-                const src = document.getElementById('v4-hero-source');
-                const vid = document.getElementById('v4-hero-video');
-                if (src && vid) {
-                  src.src = '/videos/hero-portal.mp4';
-                  vid.load();
-                }
-              }
-            } catch (_) {}
-          })();
-        </script>
         <img
           class="v4-hero__poster-img"
           src="/videos/hero-portal-poster.jpg"
