@@ -2,6 +2,7 @@
 import '../styles/respawn-v4.css';
 import { loadAllClubs } from '../lib/clubs-loader';
 import { LANDING_FAQ } from '../data/content';
+import { CITIES } from '../data/cities';
 import BetaBanner from '../components/BetaBanner.astro';
 
 const allClubs = await loadAllClubs();
@@ -44,10 +45,11 @@ const clubBenefits = [
   { title: 'Без подписки', desc: 'Платишь только комиссию с реальных броней. Если игроков нет — ты ничего не платишь.', icon: `<svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="14" cy="14" r="11"/><path d="M9 14 H19 M14 9 V19"/></svg>` },
 ];
 
-const cities = [
-  'Алматы', 'Астана', 'Шымкент', 'Караганда', 'Актобе',
-  'Тараз', 'Павлодар', 'Усть-Каменогорск', 'Семей', 'Атырау',
-];
+// Use the canonical CITIES list (id + label) so URLs use slug `?city=almaty`
+// which matches the catalog filter logic in filters.ts (strict id equality).
+// Russian labels in URLs were a bug — they never matched because club.city
+// holds the slug, not the label.
+const cities = CITIES;
 
 function fmtPrice(n: number): string {
   return new Intl.NumberFormat('ru-RU').format(n);
@@ -185,6 +187,43 @@ function fmtPrice(n: number): string {
       </div>
     </section>
 
+    <!-- SEARCH BAR — sits right under the hero so the first thing after the
+         video reveal is "find a club". Submits to /clubs/ with city+query
+         which the catalog page reads via queryToFilters() in filters.ts. -->
+    <section class="v4-searchbar-section" aria-label="Поиск клубов">
+      <div class="v4-container">
+        <form class="v4-searchbar v4-fade-up" action="/clubs/" method="get" role="search">
+          <label class="v4-searchbar__field v4-searchbar__field--city">
+            <span class="v4-searchbar__label">Город</span>
+            <select name="city" class="v4-searchbar__select" aria-label="Город">
+              <option value="">Все города</option>
+              {cities.map((c) => (
+                <option value={c.id}>{c.label}</option>
+              ))}
+            </select>
+          </label>
+          <label class="v4-searchbar__field v4-searchbar__field--query">
+            <span class="v4-searchbar__label">Что ищешь</span>
+            <input
+              type="search"
+              name="q"
+              class="v4-searchbar__input"
+              placeholder="Название клуба, район, теги (PC, PS5, VR…)"
+              aria-label="Поиск клубов"
+              autocomplete="off"
+            />
+          </label>
+          <button type="submit" class="v4-btn v4-btn--primary v4-searchbar__submit">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="11" cy="11" r="7"/>
+              <path d="M21 21l-4.3-4.3"/>
+            </svg>
+            <span>Найти</span>
+          </button>
+        </form>
+      </div>
+    </section>
+
     <!-- CATALOG TEASER (real clubs from Supabase) -->
     <section id="catalog" class="v4-section" aria-label="Каталог клубов">
       <div class="v4-container">
@@ -302,9 +341,9 @@ function fmtPrice(n: number): string {
         </div>
         <div class="v4-cities__pills v4-fade-up">
           {cities.map((city) => (
-            <a href={`/clubs/?city=${encodeURIComponent(city)}`} class="v4-cities__pill">
+            <a href={`/clubs/?city=${city.id}`} class="v4-cities__pill">
               <span class="v4-cities__pin" aria-hidden="true"></span>
-              {city}
+              {city.label}
             </a>
           ))}
         </div>
@@ -374,9 +413,9 @@ function fmtPrice(n: number): string {
         <div>
           <div class="v4-footer__col-heading">Каталог</div>
           <ul class="v4-footer__col-list">
-            <li><a href="/clubs/?city=Алматы" class="v4-footer__col-link">Алматы</a></li>
-            <li><a href="/clubs/?city=Астана" class="v4-footer__col-link">Астана</a></li>
-            <li><a href="/clubs/?city=Шымкент" class="v4-footer__col-link">Шымкент</a></li>
+            <li><a href="/clubs/?city=almaty" class="v4-footer__col-link">Алматы</a></li>
+            <li><a href="/clubs/?city=astana" class="v4-footer__col-link">Астана</a></li>
+            <li><a href="/clubs/?city=shymkent" class="v4-footer__col-link">Шымкент</a></li>
             <li><a href="/clubs/" class="v4-footer__col-link">Все города</a></li>
           </ul>
         </div>

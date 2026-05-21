@@ -810,6 +810,109 @@
 .v4-drawer__actions { margin-top: 32px; display: flex; flex-direction: column; gap: 12px; }
 .v4-drawer__actions .v4-btn { width: 100%; }
 
+/* Search bar — sits between hero and catalog, lets user jump straight to
+   /clubs/?city=...&q=... without scrolling through the catalog teaser. */
+.v4-searchbar-section {
+  padding: 32px 0 0;
+  position: relative;
+  /* Pull the bar up a touch so it visually attaches to the bottom of hero,
+     not floats in dead space above the catalog. Margin-top negative on the
+     form so the section's top padding doesn't make it sag. */
+  margin-top: -56px;
+}
+.v4-searchbar {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  padding: 10px;
+  background: var(--v4-bg-surface);
+  border: 1px solid var(--v4-border-soft);
+  border-radius: 999px;
+  /* Soft glow so the bar reads as an interactive surface, not a passive card */
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(139, 92, 246, 0.08);
+  position: relative;
+  z-index: 4;
+}
+.v4-searchbar__field {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 8px 18px;
+  border-radius: 999px;
+  transition: background 200ms ease;
+  min-width: 0;  /* allow shrink */
+}
+.v4-searchbar__field:hover { background: rgba(255, 255, 255, 0.03); }
+.v4-searchbar__field--city { flex: 0 1 200px; }
+.v4-searchbar__field--query { flex: 1 1 auto; }
+.v4-searchbar__label {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--v4-text-muted);
+  margin-bottom: 2px;
+  line-height: 1;
+}
+.v4-searchbar__select,
+.v4-searchbar__input {
+  background: transparent;
+  border: 0;
+  outline: 0;
+  color: var(--v4-text-primary);
+  font: inherit;
+  font-size: 15px;
+  font-family: 'Inter', sans-serif;
+  letter-spacing: -0.01em;
+  padding: 0;
+  width: 100%;
+  min-width: 0;
+}
+.v4-searchbar__select {
+  appearance: none;
+  /* Custom chevron */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23a3a3a3' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0 center;
+  padding-right: 18px;
+  cursor: pointer;
+}
+.v4-searchbar__select option {
+  background: var(--v4-bg-elevated);
+  color: var(--v4-text-primary);
+}
+.v4-searchbar__input::placeholder { color: var(--v4-text-muted); }
+.v4-searchbar__input::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }
+.v4-searchbar__submit {
+  flex: 0 0 auto;
+  padding: 14px 24px;
+  border-radius: 999px;
+}
+.v4-searchbar__submit svg { flex: 0 0 auto; }
+
+@media (max-width: 720px) {
+  .v4-searchbar-section { margin-top: -24px; padding: 24px 0 0; }
+  .v4-searchbar {
+    flex-direction: column;
+    border-radius: 24px;
+    padding: 8px;
+    gap: 4px;
+  }
+  .v4-searchbar__field {
+    flex: 1 1 auto;
+    padding: 10px 14px;
+    border-radius: 18px;
+  }
+  .v4-searchbar__field--city { flex: 1 1 auto; }
+  .v4-searchbar__submit {
+    width: 100%;
+    margin-top: 4px;
+    padding: 14px 20px;
+  }
+}
+
 ::selection { background: rgba(139,92,246,0.4); color: #fff; }
 
 /* Reduced motion */
