@@ -897,11 +897,61 @@
 }
 .v4-searchbar__submit svg { flex: 0 0 auto; }
 
+/* Quick chips row under the search bar — popular cities + trust info */
+.v4-searchbar__chips {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 6px 0;
+  flex-wrap: wrap;
+}
+.v4-searchbar__chips-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.v4-searchbar__chips-label {
+  font-size: 13px;
+  color: var(--v4-text-muted);
+  margin-right: 4px;
+}
+.v4-searchbar__chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--v4-border-soft);
+  color: var(--v4-text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background 200ms ease, border-color 200ms ease, color 200ms ease, transform 200ms ease;
+}
+.v4-searchbar__chip:hover {
+  background: rgba(139, 92, 246, 0.10);
+  border-color: var(--v4-border-hover);
+  color: var(--v4-text-primary);
+  transform: translateY(-1px);
+}
+.v4-searchbar__chips-info {
+  font-size: 12px;
+  color: var(--v4-text-muted);
+  margin: 0;
+  white-space: nowrap;
+}
+
 @media (max-width: 720px) {
   .v4-searchbar-section { padding: 24px 0 12px; }
   /* Top variant on mobile: header is still 68px, beta-banner 52px when shown
      (taller font on mobile) — keep enough top padding. */
   .v4-searchbar-section--top { padding-top: 88px; }
+  .v4-searchbar__chips { flex-direction: column; align-items: flex-start; gap: 10px; padding-top: 10px; }
+  .v4-searchbar__chips-info { font-size: 11px; }
+  .v4-searchbar__chip { font-size: 12px; padding: 5px 11px; }
+  .v4-searchbar__chips-label { font-size: 12px; }
   .v4-searchbar {
     flex-direction: column;
     border-radius: 24px;

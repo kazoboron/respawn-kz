@@ -161,6 +161,27 @@ function fmtPrice(n: number): string {
             <span>Найти</span>
           </button>
         </form>
+
+        <!-- Quick links under the bar — popular cities as one-click filters,
+             plus a short trust line on the right. Same /clubs/?city=… URL
+             contract as the search form. -->
+        <div class="v4-searchbar__chips v4-fade-up">
+          <div class="v4-searchbar__chips-group" aria-label="Популярные города">
+            <span class="v4-searchbar__chips-label">Популярные города:</span>
+            <a href="/clubs/?city=almaty" class="v4-searchbar__chip">Алматы</a>
+            <a href="/clubs/?city=astana" class="v4-searchbar__chip">Астана</a>
+            <a href="/clubs/?city=shymkent" class="v4-searchbar__chip">Шымкент</a>
+            <a href="/clubs/?city=karaganda" class="v4-searchbar__chip">Караганда</a>
+            <a href="/clubs/?city=aktobe" class="v4-searchbar__chip">Актобе</a>
+          </div>
+          <p class="v4-searchbar__chips-info v4-mono">
+            <span class="v4-accent">{allClubs.length}+</span>&nbsp;клубов
+            &nbsp;·&nbsp;
+            <span class="v4-accent">10</span>&nbsp;городов
+            &nbsp;·&nbsp;
+            <span class="v4-accent">5%</span>&nbsp;кэшбэк часами
+          </p>
+        </div>
       </div>
     </section>
 
