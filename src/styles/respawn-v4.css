@@ -810,15 +810,20 @@
 .v4-drawer__actions { margin-top: 32px; display: flex; flex-direction: column; gap: 12px; }
 .v4-drawer__actions .v4-btn { width: 100%; }
 
-/* Search bar — sits between hero and catalog, lets user jump straight to
-   /clubs/?city=...&q=... without scrolling through the catalog teaser. */
+/* Search bar — placed BEFORE the hero, immediately under the fixed v4-header.
+   Submits to /clubs/?city=...&q=... which the catalog page picks up via
+   queryToFilters() in filters.ts. The `--top` modifier sets the layout for
+   this top-of-page position. (Old between-hero-and-catalog layout was removed
+   2026-05-21 per user request.) */
 .v4-searchbar-section {
-  padding: 32px 0 0;
+  padding: 32px 0 16px;
   position: relative;
-  /* Pull the bar up a touch so it visually attaches to the bottom of hero,
-     not floats in dead space above the catalog. Margin-top negative on the
-     form so the section's top padding doesn't make it sag. */
-  margin-top: -56px;
+}
+.v4-searchbar-section--top {
+  /* Clear the 68px fixed header + ~24px breathing room. Beta-banner adds
+     38px on top via global :has() rule in BetaBanner.astro, so 92px total
+     here keeps the search field always visible below header even with banner. */
+  padding-top: 92px;
 }
 .v4-searchbar {
   display: flex;
@@ -893,7 +898,10 @@
 .v4-searchbar__submit svg { flex: 0 0 auto; }
 
 @media (max-width: 720px) {
-  .v4-searchbar-section { margin-top: -24px; padding: 24px 0 0; }
+  .v4-searchbar-section { padding: 24px 0 12px; }
+  /* Top variant on mobile: header is still 68px, beta-banner 52px when shown
+     (taller font on mobile) — keep enough top padding. */
+  .v4-searchbar-section--top { padding-top: 88px; }
   .v4-searchbar {
     flex-direction: column;
     border-radius: 24px;

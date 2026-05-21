@@ -126,6 +126,44 @@ function fmtPrice(n: number): string {
   </div>
 
   <main>
+    <!-- SEARCH BAR — moved here to sit immediately under the fixed header.
+         User sees it before scrolling, parallel to the «Войти» / «Найти клуб»
+         actions in the header. Submits to /clubs/?city=…&q=… which the
+         catalog page reads via queryToFilters() in filters.ts. -->
+    <section class="v4-searchbar-section v4-searchbar-section--top" aria-label="Поиск клубов">
+      <div class="v4-container">
+        <form class="v4-searchbar v4-fade-up" action="/clubs/" method="get" role="search">
+          <label class="v4-searchbar__field v4-searchbar__field--city">
+            <span class="v4-searchbar__label">Город</span>
+            <select name="city" class="v4-searchbar__select" aria-label="Город">
+              <option value="">Все города</option>
+              {cities.map((c) => (
+                <option value={c.id}>{c.label}</option>
+              ))}
+            </select>
+          </label>
+          <label class="v4-searchbar__field v4-searchbar__field--query">
+            <span class="v4-searchbar__label">Что ищешь</span>
+            <input
+              type="search"
+              name="q"
+              class="v4-searchbar__input"
+              placeholder="Название клуба, район, теги (PC, PS5, VR…)"
+              aria-label="Поиск клубов"
+              autocomplete="off"
+            />
+          </label>
+          <button type="submit" class="v4-btn v4-btn--primary v4-searchbar__submit">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="11" cy="11" r="7"/>
+              <path d="M21 21l-4.3-4.3"/>
+            </svg>
+            <span>Найти</span>
+          </button>
+        </form>
+      </div>
+    </section>
+
     <!-- HERO: pinned 300vh with scroll-scrub portal video -->
     <section id="top" class="v4-hero" aria-label="Hero" data-v4-hero>
       <div class="v4-hero__sticky">
@@ -184,43 +222,6 @@ function fmtPrice(n: number): string {
           <span class="v4-hero__dot" data-dot="1"></span>
           <span class="v4-hero__dot" data-dot="2"></span>
         </div>
-      </div>
-    </section>
-
-    <!-- SEARCH BAR — sits right under the hero so the first thing after the
-         video reveal is "find a club". Submits to /clubs/ with city+query
-         which the catalog page reads via queryToFilters() in filters.ts. -->
-    <section class="v4-searchbar-section" aria-label="Поиск клубов">
-      <div class="v4-container">
-        <form class="v4-searchbar v4-fade-up" action="/clubs/" method="get" role="search">
-          <label class="v4-searchbar__field v4-searchbar__field--city">
-            <span class="v4-searchbar__label">Город</span>
-            <select name="city" class="v4-searchbar__select" aria-label="Город">
-              <option value="">Все города</option>
-              {cities.map((c) => (
-                <option value={c.id}>{c.label}</option>
-              ))}
-            </select>
-          </label>
-          <label class="v4-searchbar__field v4-searchbar__field--query">
-            <span class="v4-searchbar__label">Что ищешь</span>
-            <input
-              type="search"
-              name="q"
-              class="v4-searchbar__input"
-              placeholder="Название клуба, район, теги (PC, PS5, VR…)"
-              aria-label="Поиск клубов"
-              autocomplete="off"
-            />
-          </label>
-          <button type="submit" class="v4-btn v4-btn--primary v4-searchbar__submit">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <circle cx="11" cy="11" r="7"/>
-              <path d="M21 21l-4.3-4.3"/>
-            </svg>
-            <span>Найти</span>
-          </button>
-        </form>
       </div>
     </section>
 
