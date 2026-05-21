@@ -2,6 +2,7 @@ import { supabase } from '../lib/supabase';
 import { type ClubRow, type NewBooking } from '../data/supabase-types';
 import { saveReturnUrl, getCurrentUser } from './auth';
 import { openBookingFormModal } from './booking-form';
+import { openModal } from './modal';
 
 function parseClubData(btn: HTMLElement): ClubRow | null {
   const raw = btn.getAttribute('data-club');
@@ -80,8 +81,25 @@ async function handleBookingClick(btn: HTMLElement): Promise<void> {
 
   const user = await getCurrentUser();
   if (!user) {
+    // Previously: immediate redirect to /login/. Users reported this felt like
+    // being "thrown" back to the homepage — they didn't see the login intent.
+    // Now: show an explicit confirm modal so the redirect is user-initiated.
     saveReturnUrl(window.location.pathname + window.location.search);
-    window.location.href = `/login/?return=${encodeURIComponent(window.location.pathname)}`;
+    openModal({
+      title: 'Войди чтобы забронировать',
+      body: `
+        <p style="margin:0 0 16px">
+          Для брони слота в <strong>${club.name}</strong> нужно войти в аккаунт.
+          Магическая ссылка придёт на почту — пароль не нужен.
+        </p>
+        <div style="display:flex;gap:12px;flex-wrap:wrap">
+          <a href="/login/?return=${encodeURIComponent(window.location.pathname)}" class="btn btn--primary" data-login-cta>Войти</a>
+          <button type="button" class="btn btn--ghost" data-modal-close>Отмена</button>
+        </div>
+      `,
+    });
+    // The login anchor is a normal <a> — clicking will navigate. The modal
+    // doesn't need to close first because the page unloads anyway.
     return;
   }
 
