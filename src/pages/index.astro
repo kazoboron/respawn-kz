@@ -2,6 +2,7 @@
 import '../styles/respawn-v4.css';
 import { loadAllClubs } from '../lib/clubs-loader';
 import { LANDING_FAQ } from '../data/content';
+import BetaBanner from '../components/BetaBanner.astro';
 
 const allClubs = await loadAllClubs();
 // Show ALL clubs on the homepage (user request 2026-05-20: «давай сразу
@@ -75,6 +76,7 @@ function fmtPrice(n: number): string {
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
 </head>
 <body class="v4-root">
+  <BetaBanner />
 
   <header class="v4-header" id="v4-header">
     <div class="v4-header__inner">

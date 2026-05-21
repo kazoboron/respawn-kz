@@ -44,6 +44,32 @@ const TEMPLATES: Record<string, TemplateDef> = {
     `,
   },
 
+  booking_pending_customer: {
+    subject: (p) => `Бронь принята — ${p.club_name}, ${p.date}`,
+    bodyHtml: (p) => `
+      <h1>Бронь принята, ждём подтверждения клуба</h1>
+      <p>Твоя бронь записана. Клуб <strong>${e(p.club_name)}</strong> должен подтвердить её в течение нескольких часов — придёт ещё одно письмо.</p>
+      <ul>
+        <li>Дата: ${e(p.date)}</li>
+        <li>Время: ${e(p.time_slot)} (${e(p.hours)} ч)</li>
+        <li>Сумма: ${e(p.total_price)} ₸ — оплата в клубе по факту</li>
+      </ul>
+      <p>Если клуб не подтвердит за сутки — отмени бронь в <a href="${SITE_URL}/me/">личном кабинете</a> и попробуй другой клуб.</p>
+      <p style="color:#888;font-size:13px">Сервис в режиме закрытой беты. Если что-то пошло не так — напиши на <a href="https://t.me/respawn_kz_support">@respawn_kz_support</a>.</p>
+    `,
+    bodyText: (p) => `
+Бронь принята, ждём подтверждения клуба ${p.club_name}.
+
+Дата: ${p.date}
+Время: ${p.time_slot} (${p.hours} ч)
+Сумма: ${p.total_price} ₸ — оплата в клубе по факту
+
+Если клуб не подтвердит за сутки — отмени бронь в ${SITE_URL}/me/ и попробуй другой клуб.
+
+Сервис в режиме закрытой беты. Поддержка: https://t.me/respawn_kz_support
+    `,
+  },
+
   booking_confirmed: {
     subject: (p) => `Бронь подтверждена — ${p.club_name}, ${p.date}`,
     bodyHtml: (p) => `

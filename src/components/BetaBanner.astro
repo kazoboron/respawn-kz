@@ -1,0 +1,125 @@
+---
+/**
+ * Closed-beta indicator + magic-link spam hint.
+ * Shows on every page, dismissible per sessionStorage so it doesn't
+ * spam the same user across SPA-feel navigation.
+ *
+ * Used in BaseLayout (inner pages) and index.astro (v4 homepage standalone).
+ * Designed to be safe inside any layout — fixed position, high z-index,
+ * minimal DOM. Visible immediately, no FOUC.
+ */
+---
+
+<div class="beta-banner" id="beta-banner" hidden>
+  <div class="beta-banner__inner">
+    <span class="beta-banner__pill">BETA</span>
+    <span class="beta-banner__text">
+      Сервис в закрытом тестировании. Магическая ссылка приходит на почту —
+      проверь папку <strong>«Спам»</strong>, если не нашёл письмо.
+    </span>
+    <button
+      type="button"
+      class="beta-banner__close"
+      id="beta-banner-close"
+      aria-label="Закрыть"
+    >×</button>
+  </div>
+</div>
+
+<script is:inline>
+  (() => {
+    try {
+      const banner = document.getElementById('beta-banner');
+      const close = document.getElementById('beta-banner-close');
+      if (!banner) return;
+      // Show unless already dismissed in this session
+      if (sessionStorage.getItem('beta-banner-dismissed') !== '1') {
+        banner.hidden = false;
+      }
+      close?.addEventListener('click', () => {
+        banner.hidden = true;
+        try { sessionStorage.setItem('beta-banner-dismissed', '1'); } catch {}
+      });
+    } catch {}
+  })();
+</script>
+
+<style is:global>
+  .beta-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: linear-gradient(90deg, rgba(139, 92, 246, 0.95) 0%, rgba(217, 70, 239, 0.95) 100%);
+    color: #fff;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.3);
+  }
+  .beta-banner[hidden] { display: none; }
+  .beta-banner__inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 8px 16px 8px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+    line-height: 1.4;
+  }
+  .beta-banner__pill {
+    flex: 0 0 auto;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    padding: 3px 9px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.22);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    text-transform: uppercase;
+  }
+  .beta-banner__text { flex: 1 1 auto; min-width: 0; }
+  .beta-banner__text strong { font-weight: 600; }
+  .beta-banner__close {
+    flex: 0 0 auto;
+    width: 28px;
+    height: 28px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 200ms ease;
+  }
+  .beta-banner__close:hover { background: rgba(255, 255, 255, 0.2); }
+
+  /* Banner is fixed at top; shift other fixed headers down by its height when visible */
+  body:has(.beta-banner:not([hidden])) .header,
+  body:has(.beta-banner:not([hidden])) .v4-header {
+    top: 38px;
+  }
+  body:has(.beta-banner:not([hidden])) main {
+    padding-top: 38px;
+  }
+  /* v4 homepage hero is full-bleed sticky — push down via padding on root */
+  body.v4-root:has(.beta-banner:not([hidden])) {
+    padding-top: 38px;
+  }
+
+  @media (max-width: 640px) {
+    .beta-banner__inner { font-size: 12px; padding: 6px 12px 6px 14px; gap: 8px; }
+    .beta-banner__pill { font-size: 9px; padding: 2px 7px; }
+    .beta-banner__close { width: 24px; height: 24px; font-size: 16px; }
+    body:has(.beta-banner:not([hidden])) .header,
+    body:has(.beta-banner:not([hidden])) .v4-header { top: 52px; }
+    body:has(.beta-banner:not([hidden])) main { padding-top: 52px; }
+    body.v4-root:has(.beta-banner:not([hidden])) { padding-top: 52px; }
+  }
+</style>

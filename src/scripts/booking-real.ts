@@ -112,11 +112,20 @@ async function handleBookingClick(btn: HTMLElement): Promise<void> {
     title: `Забронировать — ${club.name}`,
     intro: `<strong>${club.name}</strong> · ${club.district ?? ''} · ${club.address}`,
     submitLabel: 'Забронировать',
-    successTitle: 'Бронь сохранена!',
+    successTitle: 'Бронь сохранена',
     successBody: (d) => `
-      <p>Запись о брони добавлена.</p>
-      <p style="margin-top:12px">Клуб <strong>${club.name}</strong>, дата <span class="modal__highlight">${d.date}</span>, время <span class="modal__highlight">${d.time_slot}</span>, <span class="modal__highlight">${d.hours} ч</span> · итого <span class="modal__highlight">${formatPrice(d.total_price)} ₸</span>${d.redeem_hours > 0 ? ` · кэшбэк <span class="modal__highlight">${d.redeem_hours.toFixed(2)} ч</span>` : ''}.</p>
-      <p style="margin-top:12px;color:var(--text-secondary)">Статус: ожидает подтверждения. Управление: <a href="/me/" style="color:var(--neon-cyan)">личный кабинет</a>.</p>
+      <p style="margin:0 0 14px">
+        <strong>${club.name}</strong>, <span class="modal__highlight">${d.date}</span> в
+        <span class="modal__highlight">${d.time_slot}</span>, <span class="modal__highlight">${d.hours} ч</span>
+        · итого <span class="modal__highlight">${formatPrice(d.total_price)} ₸</span>${d.redeem_hours > 0 ? ` (кэшбэк ${d.redeem_hours.toFixed(2)} ч списан)` : ''}.
+      </p>
+      <p style="margin:0 0 14px;color:var(--text-secondary);line-height:1.5">
+        <strong>Что дальше:</strong> клуб подтвердит бронь в течение нескольких часов — на почту придёт уведомление.
+        Если не подтвердят за день — отмени бронь в <a href="/me/" style="color:var(--accent)">личном кабинете</a> и попробуй другой клуб.
+      </p>
+      <p style="margin:0;color:var(--text-muted);font-size:13px">
+        Оплата производится в клубе по факту посещения. Услуга в бета-режиме.
+      </p>
     `,
     onSubmit: async (d) => {
       const payload: NewBooking = {

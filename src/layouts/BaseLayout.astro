@@ -4,6 +4,7 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import Modal from '../components/Modal.astro';
 import AmbientBackground from '../components/AmbientBackground.astro';
+import BetaBanner from '../components/BetaBanner.astro';
 
 interface Props {
   title: string;
@@ -85,6 +86,7 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site ?? 'https://respawn.
   </head>
   <body>
     <AmbientBackground />
+    <BetaBanner />
     <a href="#main-content" class="skip-link">Перейти к контенту</a>
     <noscript>
       <div class="noscript-banner" role="alert">

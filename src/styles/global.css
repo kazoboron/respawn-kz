@@ -31,14 +31,22 @@
   --c-cyan-400: #22d3ee;
   --c-amber-400: #fbbf24;
 
-  /* Legacy neon aliases (existing CSS still works) */
+  /* Legacy neon aliases (existing CSS still works).
+     IMPORTANT 2026-05-21: --neon-cyan was originally bound to the cyan hue
+     (#22d3ee) because the site's old design used cyan as primary accent.
+     The v4 redesign uses violet as primary; redirecting --neon-cyan to violet
+     here lets every existing rule that read --neon-cyan (links, button text,
+     focus rings, accent borders — ~30+ rules) snap to the new palette without
+     touching each rule. Cyan remains available via --c-cyan-400 for any
+     intentional usage; --success still points at it for green-ish success
+     state which is unchanged. */
   --neon-violet: var(--c-violet-500);
   --neon-purple: var(--c-violet-600);
   --neon-magenta: var(--c-pink-500);
   --neon-pink: var(--c-pink-400);
   --neon-blue: var(--c-blue-500);
   --neon-indigo: var(--c-indigo-500);
-  --neon-cyan: var(--c-cyan-400);
+  --neon-cyan: var(--c-violet-400);   /* was: var(--c-cyan-400) — unified to v4 violet */
   --neon-yellow: var(--c-amber-400);
   --neon-orange: #f97316;
 
