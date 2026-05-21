@@ -108,19 +108,10 @@ COMMENT ON FUNCTION public.expire_stale_pending_bookings(integer) IS
 --
 -- Idempotent: if the new event_type already exists in the enum, skip.
 
--- Add 'booking_pending_customer' to the event_type enum if missing
-DO $$
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_enum
-    WHERE enumtypid = (
-      SELECT oid FROM pg_type WHERE typname = 'notification_event_type'
-    )
-    AND enumlabel = 'booking_pending_customer'
-  ) THEN
-    ALTER TYPE notification_event_type ADD VALUE 'booking_pending_customer';
-  END IF;
-END$$;
+-- Add 'booking_pending_customer' to the event_type enum if missing.
+-- IF NOT EXISTS variant works in Postgres 12+ and runs as a standalone
+-- statement (no transaction wrap) so Supabase SQL Editor accepts it.
+ALTER TYPE notification_event_type ADD VALUE IF NOT EXISTS 'booking_pending_customer';
 
 -- Replace the trigger function to also enqueue customer-side email.
 -- Preserves existing club-admin notification behavior; just adds one more
