@@ -10,12 +10,29 @@
 -- email to the customer's address. The Edge Function (send-notification)
 -- needs a matching template — added in the same PR.
 --
--- Idempotent: if the new event_type already exists in the enum, skip.
+-- Idempotent: re-creating the CHECK constraint each run is safe.
+-- The `event_type` column is `text` (not an enum), guarded by a CHECK
+-- constraint named `notifications_outbox_event_type_check`. Migrations
+-- 0014/0015/0017 extended this list the same way — drop & re-add.
 
--- Add 'booking_pending_customer' to the event_type enum if missing.
--- IF NOT EXISTS variant works in Postgres 12+ and runs as a standalone
--- statement (no transaction wrap) so Supabase SQL Editor accepts it.
-ALTER TYPE notification_event_type ADD VALUE IF NOT EXISTS 'booking_pending_customer';
+ALTER TABLE public.notifications_outbox
+  DROP CONSTRAINT IF EXISTS notifications_outbox_event_type_check;
+
+ALTER TABLE public.notifications_outbox
+  ADD CONSTRAINT notifications_outbox_event_type_check
+  CHECK (event_type IN (
+    'application_submitted',
+    'application_approved',
+    'application_rejected',
+    'booking_created',
+    'booking_confirmed',
+    'booking_cancelled',
+    'booking_completed',
+    'booking_no_show',
+    'booking_rescheduled',
+    'review_replied',
+    'booking_pending_customer'
+  ));
 
 -- Replace the trigger function to also enqueue customer-side email.
 -- Preserves existing club-admin notification behavior; just adds one more
