@@ -260,8 +260,11 @@ function fmtPrice(n: number): string {
           muted
           loop
           playsinline
+          webkit-playsinline
           preload="auto"
-          poster="/videos/hero-portal-poster.jpg"
+          disablepictureinpicture
+          disableremoteplayback
+          x-webkit-airplay="deny"
           aria-hidden="true">
           <source src="/videos/hero-portal.mp4" type="video/mp4" />
         </video>
@@ -593,42 +596,46 @@ function fmtPrice(n: number): string {
 
       const setStaticMode = () => {
         // Mobile + reduced-motion: video plays in autoloop (not scroll-scrub).
-        // Headline stays visible the whole time via CSS opacity: 1 !important
-        // on .v4-hero__beat--1 inside the mobile media query.
         if (video) {
           if (reduced.matches) {
-            // True reduced motion: pause + show poster
             video.style.display = 'none';
             if (poster) poster.removeAttribute('hidden');
             try { video.pause(); } catch (_) {}
           } else {
-            // Mobile: looping autoplay. HTML attrs (autoplay+muted+playsinline+loop)
-            // do the heavy lifting; JS play() is just a redundant safety net.
             video.style.display = 'block';
             if (poster) poster.setAttribute('hidden', '');
             video.loop = true;
             video.muted = true;
             const tryPlay = () => {
-              const p = video.play();
-              if (p && typeof p.catch === 'function') {
-                p.catch(() => { /* still blocked — fallback wakes on user gesture */ });
-              }
+              try {
+                const p = video.play();
+                if (p && typeof p.catch === 'function') p.catch(() => {});
+              } catch (_) {}
             };
             tryPlay();
-            // First user gesture fallback — some Android Chrome / Low-Power iOS
-            // builds block autoplay until user interacts at all. Wake video on
-            // ANY first touch / click anywhere on the page.
-            if (video.paused) {
-              const wake = () => {
-                tryPlay();
+            // Wake on ANY user gesture (one-shot, removes self after success)
+            const wake = () => {
+              tryPlay();
+              if (!video.paused) {
                 window.removeEventListener('touchstart', wake);
                 window.removeEventListener('click', wake);
                 window.removeEventListener('scroll', wake);
-              };
-              window.addEventListener('touchstart', wake, { passive: true, once: false });
-              window.addEventListener('click', wake, { once: false });
-              window.addEventListener('scroll', wake, { passive: true, once: false });
-            }
+                window.removeEventListener('pointerdown', wake);
+              }
+            };
+            window.addEventListener('touchstart', wake, { passive: true });
+            window.addEventListener('click', wake);
+            window.addEventListener('scroll', wake, { passive: true });
+            window.addEventListener('pointerdown', wake, { passive: true });
+            // Resume on tab return — browsers pause hidden tabs to save battery
+            document.addEventListener('visibilitychange', () => {
+              if (!document.hidden && video.paused) tryPlay();
+            });
+            // Watchdog — every 2s check if video paused, retry. Bulletproof
+            // against any browser-side autoplay-block surprises.
+            setInterval(() => {
+              if (video.paused && !reduced.matches) tryPlay();
+            }, 2000);
           }
         }
         beats.forEach((b) => {

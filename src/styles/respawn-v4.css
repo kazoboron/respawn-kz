@@ -199,20 +199,36 @@
   z-index: 0;
 }
 
-/* Hide native video controls + the iOS/Chrome "play" overlay that
-   appears when autoplay was blocked. Even without `controls` attr,
-   webkit injects a big play button on the poster until video starts. */
+/* Nuke every native control pseudo-element webkit might inject.
+   iOS Safari is the worst offender — shows a big center play overlay
+   on the poster + a tap-to-play icon. We hide ALL of them aggressively. */
 .v4-hero__video::-webkit-media-controls,
+.v4-hero__video::-webkit-media-controls-enclosure,
+.v4-hero__video::-webkit-media-controls-overlay-enclosure,
 .v4-hero__video::-webkit-media-controls-panel,
-.v4-hero__video::-webkit-media-controls-start-playback-button {
+.v4-hero__video::-webkit-media-controls-play-button,
+.v4-hero__video::-webkit-media-controls-overlay-play-button,
+.v4-hero__video::-webkit-media-controls-start-playback-button,
+.v4-hero__video::-webkit-media-controls-status-display,
+.v4-hero__video::-webkit-media-controls-timeline,
+.v4-hero__video::-webkit-media-controls-current-time-display,
+.v4-hero__video::-webkit-media-controls-time-remaining-display,
+.v4-hero__video::-webkit-media-controls-mute-button,
+.v4-hero__video::-webkit-media-controls-toggle-closed-captions-button,
+.v4-hero__video::-webkit-media-controls-volume-slider,
+.v4-hero__video::-webkit-media-controls-fullscreen-button {
   display: none !important;
   -webkit-appearance: none !important;
   appearance: none !important;
   opacity: 0 !important;
   pointer-events: none !important;
+  visibility: hidden !important;
 }
 .v4-hero__video {
   pointer-events: none;  /* tap goes through to underlying content/links */
+  /* Solid bg while video buffers — replaces removed poster (poster was
+     causing iOS to show the big tap-to-play overlay). */
+  background: #050414;
 }
 .v4-hero__vignette {
   position: absolute;
