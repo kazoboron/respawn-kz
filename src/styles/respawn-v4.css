@@ -836,9 +836,9 @@
   box-shadow: 0 12px 36px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(139, 92, 246, 0.08);
   position: relative;
   z-index: 4;
-  /* Slim + a touch wider per user 2026-XX feedback. Just holds
+  /* Slim + wide per user 2026-XX feedback. Just holds
      [city select] + [geo pin] + [Найти] — pure icons where possible. */
-  max-width: 520px;
+  max-width: 720px;
   margin-left: auto;
   margin-right: auto;
   height: 48px;
