@@ -78,6 +78,28 @@ function fmtPrice(n: number): string {
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
 </head>
 <body class="v4-root">
+  <!-- SW killswitch — runs first to kill any stale service worker from
+       previous deploys and force a fresh reload. See BaseLayout for full
+       comment; same logic duplicated here because the v4 home is standalone
+       (no BaseLayout). -->
+  <script is:inline>
+    (async () => {
+      if (!('serviceWorker' in navigator)) return;
+      try {
+        const regs = await navigator.serviceWorker.getRegistrations();
+        if (regs.length === 0) return;
+        for (const r of regs) await r.unregister();
+        if ('caches' in window) {
+          const keys = await caches.keys();
+          await Promise.all(keys.map((k) => caches.delete(k)));
+        }
+        if (!sessionStorage.getItem('sw-killed')) {
+          sessionStorage.setItem('sw-killed', '1');
+          window.location.reload();
+        }
+      } catch (e) { console.warn('[respawn.kz] SW cleanup error', e); }
+    })();
+  </script>
   <BetaBanner />
 
   <header class="v4-header" id="v4-header">

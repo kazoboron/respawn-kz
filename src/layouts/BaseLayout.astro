@@ -102,24 +102,34 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site ?? 'https://respawn.
     <script>
       import '../scripts/init';
     </script>
-    <script>
-      import { registerSW } from 'virtual:pwa-register';
-      const updateSW = registerSW({
-        immediate: true,
-        // When a new SW activates after a deploy, force the page to reload
-        // so users see the latest code without manual hard-refresh.
-        // Guarded by sessionStorage so we only auto-reload once per session
-        // (avoids reload loops if anything goes sideways).
-        onNeedRefresh() {
-          if (sessionStorage.getItem('sw-reloaded') === '1') return;
-          sessionStorage.setItem('sw-reloaded', '1');
-          updateSW(true); // installs the waiting SW, then auto-reloads
-        },
-        onOfflineReady() {
-          // Optional: console hint, nothing user-facing for now
-          console.info('[respawn.kz] Готов к работе офлайн');
-        },
-      });
+    <!-- 2026-05-23: SW disabled for beta period to prevent stale-cache bugs.
+         During rapid iteration (auth flow, booking UX, etc) cached old code
+         was confusing users. registerSW() commented out so no new SW
+         installs. Cleanup script below unregisters any existing SW from
+         previous deploys + clears caches, forcing a single reload to fresh
+         code. Re-enable when codebase stabilizes. -->
+    <script is:inline>
+      (async () => {
+        if (!('serviceWorker' in navigator)) return;
+        try {
+          const regs = await navigator.serviceWorker.getRegistrations();
+          if (regs.length === 0) return; // no SW, nothing to clean
+          for (const r of regs) await r.unregister();
+          if ('caches' in window) {
+            const keys = await caches.keys();
+            await Promise.all(keys.map((k) => caches.delete(k)));
+          }
+          // Reload ONCE per session so cleared-cache content is fetched fresh.
+          // sessionStorage guard prevents an infinite reload loop if something
+          // about this script keeps detecting SW (shouldn't, but defensive).
+          if (!sessionStorage.getItem('sw-killed')) {
+            sessionStorage.setItem('sw-killed', '1');
+            window.location.reload();
+          }
+        } catch (e) {
+          console.warn('[respawn.kz] SW cleanup error', e);
+        }
+      })();
     </script>
   </body>
 </html>
