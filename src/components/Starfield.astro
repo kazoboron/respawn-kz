@@ -65,8 +65,16 @@
         size: 0.4 + depth * 1.6,
         brightness: 0.25 + depth * 0.75,
         accent: Math.random() < 0.18,
-        // Twinkle phase: slight brightness oscillation for organic feel
-        twinkle: Math.random() * Math.PI * 2,
+        // Chaotic twinkling — each star has its own clock + amplitude
+        // so they sparkle independently rather than in lockstep.
+        twinklePhase: Math.random() * Math.PI * 2,
+        twinkleSpeed: 0.5 + Math.random() * 4.5,        // 0.5x..5x — wide variety
+        twinkleAmp: 0.35 + Math.random() * 0.55,         // 0.35..0.9 — some stars
+                                                         // nearly disappear, others
+                                                         // stay mostly bright
+        // ~6% of stars get occasional sharp flares (bright burst on top of base)
+        flareChance: Math.random() < 0.06 ? Math.random() * 0.003 : 0,
+        flareUntil: 0,
       };
     }
 
@@ -112,9 +120,25 @@
           Object.assign(s, makeStar(false));
         }
 
-        // Subtle twinkle: ±15% brightness over ~2s
-        const tw = 0.85 + 0.15 * Math.sin(now * 0.002 + s.twinkle);
-        const alpha = s.brightness * tw;
+        // Chaotic twinkle — per-star frequency × per-star amplitude.
+        // Each star pulses on its own clock so the field looks alive,
+        // not synchronized. sin() gives -1..1; we map to (1-amp)..1 so
+        // amplitude controls how dim the dimmest moment is.
+        const wave = Math.sin(now * 0.001 * s.twinkleSpeed + s.twinklePhase);
+        const tw = 1 - s.twinkleAmp + s.twinkleAmp * (wave * 0.5 + 0.5);
+        let alpha = s.brightness * tw;
+
+        // Random flares — rare, sharp brightness spikes for ~120ms
+        if (s.flareChance > 0) {
+          if (now < s.flareUntil) {
+            // mid-flare: linearly fade from 1.6x → 1x
+            const f = Math.max(0, (s.flareUntil - now) / 120);
+            alpha = Math.min(1, alpha + f * 0.7);
+          } else if (Math.random() < s.flareChance) {
+            s.flareUntil = now + 120;
+            alpha = Math.min(1, alpha + 0.7);
+          }
+        }
 
         if (s.accent) {
           ctx.fillStyle = `hsla(${ACCENT_HUE}, 90%, 72%, ${alpha})`;
