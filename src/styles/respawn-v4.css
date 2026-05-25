@@ -924,8 +924,15 @@
   background: var(--v4-bg-elevated);
   color: var(--v4-text-primary);
 }
-.v4-searchbar__input::placeholder { color: var(--v4-text-muted); }
+.v4-searchbar__input::placeholder {
+  color: var(--v4-text-muted);
+  opacity: 0.55;
+  font-style: italic;
+  font-weight: 400;
+}
 .v4-searchbar__input::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }
+/* Don't show the native search-clear button arrow either */
+.v4-searchbar__input { -webkit-appearance: none; appearance: none; }
 .v4-searchbar__submit {
   flex: 0 0 auto;
   align-self: center;

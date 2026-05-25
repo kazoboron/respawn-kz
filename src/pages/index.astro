@@ -157,12 +157,23 @@ function fmtPrice(n: number): string {
       <div class="v4-container">
         <form class="v4-searchbar v4-fade-up" id="v4-search-form" action="/clubs/" method="get" role="search">
           <div class="v4-searchbar__field v4-searchbar__field--city">
-            <select name="city" class="v4-searchbar__select" aria-label="Выбрать город">
-              <option value="">Все города</option>
-              {cities.map((c) => (
-                <option value={c.id}>{c.label}</option>
-              ))}
-            </select>
+            <input
+              type="search"
+              name="q"
+              class="v4-searchbar__input"
+              placeholder="что ищешь?"
+              aria-label="Поиск клубов по городу, названию, району, тегам"
+              autocomplete="off"
+              list="v4-search-suggestions"
+              id="v4-search-input"
+            />
+            <datalist id="v4-search-suggestions">
+              {cities.map((c) => <option value={c.label}></option>)}
+              <option value="PC"></option>
+              <option value="PS5"></option>
+              <option value="VR"></option>
+              <option value="Sim Racing"></option>
+            </datalist>
           </div>
           <button type="button" class="v4-searchbar__geo-btn" id="v4-searchbar-geo" aria-label="Найти ближайший город по геолокации" title="Ближайший город">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -716,19 +727,10 @@ function fmtPrice(n: number): string {
       els.forEach((el) => io.observe(el));
     })();
 
-    // Auto-submit search form when city select changes — users expect
-    // picking a city in the dropdown to jump immediately to /clubs/?city=…,
-    // they don't reach for the "Найти" button.
-    (() => {
-      const form = document.getElementById('v4-search-form');
-      const select = form?.querySelector('select[name="city"]');
-      if (!form || !select) return;
-      select.addEventListener('change', () => {
-        // Only auto-submit if user actually chose a city (not the empty
-        // "Все города" default — then they probably want to type a query)
-        if (select.value) form.submit();
-      });
-    })();
+    // No auto-submit needed — the bar is now a free-text input. User
+    // hits Enter or clicks Найти. Datalist suggestions cover quick city
+    // picks. The input submits as ?q=… which catalog filters across
+    // name + city slug + city label + district + tags.
 
     // City chip click → inline filtered results above the hero. Reads
     // pre-rendered #v4-clubs-data JSON, filters by city, renders cards
@@ -827,8 +829,8 @@ function fmtPrice(n: number): string {
     // IIFE doesn't need access to CITIES from the SSG context.
     (() => {
       const btn = document.getElementById('v4-searchbar-geo');
-      const select = document.querySelector('#v4-search-form select[name="city"]');
-      if (!btn || !select) return;
+      const input = document.getElementById('v4-search-input');
+      if (!btn || !input) return;
 
       // Inline city coords for Haversine. Keep in sync with src/data/cities.ts.
       const CITY_COORDS = [
@@ -881,17 +883,15 @@ function fmtPrice(n: number): string {
           (pos) => {
             const { latitude, longitude } = pos.coords;
             const { city, distance } = findClosestCity(latitude, longitude);
-            // Set dropdown value WITHOUT dispatching change (would auto-submit).
-            select.value = city.id;
-            // Visual feedback on button + show inline-results for that city
+            // Fill the search input with the detected city label so user
+            // sees what was picked and can edit if wrong before submit.
+            input.value = city.label;
             const distText = distance < 1 ? 'вы внутри' : `~${Math.round(distance)} км`;
             setBtnState(`${city.label} · ${distText}`, 'success');
             btn.disabled = false;
-            // Reactivate chip if matching one exists
             document.querySelectorAll('[data-city-chip]').forEach((c) =>
               c.classList.toggle('is-active', c.getAttribute('data-city-chip') === city.id)
             );
-            // Show inline results
             if (typeof window.__v4ShowCity === 'function') {
               window.__v4ShowCity(city.id);
             }
