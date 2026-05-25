@@ -1025,26 +1025,28 @@
   color: var(--v4-text-primary);
 }
 
-/* Quick chips row under the search bar — city pills, centered to the bar */
+/* Quick chips row under the search bar — city pills, single line.
+   All 10 cities must fit on one row. On narrow viewports the wrapper
+   scrolls horizontally instead of wrapping. */
 .v4-searchbar__chips {
   display: flex;
   align-items: center;
-  justify-content: center;       /* centered along the row */
-  gap: 16px;
+  justify-content: center;
   padding: 14px 6px 0;
-  flex-wrap: wrap;
-  /* Match the bar's max-width so the row visually aligns under it
-     instead of stretching across the full v4-container. */
-  max-width: 720px;
   margin-left: auto;
   margin-right: auto;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
 }
 .v4-searchbar__chips-group {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;        /* never wrap to 2 lines */
+  gap: 6px;
+  padding-bottom: 4px;      /* breathing room above scrollbar */
 }
 .v4-searchbar__chips-label {
   font-size: 13px;
@@ -1054,7 +1056,9 @@
 .v4-searchbar__chip {
   display: inline-flex;
   align-items: center;
-  padding: 6px 14px;
+  flex: 0 0 auto;            /* prevent shrink inside nowrap flex */
+  white-space: nowrap;       /* keep "Усть-Каменогорск" on one line */
+  padding: 5px 12px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid var(--v4-border-soft);
