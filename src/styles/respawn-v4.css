@@ -1025,18 +1025,24 @@
   color: var(--v4-text-primary);
 }
 
-/* Quick chips row under the search bar — popular cities + trust info */
+/* Quick chips row under the search bar — city pills, centered to the bar */
 .v4-searchbar__chips {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;       /* centered along the row */
   gap: 16px;
-  padding: 12px 6px 0;
+  padding: 14px 6px 0;
   flex-wrap: wrap;
+  /* Match the bar's max-width so the row visually aligns under it
+     instead of stretching across the full v4-container. */
+  max-width: 720px;
+  margin-left: auto;
+  margin-right: auto;
 }
 .v4-searchbar__chips-group {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   flex-wrap: wrap;
 }
