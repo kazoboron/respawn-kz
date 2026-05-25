@@ -5,6 +5,7 @@ import { LANDING_FAQ } from '../data/content';
 import { CITIES } from '../data/cities';
 import BetaBanner from '../components/BetaBanner.astro';
 import Starfield from '../components/Starfield.astro';
+import Logo from '../components/Logo.astro';
 
 const allClubs = await loadAllClubs();
 // Show ALL clubs on the homepage (user request 2026-05-20: «давай сразу
@@ -106,7 +107,7 @@ function fmtPrice(n: number): string {
 
   <header class="v4-header" id="v4-header">
     <div class="v4-header__inner">
-      <a href="#top" class="v4-logo" aria-label="respawn.kz home">respawn.kz</a>
+      <Logo size="sm" />
       <nav class="v4-nav" aria-label="Главная навигация">
         <a href="#catalog" class="v4-nav-link">Клубы</a>
         <a href="#cities" class="v4-nav-link">Города</a>
@@ -128,7 +129,7 @@ function fmtPrice(n: number): string {
     <div class="v4-drawer__backdrop" data-drawer-close></div>
     <aside class="v4-drawer__panel" role="dialog" aria-modal="true" aria-label="Меню">
       <div class="v4-drawer__top">
-        <span class="v4-logo">respawn.kz</span>
+        <Logo size="sm" />
         <button class="v4-hamburger" aria-label="Закрыть меню" data-drawer-close>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M6 6l12 12"/><path d="M18 6L6 18"/>
@@ -524,7 +525,7 @@ function fmtPrice(n: number): string {
         </div>
       </div>
       <div class="v4-footer__bottom">
-        <span class="v4-logo">respawn.kz</span>
+        <Logo size="sm" />
         <span class="v4-footer__copyright v4-mono">© 2026 respawn.kz · Алматы, Казахстан</span>
       </div>
     </div>
