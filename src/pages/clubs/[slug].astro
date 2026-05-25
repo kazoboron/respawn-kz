@@ -183,15 +183,15 @@ if (topReviews.length > 0) {
       <div class="club-page__layout">
         <div class="club-page__main">
           <section class="club-section">
-            <h2 class="club-section__title">О клубе</h2>
-            <p class="club-section__text">{club.description}</p>
-          </section>
-
-          <section class="club-section">
             <h2 class="club-section__title">Что у нас есть</h2>
             <ul class="equipment-list">
               {club.equipment.map((e) => <li>{e}</li>)}
             </ul>
+          </section>
+
+          <section class="club-section">
+            <h2 class="club-section__title">О клубе</h2>
+            <p class="club-section__text">{club.description}</p>
           </section>
 
           <section class="club-section">

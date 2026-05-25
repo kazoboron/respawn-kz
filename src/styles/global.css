@@ -2084,37 +2084,24 @@ body.menu-open {
    CLUB DETAIL page
    ============================================ */
 .club-page {
-  padding-top: 120px;
-  padding-bottom: 80px;
+  padding-top: 96px;
+  padding-bottom: 56px;
   position: relative;
   isolation: isolate;
 }
 
-.club-page::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 400px;
-  background-image: url('/img/club-rows.webp');
-  background-size: cover;
-  background-position: center;
-  opacity: 0.15;
-  z-index: -1;
-  mask-image: linear-gradient(180deg, black 0%, transparent 100%);
-  -webkit-mask-image: linear-gradient(180deg, black 0%, transparent 100%);
-}
+/* Removed the giant 400px Warzone background hero strip — was eating
+   vertical space and clashing with the Starfield bg. Stars are enough. */
 
 .club-page__hero {
-  margin-bottom: 32px;
+  margin-bottom: 20px;
 }
 
 .club-page__name {
   font-family: "JetBrains Mono", monospace;
-  font-size: clamp(32px, 5vw, 56px);
-  margin-bottom: 12px;
-  text-shadow: 0 0 30px rgba(0, 240, 255, 0.3);
+  font-size: clamp(28px, 4vw, 44px);
+  margin-bottom: 8px;
+  text-shadow: 0 0 30px rgba(139, 92, 246, 0.3);
 }
 
 .club-page__meta {
@@ -2122,8 +2109,8 @@ body.menu-open {
   align-items: center;
   gap: 8px;
   color: var(--text-secondary);
-  font-size: 16px;
-  margin-bottom: 16px;
+  font-size: 15px;
+  margin-bottom: 12px;
   flex-wrap: wrap;
 }
 
@@ -2135,9 +2122,9 @@ body.menu-open {
 
 .club-page__gallery {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
-  margin-bottom: 48px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 28px;
 }
 
 .gallery-item {
@@ -2166,19 +2153,36 @@ body.menu-open {
 .club-page__layout {
   display: grid;
   grid-template-columns: 2fr 1fr;
-  gap: 40px;
-  margin-bottom: 64px;
+  gap: 28px;
+  margin-bottom: 40px;
 }
 
 .club-page__main {
   display: flex;
   flex-direction: column;
-  gap: 40px;
+  gap: 24px;
 }
 
 .club-section__title {
-  font-size: 24px;
-  margin-bottom: 16px;
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+
+/* Dark Google Maps iframe — Google embed renders light-themed by
+   default; invert + hue-rotate lands close to a dark-mode map.
+   The wrapping container also gets a black background so the iframe
+   has nothing white peeking around. */
+.club-map {
+  background: #000;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  margin-top: 20px;
+}
+.club-map iframe {
+  display: block;
+  margin-top: 0 !important;
+  background: #000;
+  filter: invert(0.92) hue-rotate(180deg) brightness(0.92) saturate(0.85);
 }
 
 .club-section__text {
