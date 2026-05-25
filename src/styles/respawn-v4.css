@@ -279,28 +279,42 @@
   box-shadow: 0 0 12px rgba(139,92,246,0.6);
 }
 
-/* Mobile hero — scroll-scrub kept (per user request), but with a shorter
-   total scroll length (250vh vs desktop 400vh) so mobile users don't have
-   to scroll forever to clear the hero. iOS Safari 15+ supports inline
-   currentTime scrubbing on muted+playsinline videos; the JS primes the
-   decoder once via play()+pause() then writes currentTime each rAF. */
+/* Mobile hero — autoloop video, not scroll-scrub. On phones the desktop's
+   400vh scroll-scrub is awkward (long scroll, currentTime jitter on iOS,
+   often the headline beats disappeared mid-transition). Replaced with a
+   single-screen looping video + always-visible headline overlay. JS
+   handles the autoplay (see setStaticMode in index.astro). */
 @media (max-width: 640px) {
-  .v4-hero { height: 250vh; }
+  .v4-hero {
+    height: 78vh;          /* leaves room for the search bar above */
+    min-height: 420px;
+  }
+  .v4-hero__sticky {
+    position: relative;    /* no sticky on mobile — single fixed view */
+    top: auto;
+    height: 100%;
+  }
+  /* Beat 3 (post-portal) is irrelevant when there's no scroll-scrub */
+  .v4-hero__beat--3 { display: none; }
+  /* Beat 1 always visible — bottom-anchored over the video */
+  .v4-hero__beat--1 {
+    opacity: 1 !important;
+    transform: none !important;
+    pointer-events: auto !important;
+    justify-content: flex-end;
+    padding: 0 20px 12vh;
+  }
   .v4-hero__beat--1 .v4-h-hero {
-    font-size: clamp(32px, 8vw, 48px);
+    font-size: clamp(28px, 7vw, 42px);
+    line-height: 1.05;
   }
-  .v4-hero__beat--3 .v4-h-section {
-    font-size: clamp(26px, 7vw, 40px);
-  }
-  /* Tighter side padding so headline fits comfortably */
-  .v4-hero__beat { padding: 0 20px; }
-  /* Stronger vignette on mobile so text reads over video */
+  /* Stronger vignette so headline reads over moving video */
   .v4-hero__vignette {
-    background: radial-gradient(ellipse at center, transparent 25%, rgba(0,0,0,0.7) 100%);
+    background: radial-gradient(ellipse at center top, transparent 15%, rgba(0,0,0,0.85) 100%);
   }
-  /* Right-side dot rail is cramped on phones — hide; cue stays for scroll hint */
+  /* Cramped UI bits hidden on phones */
   .v4-hero__dots { display: none; }
-  .v4-hero__cue { bottom: 24px; }
+  .v4-hero__cue { display: none; }
 }
 
 /* Sections */
@@ -1089,10 +1103,10 @@
 }
 
 @media (max-width: 720px) {
-  .v4-searchbar-section { padding: 24px 0 12px; }
+  .v4-searchbar-section { padding: 14px 0 8px; }
   /* Top variant on mobile: header is still 68px, beta-banner 52px when shown
-     (taller font on mobile) — keep enough top padding. */
-  .v4-searchbar-section--top { padding-top: 88px; }
+     (taller font on mobile) — keep enough top padding to clear them. */
+  .v4-searchbar-section--top { padding-top: 78px; }
   .v4-searchbar__chips { flex-direction: column; align-items: flex-start; gap: 10px; padding-top: 10px; }
   .v4-searchbar__chips-info { font-size: 11px; }
   .v4-searchbar__chip { font-size: 12px; padding: 5px 11px; }

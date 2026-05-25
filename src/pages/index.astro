@@ -590,14 +590,30 @@ function fmtPrice(n: number): string {
       const cue = hero.querySelector('[data-cue]');
 
       const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+      const isMobile = window.matchMedia('(max-width: 640px)');
 
       const setStaticMode = () => {
-        // Reduced-motion only: pause video, show static poster, freeze beats
+        // Mobile + reduced-motion: video plays in autoloop (not scroll-scrub).
+        // Headline stays visible the whole time via CSS opacity: 1 !important
+        // on .v4-hero__beat--1 inside the mobile media query.
         if (video) {
-          video.style.display = 'none';
-          try { video.pause(); } catch (_) {}
+          if (reduced.matches) {
+            // True reduced motion: pause + show poster
+            video.style.display = 'none';
+            if (poster) poster.removeAttribute('hidden');
+            try { video.pause(); } catch (_) {}
+          } else {
+            // Mobile: looping autoplay
+            video.style.display = 'block';
+            if (poster) poster.setAttribute('hidden', '');
+            video.loop = true;
+            video.muted = true;
+            const p = video.play();
+            if (p && typeof p.catch === 'function') {
+              p.catch(() => { /* autoplay may be blocked by browser; ignore */ });
+            }
+          }
         }
-        if (poster) poster.removeAttribute('hidden');
         beats.forEach((b) => {
           b.classList.toggle('is-active', b.dataset.beat === '1');
         });
@@ -634,11 +650,12 @@ function fmtPrice(n: number): string {
       };
 
       const onStateChange = () => {
-        if (reduced.matches) setStaticMode();
+        if (reduced.matches || isMobile.matches) setStaticMode();
         else setInteractiveMode();
       };
       onStateChange();
       reduced.addEventListener('change', onStateChange);
+      isMobile.addEventListener('change', onStateChange);
 
       // Lerp video.currentTime toward target every animation frame.
       // Even when scroll stops, the video keeps easing into its final
@@ -671,7 +688,7 @@ function fmtPrice(n: number): string {
       let lastProgress = -1;
       const update = () => {
         rafPending = false;
-        if (reduced.matches) return;
+        if (reduced.matches || isMobile.matches) return;  // no scroll-scrub on mobile
         const rect = hero.getBoundingClientRect();
         const total = hero.offsetHeight - window.innerHeight;
         const passed = Math.min(Math.max(-rect.top, 0), total);
