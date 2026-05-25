@@ -2452,34 +2452,47 @@ body.menu-open {
    ============================================ */
 .booking-form__row {
   display: grid;
-  grid-template-columns: 1.2fr 1fr 0.8fr;
+  /* Equal columns so the hours stepper (~112px min) fits in the third
+     track. The previous 1.2/1/0.8 split squeezed the stepper, causing
+     visible overflow + parent-row shift when buttons were clicked. */
+  grid-template-columns: 1fr 1fr 1fr;
   gap: 12px;
   margin-bottom: 16px;
+  align-items: end;
 }
 
 /* Hours stepper — replaces ugly native number input arrows. The native
-   spinner buttons in Chrome are hard to hit on touch + their click area
-   sometimes triggers focus expansion that made the parent bar grow. We
-   hide native spinners and provide visible −/+ buttons either side. */
+   spinner buttons in Chrome were hard to hit on touch + their focus
+   expansion grew the parent column, shifting the other fields. This
+   stepper fits inside the booking-form grid track (~110-140px) without
+   overflow: width 100% + box-sizing border-box on the container,
+   min-width 0 on the input so it shrinks rather than pushing siblings,
+   and explicit fixed-width buttons that don't change on hover/active. */
 .hours-stepper {
   display: flex;
   align-items: stretch;
   gap: 0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   background: var(--bg-surface);
   overflow: hidden;
+  height: 44px;
 }
 .hours-stepper:focus-within {
   border-color: var(--border-hover);
 }
 .hours-stepper__btn {
-  flex: 0 0 auto;
-  width: 40px;
+  flex: 0 0 36px;
+  width: 36px;
+  height: 100%;
+  padding: 0;
   border: 0;
   background: transparent;
   color: var(--text-primary);
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 500;
   line-height: 1;
   cursor: pointer;
@@ -2488,23 +2501,32 @@ body.menu-open {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  box-sizing: border-box;
 }
-.hours-stepper__btn:hover {
+.hours-stepper__btn:hover:not(:disabled) {
   background: rgba(139, 92, 246, 0.12);
   color: var(--accent);
 }
-.hours-stepper__btn:active {
+.hours-stepper__btn:active:not(:disabled) {
   background: rgba(139, 92, 246, 0.22);
 }
+.hours-stepper__btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
 .hours-stepper__input {
-  flex: 1 1 auto;
+  flex: 1 1 0;
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  padding: 0 4px;
   border: 0;
   background: transparent;
   text-align: center;
   font-size: 16px;
   font-weight: 500;
   color: var(--text-primary);
-  min-width: 0;
+  box-sizing: border-box;
   /* Hide native number-input spinner buttons */
   appearance: textfield;
   -moz-appearance: textfield;
