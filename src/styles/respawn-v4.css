@@ -198,6 +198,22 @@
   object-fit: cover;
   z-index: 0;
 }
+
+/* Hide native video controls + the iOS/Chrome "play" overlay that
+   appears when autoplay was blocked. Even without `controls` attr,
+   webkit injects a big play button on the poster until video starts. */
+.v4-hero__video::-webkit-media-controls,
+.v4-hero__video::-webkit-media-controls-panel,
+.v4-hero__video::-webkit-media-controls-start-playback-button {
+  display: none !important;
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+.v4-hero__video {
+  pointer-events: none;  /* tap goes through to underlying content/links */
+}
 .v4-hero__vignette {
   position: absolute;
   inset: 0;

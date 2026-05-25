@@ -602,14 +602,32 @@ function fmtPrice(n: number): string {
             if (poster) poster.removeAttribute('hidden');
             try { video.pause(); } catch (_) {}
           } else {
-            // Mobile: looping autoplay
+            // Mobile: looping autoplay. HTML attrs (autoplay+muted+playsinline+loop)
+            // do the heavy lifting; JS play() is just a redundant safety net.
             video.style.display = 'block';
             if (poster) poster.setAttribute('hidden', '');
             video.loop = true;
             video.muted = true;
-            const p = video.play();
-            if (p && typeof p.catch === 'function') {
-              p.catch(() => { /* autoplay may be blocked by browser; ignore */ });
+            const tryPlay = () => {
+              const p = video.play();
+              if (p && typeof p.catch === 'function') {
+                p.catch(() => { /* still blocked — fallback wakes on user gesture */ });
+              }
+            };
+            tryPlay();
+            // First user gesture fallback — some Android Chrome / Low-Power iOS
+            // builds block autoplay until user interacts at all. Wake video on
+            // ANY first touch / click anywhere on the page.
+            if (video.paused) {
+              const wake = () => {
+                tryPlay();
+                window.removeEventListener('touchstart', wake);
+                window.removeEventListener('click', wake);
+                window.removeEventListener('scroll', wake);
+              };
+              window.addEventListener('touchstart', wake, { passive: true, once: false });
+              window.addEventListener('click', wake, { once: false });
+              window.addEventListener('scroll', wake, { passive: true, once: false });
             }
           }
         }
