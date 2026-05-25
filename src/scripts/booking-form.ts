@@ -186,9 +186,14 @@ function renderForm(
         </label>
         <label class="auth-field" for="booking-hours">
           <span class="auth-label">Часов</span>
-          <input type="number" id="booking-hours" name="hours" class="auth-input" required
-                 min="1" max="12" value="${hoursValue}"
-                 aria-describedby="booking-notice booking-error" aria-invalid="false" />
+          <div class="hours-stepper" role="group" aria-labelledby="booking-hours-label">
+            <button type="button" class="hours-stepper__btn" data-hours-step="-1" aria-label="Меньше часов">−</button>
+            <input type="number" id="booking-hours" name="hours" class="auth-input hours-stepper__input" required
+                   inputmode="numeric"
+                   min="1" max="12" value="${hoursValue}"
+                   aria-describedby="booking-notice booking-error" aria-invalid="false" />
+            <button type="button" class="hours-stepper__btn" data-hours-step="+1" aria-label="Больше часов">+</button>
+          </div>
         </label>
       </div>
       ${redeemBlock}
@@ -347,6 +352,20 @@ export async function openBookingFormModal(opts: BookingFormOptions): Promise<vo
   dateInput.addEventListener('change', refreshSlots);
   hoursInput.addEventListener('input', () => { updateTotal(); refreshSlots(); });
   redeemToggle?.addEventListener('change', updateTotal);
+
+  // +/− stepper buttons next to the hours input (replaces native browser
+  // spinner arrows which look ugly + caused odd "bar stretches" behavior).
+  form.querySelectorAll<HTMLButtonElement>('[data-hours-step]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const step = Number(btn.getAttribute('data-hours-step')) || 0;
+      const cur = Number(hoursInput.value) || 1;
+      const next = Math.max(1, Math.min(12, cur + step));
+      if (next === cur) return;
+      hoursInput.value = String(next);
+      // Bubble synthetic 'input' so the existing handler updates total + slots
+      hoursInput.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+  });
   await refreshSlots();
   updateTotal();
 

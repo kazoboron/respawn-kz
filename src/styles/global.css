@@ -2457,6 +2457,65 @@ body.menu-open {
   margin-bottom: 16px;
 }
 
+/* Hours stepper — replaces ugly native number input arrows. The native
+   spinner buttons in Chrome are hard to hit on touch + their click area
+   sometimes triggers focus expansion that made the parent bar grow. We
+   hide native spinners and provide visible −/+ buttons either side. */
+.hours-stepper {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+  overflow: hidden;
+}
+.hours-stepper:focus-within {
+  border-color: var(--border-hover);
+}
+.hours-stepper__btn {
+  flex: 0 0 auto;
+  width: 40px;
+  border: 0;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 150ms ease, color 150ms ease;
+  user-select: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.hours-stepper__btn:hover {
+  background: rgba(139, 92, 246, 0.12);
+  color: var(--accent);
+}
+.hours-stepper__btn:active {
+  background: rgba(139, 92, 246, 0.22);
+}
+.hours-stepper__input {
+  flex: 1 1 auto;
+  border: 0;
+  background: transparent;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text-primary);
+  min-width: 0;
+  /* Hide native number-input spinner buttons */
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+.hours-stepper__input::-webkit-outer-spin-button,
+.hours-stepper__input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.hours-stepper__input:focus { outline: none; }
+
 .booking-form__notice {
   padding: 10px 14px;
   background: rgba(251, 146, 60, 0.12);
