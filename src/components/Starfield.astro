@@ -40,21 +40,33 @@
 
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+    // 2026-05-XX: switched from forward hyperspace (z-axis perspective)
+    // to a horizontal right-to-left scroll per user request. Stars
+    // travel leftward at varying parallax speeds — closer stars (bigger,
+    // brighter) move faster than far stars. Effect is a calm "moving
+    // through space sideways" feel, no streaks/trails.
     const STAR_COUNT = 220;
-    const SPEED = 0.022;        // 0.01 = slow drift, 0.03 = fast hyperspace
-    const TRAIL_INTENSITY = 0.85; // 0 = no trails, 1 = full motion blur
+    const BASE_SPEED = 0.35;      // px per frame for the slowest layer
+    const SPEED_RANGE = 1.2;      // additional px on top for fastest layer
     const ACCENT_HUE = 264;       // violet matching v4 palette
 
-    let w = 0, h = 0, cx = 0, cy = 0, dpr = 1;
+    let w = 0, h = 0, dpr = 1;
     let stars = [];
 
-    function makeStar() {
+    function makeStar(initial) {
+      // Depth 0..1 — used for parallax speed + size + brightness
+      const depth = Math.random();
       return {
-        x: (Math.random() - 0.5) * 2,
-        y: (Math.random() - 0.5) * 2,
-        z: Math.random(),                       // 0..1 (1 = far, 0 = near)
-        pz: 0,                                  // previous z for trail
-        c: Math.random() < 0.18 ? 'accent' : 'white',
+        // If initial=true, spread across whole screen; otherwise spawn at right edge
+        x: initial ? Math.random() * w : w + Math.random() * 50,
+        y: Math.random() * h,
+        depth,
+        speed: BASE_SPEED + depth * SPEED_RANGE,
+        size: 0.4 + depth * 1.6,
+        brightness: 0.25 + depth * 0.75,
+        accent: Math.random() < 0.18,
+        // Twinkle phase: slight brightness oscillation for organic feel
+        twinkle: Math.random() * Math.PI * 2,
       };
     }
 
@@ -62,8 +74,6 @@
       dpr = Math.min(window.devicePixelRatio || 1, 2);
       w = window.innerWidth;
       h = window.innerHeight;
-      cx = w / 2;
-      cy = h / 2;
       canvas.width = w * dpr;
       canvas.height = h * dpr;
       canvas.style.width = w + 'px';
@@ -73,65 +83,47 @@
 
     function init() {
       resize();
-      stars = Array.from({ length: STAR_COUNT }, makeStar);
-      stars.forEach((s) => (s.pz = s.z));
+      stars = Array.from({ length: STAR_COUNT }, () => makeStar(true));
     }
 
-    function project(s) {
-      // Perspective: closer stars (z near 0) appear further from center
-      const k = 0.65 / s.z;
-      return { sx: cx + s.x * cx * k, sy: cy + s.y * cy * k, k };
-    }
+    let lastT = performance.now();
 
-    function frame() {
+    function frame(now) {
       if (document.hidden) {
         // Tab hidden, skip drawing — reschedule sparsely
         setTimeout(() => requestAnimationFrame(frame), 500);
         return;
       }
 
-      // Motion blur via semi-transparent fill instead of clearRect — leaves
-      // bright trails for fast stars while gradually fading them.
-      ctx.fillStyle = `rgba(5, 4, 20, ${1 - TRAIL_INTENSITY})`;
+      // dt in 60fps-equivalent units, so SPEED reads as px/frame at 60fps
+      const dt = Math.min(2, (now - lastT) / 16.667);
+      lastT = now;
+
+      // Full clear each frame — no trails, clean pinpoint stars
+      ctx.fillStyle = '#050414';
       ctx.fillRect(0, 0, w, h);
 
       for (let i = 0; i < stars.length; i++) {
         const s = stars[i];
-        s.pz = s.z;
-        if (!reduced) s.z -= SPEED;
-        if (s.z <= 0.02) {
-          // Star passed viewer → respawn far away with new x/y
-          s.x = (Math.random() - 0.5) * 2;
-          s.y = (Math.random() - 0.5) * 2;
-          s.z = 1;
-          s.pz = 1;
-          s.c = Math.random() < 0.18 ? 'accent' : 'white';
-          continue;
+        if (!reduced) s.x -= s.speed * dt;
+
+        if (s.x < -5) {
+          // Off-screen left — respawn on right with new y/depth
+          Object.assign(s, makeStar(false));
         }
 
-        const { sx, sy, k } = project(s);
-        // Skip stars projected off-screen
-        if (sx < -10 || sx > w + 10 || sy < -10 || sy > h + 10) continue;
+        // Subtle twinkle: ±15% brightness over ~2s
+        const tw = 0.85 + 0.15 * Math.sin(now * 0.002 + s.twinkle);
+        const alpha = s.brightness * tw;
 
-        // Previous position for trail
-        const pk = 0.65 / s.pz;
-        const psx = cx + s.x * cx * pk;
-        const psy = cy + s.y * cy * pk;
-
-        const brightness = Math.min(1, (1 - s.z) * 1.4);
-        const size = Math.max(0.4, k * 1.1);
-
-        if (s.c === 'accent') {
-          ctx.strokeStyle = `hsla(${ACCENT_HUE}, 90%, 70%, ${brightness})`;
+        if (s.accent) {
+          ctx.fillStyle = `hsla(${ACCENT_HUE}, 90%, 72%, ${alpha})`;
         } else {
-          ctx.strokeStyle = `rgba(255, 255, 255, ${brightness})`;
+          ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
         }
-        ctx.lineWidth = size;
-        ctx.lineCap = 'round';
         ctx.beginPath();
-        ctx.moveTo(psx, psy);
-        ctx.lineTo(sx, sy);
-        ctx.stroke();
+        ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+        ctx.fill();
       }
 
       requestAnimationFrame(frame);
