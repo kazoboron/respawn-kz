@@ -873,21 +873,20 @@
 }
 .v4-searchbar {
   display: flex;
-  align-items: stretch;
+  align-items: center;       /* center children vertically, no stretching */
   gap: 6px;
-  padding: 5px;
+  padding: 4px 4px 4px 6px;
   background: var(--v4-bg-surface);
   border: 1px solid var(--v4-border-soft);
   border-radius: 999px;
   box-shadow: 0 12px 36px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(139, 92, 246, 0.08);
   position: relative;
   z-index: 4;
-  /* Slim + wide per user 2026-XX feedback. Just holds
-     [city select] + [geo pin] + [Найти] — pure icons where possible. */
   max-width: 720px;
   margin-left: auto;
   margin-right: auto;
-  height: 48px;
+  height: 50px;
+  box-sizing: border-box;
 }
 .v4-searchbar__field {
   flex: 1 1 auto;
@@ -901,22 +900,23 @@
 .v4-searchbar__field:hover { background: rgba(255, 255, 255, 0.03); }
 .v4-searchbar__field--city { flex: 1 1 auto; }
 
-/* Geo-pin button — standalone, just an icon. Title attr explains on hover. */
+/* Geo-pin button — perfectly round, sits next to the Найти button */
 .v4-searchbar__geo-btn {
-  flex: 0 0 38px;
-  width: 38px;
-  height: 38px;
+  flex: 0 0 40px;
+  width: 40px;
+  height: 40px;
   align-self: center;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   padding: 0;
-  border-radius: 999px;
-  background: rgba(139, 92, 246, 0.12);
-  border: 1px solid rgba(139, 92, 246, 0.28);
+  border-radius: 50%;        /* explicit circle, not just rounded */
+  background: rgba(139, 92, 246, 0.14);
+  border: 1px solid rgba(139, 92, 246, 0.3);
   color: var(--v4-accent);
   cursor: pointer;
   transition: background 200ms ease, border-color 200ms ease, transform 200ms ease;
+  box-sizing: border-box;
 }
 .v4-searchbar__geo-btn:hover:not(:disabled) {
   background: rgba(139, 92, 246, 0.22);
@@ -982,12 +982,16 @@
 .v4-searchbar__submit {
   flex: 0 0 auto;
   align-self: center;
-  padding: 0 18px;
-  height: 38px;
+  padding: 0 16px !important;     /* override .v4-btn base padding */
+  height: 40px;
+  min-height: 40px;
   border-radius: 999px;
-  font-size: 14px;
+  font-size: 13px;
+  line-height: 1;
+  gap: 6px;
+  box-sizing: border-box;
 }
-.v4-searchbar__submit svg { flex: 0 0 auto; }
+.v4-searchbar__submit svg { flex: 0 0 auto; width: 14px; height: 14px; }
 
 /* Inline results — appears when user clicks a city chip above the hero */
 .v4-inline-results {
