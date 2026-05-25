@@ -207,6 +207,29 @@ function renderForm(
   `;
 }
 
+// Cache booked slots per (slug, date, excludeId) so changing the HOURS
+// stepper doesn't re-fetch — we already know what's booked that day, only
+// need to recompute which START times still fit. Cuts the network round-trip
+// from each +/− click. Cache is per-form-session — invalidated whenever a
+// new openBookingFormModal call runs.
+let bookedCache: { key: string; data: BookedSlot[] } | null = null;
+
+function invalidateBookedCache(): void {
+  bookedCache = null;
+}
+
+async function getBookedForDay(
+  club: ClubRow,
+  dateStr: string,
+  excludeBookingId: string | undefined,
+): Promise<BookedSlot[]> {
+  const key = `${club.slug}|${dateStr}|${excludeBookingId ?? ''}`;
+  if (bookedCache?.key === key) return bookedCache.data;
+  const data = await fetchBookedForDay(club.slug, dateStr, excludeBookingId);
+  bookedCache = { key, data };
+  return data;
+}
+
 async function rebuildTimeSelect(
   club: ClubRow,
   dateStr: string,
@@ -232,12 +255,18 @@ async function rebuildTimeSelect(
     ? Array.from({ length: 24 }, (_, i) => i)
     : generateSlots(parseHour(hours.open), parseHour(hours.close));
 
-  // Show loading state while fetching booked slots
-  timeSelect.innerHTML = '<option value="">— загрузка слотов —</option>';
-  timeSelect.disabled = true;
-  timeSelect.setAttribute('aria-busy', 'true');
+  // If we already have booked-slots cached for this (slug, date), skip the
+  // "— загрузка —" flash and rebuild options synchronously. Network fetch
+  // only happens on the FIRST call (initial paint) or when the date changes.
+  const cacheKey = `${club.slug}|${dateStr}|${excludeBookingId ?? ''}`;
+  const cacheHit = bookedCache?.key === cacheKey;
+  if (!cacheHit) {
+    timeSelect.innerHTML = '<option value="">— загрузка слотов —</option>';
+    timeSelect.disabled = true;
+    timeSelect.setAttribute('aria-busy', 'true');
+  }
 
-  const booked = await fetchBookedForDay(club.slug, dateStr, excludeBookingId);
+  const booked = await getBookedForDay(club, dateStr, excludeBookingId);
 
   timeSelect.removeAttribute('aria-busy');
 
@@ -283,6 +312,10 @@ async function rebuildTimeSelect(
 
 export async function openBookingFormModal(opts: BookingFormOptions): Promise<void> {
   const { club, mode, initial, excludeBookingId, loyaltyBalance, title, intro, submitLabel, successTitle, successBody, onSubmit } = opts;
+
+  // Reset booked-slots cache for a fresh form session (different club /
+  // different date / etc — don't reuse stale data from previous open).
+  invalidateBookedCache();
 
   openModal({
     title,
