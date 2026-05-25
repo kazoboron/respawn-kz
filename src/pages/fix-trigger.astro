@@ -29,27 +29,26 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
     (async () => {
       try {
-        setStatus('Диагностика — что в БД сейчас…');
-        const diag = await supabase.functions.invoke('apply-trigger-fix', { method: 'GET' });
-        outputEl.textContent = 'DIAGNOSE:\n' + JSON.stringify(diag.data ?? diag.error, null, 2);
+        setStatus('Вызываю edge-функцию…');
+        const res = await supabase.functions.invoke('apply-trigger-fix', { method: 'POST' });
+        const out = res.data ?? res.error;
+        outputEl.textContent = JSON.stringify(out, null, 2);
 
-        setStatus('Применяю фикс через POST…');
-        await new Promise((r) => setTimeout(r, 500));
-        const applied = await supabase.functions.invoke('apply-trigger-fix', { method: 'POST' });
-        outputEl.textContent += '\n\nAPPLIED:\n' + JSON.stringify(applied.data ?? applied.error, null, 2);
-
-        if (applied.error) {
-          setStatus('❌ Не получилось — см. лог ниже', 'error');
+        if (res.error) {
+          setStatus('❌ Сбой вызова — см. лог', 'error');
           return;
         }
-        const data = applied.data as { after_contains_club_owners?: boolean; after_contains_helper?: boolean };
-        if (data?.after_contains_club_owners === false && data?.after_contains_helper === true) {
+        const data = res.data as {
+          ok?: boolean;
+          after?: { contains_club_owners?: boolean; contains_helper?: boolean };
+        };
+        if (data?.ok && data.after?.contains_club_owners === false && data.after?.contains_helper === true) {
           setStatus('✓ Готово. Триггер обновлён. Можно бронировать.', 'success');
         } else {
           setStatus('⚠️ Результат не как ожидалось — см. лог', 'error');
         }
       } catch (e) {
-        setStatus('❌ Сбой при вызове функции', 'error');
+        setStatus('❌ Сбой при вызове', 'error');
         outputEl.textContent = String(e instanceof Error ? e.message : e);
       }
     })();

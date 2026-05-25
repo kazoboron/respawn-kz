@@ -1,6 +1,5 @@
-// One-shot Edge Function: replaces the broken notify_booking_created()
-// trigger. Uses pg from the standard library instead of deno-postgres
-// to avoid third-party import failures.
+// One-shot: replace broken notify_booking_created() trigger.
+// Returns both before/after + env diagnostic in a single POST response.
 
 const FIX_SQL = `
 CREATE OR REPLACE FUNCTION notify_booking_created()
@@ -44,68 +43,74 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 `;
 
-const corsHeaders = {
+// Wildcard headers — must cover all supabase-js auto-injected headers
+// (authorization, apikey, content-type, x-client-info, x-supabase-api-version)
+const cors = {
   'access-control-allow-origin': '*',
-  'access-control-allow-headers': 'authorization, content-type, apikey',
-  'access-control-allow-methods': 'GET, POST, OPTIONS',
+  'access-control-allow-headers': '*',
+  'access-control-allow-methods': 'POST, OPTIONS',
+  'access-control-max-age': '86400',
   'content-type': 'application/json',
 };
 
-function json(body: unknown, status = 200): Response {
-  return new Response(JSON.stringify(body, null, 2), { status, headers: corsHeaders });
+function j(body: unknown, status = 200): Response {
+  return new Response(JSON.stringify(body, null, 2), { status, headers: cors });
 }
 
 Deno.serve(async (req) => {
-  if (req.method === 'OPTIONS') return new Response('', { headers: corsHeaders });
+  if (req.method === 'OPTIONS') return new Response('', { headers: cors });
 
-  // Diagnostic — what env vars are visible?
   const env = {
-    has_SUPABASE_URL: !!Deno.env.get('SUPABASE_URL'),
-    has_SUPABASE_ANON_KEY: !!Deno.env.get('SUPABASE_ANON_KEY'),
-    has_SUPABASE_SERVICE_ROLE_KEY: !!Deno.env.get('SUPABASE_SERVICE_ROLE_KEY'),
     has_SUPABASE_DB_URL: !!Deno.env.get('SUPABASE_DB_URL'),
+    has_SUPABASE_SERVICE_ROLE_KEY: !!Deno.env.get('SUPABASE_SERVICE_ROLE_KEY'),
   };
 
-  if (req.method === 'GET') {
-    return json({ ok: true, mode: 'echo', env });
-  }
-
   if (req.method !== 'POST') {
-    return json({ ok: false, error: 'Use GET (diagnose) or POST (apply)' }, 405);
+    return j({ ok: false, error: 'POST only', env }, 405);
   }
 
-  // Lazy import deno-postgres only on POST so GET still works for diagnosis
-  // even if the import fails. Wrap import in try/catch so we get a useful
-  // error JSON instead of a CORS-less fetch failure.
   let Client: typeof import('https://deno.land/x/postgres@v0.19.3/mod.ts').Client;
   try {
     ({ Client } = await import('https://deno.land/x/postgres@v0.19.3/mod.ts'));
   } catch (e) {
-    return json({ ok: false, error: 'postgres import failed', detail: String(e), env }, 500);
+    return j({ ok: false, stage: 'import', error: String(e), env }, 500);
   }
 
   const dbUrl = Deno.env.get('SUPABASE_DB_URL');
   if (!dbUrl) {
-    return json({ ok: false, error: 'SUPABASE_DB_URL not set in function env', env }, 500);
+    return j({ ok: false, stage: 'env', error: 'SUPABASE_DB_URL missing', env }, 500);
   }
 
   const client = new Client(dbUrl);
   try {
     await client.connect();
-    await client.queryArray(FIX_SQL);
-    const result = await client.queryObject<{ prosrc: string }>(
+
+    const before = await client.queryObject<{ prosrc: string }>(
       "SELECT prosrc FROM pg_proc WHERE proname = 'notify_booking_created' LIMIT 1"
     );
-    const src = result.rows[0]?.prosrc ?? '';
-    return json({
+    const beforeSrc = before.rows[0]?.prosrc ?? '';
+
+    await client.queryArray(FIX_SQL);
+
+    const after = await client.queryObject<{ prosrc: string }>(
+      "SELECT prosrc FROM pg_proc WHERE proname = 'notify_booking_created' LIMIT 1"
+    );
+    const afterSrc = after.rows[0]?.prosrc ?? '';
+
+    return j({
       ok: true,
-      mode: 'applied',
-      after_contains_club_owners: src.includes('club_owners'),
-      after_contains_helper: src.includes('get_club_admin_emails'),
-      source_preview: src.slice(0, 300),
+      before: {
+        contains_club_owners: beforeSrc.includes('club_owners'),
+        contains_helper: beforeSrc.includes('get_club_admin_emails'),
+      },
+      after: {
+        contains_club_owners: afterSrc.includes('club_owners'),
+        contains_helper: afterSrc.includes('get_club_admin_emails'),
+        preview: afterSrc.slice(0, 300),
+      },
     });
   } catch (e) {
-    return json({ ok: false, error: 'DB error', detail: e instanceof Error ? e.message : String(e), env }, 500);
+    return j({ ok: false, stage: 'db', error: e instanceof Error ? e.message : String(e), env }, 500);
   } finally {
     try { await client.end(); } catch (_) {}
   }
