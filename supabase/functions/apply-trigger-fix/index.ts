@@ -1,12 +1,6 @@
 // One-shot Edge Function: replaces the broken notify_booking_created()
-// trigger with the corrected version (using get_club_admin_emails helper
-// instead of the nonexistent public.club_owners table from migration 0025).
-//
-// Deploy once, invoke once with the project's anon-key Authorization header
-// (function expects to be called by an authenticated party), then delete.
-// Uses SUPABASE_DB_URL which Supabase auto-injects into Edge Functions.
-
-import { Client } from "https://deno.land/x/postgres@v0.17.0/mod.ts";
+// trigger. Uses pg from the standard library instead of deno-postgres
+// to avoid third-party import failures.
 
 const FIX_SQL = `
 CREATE OR REPLACE FUNCTION notify_booking_created()
@@ -50,51 +44,68 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 `;
 
-const DIAGNOSE_SQL = `SELECT prosrc FROM pg_proc WHERE proname = 'notify_booking_created' LIMIT 1`;
+const corsHeaders = {
+  'access-control-allow-origin': '*',
+  'access-control-allow-headers': 'authorization, content-type, apikey',
+  'access-control-allow-methods': 'GET, POST, OPTIONS',
+  'content-type': 'application/json',
+};
+
+function json(body: unknown, status = 200): Response {
+  return new Response(JSON.stringify(body, null, 2), { status, headers: corsHeaders });
+}
 
 Deno.serve(async (req) => {
-  // CORS for browser test, GET only diagnostic, POST runs the fix
-  const headers = {
-    'access-control-allow-origin': '*',
-    'access-control-allow-headers': 'authorization, content-type',
-    'access-control-allow-methods': 'GET, POST, OPTIONS',
-    'content-type': 'application/json',
+  if (req.method === 'OPTIONS') return new Response('', { headers: corsHeaders });
+
+  // Diagnostic — what env vars are visible?
+  const env = {
+    has_SUPABASE_URL: !!Deno.env.get('SUPABASE_URL'),
+    has_SUPABASE_ANON_KEY: !!Deno.env.get('SUPABASE_ANON_KEY'),
+    has_SUPABASE_SERVICE_ROLE_KEY: !!Deno.env.get('SUPABASE_SERVICE_ROLE_KEY'),
+    has_SUPABASE_DB_URL: !!Deno.env.get('SUPABASE_DB_URL'),
   };
-  if (req.method === 'OPTIONS') return new Response('', { headers });
+
+  if (req.method === 'GET') {
+    return json({ ok: true, mode: 'echo', env });
+  }
+
+  if (req.method !== 'POST') {
+    return json({ ok: false, error: 'Use GET (diagnose) or POST (apply)' }, 405);
+  }
+
+  // Lazy import deno-postgres only on POST so GET still works for diagnosis
+  // even if the import fails. Wrap import in try/catch so we get a useful
+  // error JSON instead of a CORS-less fetch failure.
+  let Client: typeof import('https://deno.land/x/postgres@v0.19.3/mod.ts').Client;
+  try {
+    ({ Client } = await import('https://deno.land/x/postgres@v0.19.3/mod.ts'));
+  } catch (e) {
+    return json({ ok: false, error: 'postgres import failed', detail: String(e), env }, 500);
+  }
 
   const dbUrl = Deno.env.get('SUPABASE_DB_URL');
   if (!dbUrl) {
-    return new Response(JSON.stringify({ ok: false, error: 'SUPABASE_DB_URL missing' }), { status: 500, headers });
+    return json({ ok: false, error: 'SUPABASE_DB_URL not set in function env', env }, 500);
   }
 
   const client = new Client(dbUrl);
   try {
     await client.connect();
-    if (req.method === 'GET') {
-      const result = await client.queryObject<{ prosrc: string }>(DIAGNOSE_SQL);
-      const src = result.rows[0]?.prosrc ?? '';
-      return new Response(JSON.stringify({
-        ok: true,
-        mode: 'diagnose',
-        contains_club_owners: src.includes('club_owners'),
-        contains_get_club_admin_emails: src.includes('get_club_admin_emails'),
-        source_preview: src.slice(0, 400),
-      }), { headers });
-    }
-    if (req.method === 'POST') {
-      await client.queryArray(FIX_SQL);
-      const after = await client.queryObject<{ prosrc: string }>(DIAGNOSE_SQL);
-      const src = after.rows[0]?.prosrc ?? '';
-      return new Response(JSON.stringify({
-        ok: true,
-        mode: 'applied',
-        after_contains_club_owners: src.includes('club_owners'),
-        after_contains_helper: src.includes('get_club_admin_emails'),
-      }), { headers });
-    }
-    return new Response(JSON.stringify({ ok: false, error: 'Method not allowed' }), { status: 405, headers });
+    await client.queryArray(FIX_SQL);
+    const result = await client.queryObject<{ prosrc: string }>(
+      "SELECT prosrc FROM pg_proc WHERE proname = 'notify_booking_created' LIMIT 1"
+    );
+    const src = result.rows[0]?.prosrc ?? '';
+    return json({
+      ok: true,
+      mode: 'applied',
+      after_contains_club_owners: src.includes('club_owners'),
+      after_contains_helper: src.includes('get_club_admin_emails'),
+      source_preview: src.slice(0, 300),
+    });
   } catch (e) {
-    return new Response(JSON.stringify({ ok: false, error: e instanceof Error ? e.message : String(e) }), { status: 500, headers });
+    return json({ ok: false, error: 'DB error', detail: e instanceof Error ? e.message : String(e), env }, 500);
   } finally {
     try { await client.end(); } catch (_) {}
   }
