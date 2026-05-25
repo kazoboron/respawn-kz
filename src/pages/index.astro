@@ -4,6 +4,7 @@ import { loadAllClubs } from '../lib/clubs-loader';
 import { LANDING_FAQ } from '../data/content';
 import { CITIES } from '../data/cities';
 import BetaBanner from '../components/BetaBanner.astro';
+import Starfield from '../components/Starfield.astro';
 
 const allClubs = await loadAllClubs();
 // Show ALL clubs on the homepage (user request 2026-05-20: «давай сразу
@@ -78,6 +79,7 @@ function fmtPrice(n: number): string {
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
 </head>
 <body class="v4-root">
+  <Starfield />
   <!-- SW killswitch — runs first to kill any stale service worker from
        previous deploys and force a fresh reload. See BaseLayout for full
        comment; same logic duplicated here because the v4 home is standalone

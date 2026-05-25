@@ -3,7 +3,7 @@ import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import Modal from '../components/Modal.astro';
-import AmbientBackground from '../components/AmbientBackground.astro';
+import Starfield from '../components/Starfield.astro';
 import BetaBanner from '../components/BetaBanner.astro';
 
 interface Props {
@@ -85,7 +85,7 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site ?? 'https://respawn.
     <title>{title}</title>
   </head>
   <body>
-    <AmbientBackground />
+    <Starfield />
     <BetaBanner />
     <a href="#main-content" class="skip-link">Перейти к контенту</a>
     <noscript>

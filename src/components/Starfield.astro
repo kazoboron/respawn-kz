@@ -1,0 +1,144 @@
+---
+/**
+ * Fast-flying starfield background — replaces the static ambient orbs.
+ * Canvas full-viewport, position:fixed z-index:-1 so site content sits
+ * above it. Stars have x/y/z (depth), each frame z decreases (move toward
+ * viewer), perspective projection makes near stars trail outward as
+ * streaks — Star Wars / cyberpunk hyperspace effect.
+ *
+ * Performance:
+ * - 220 stars (tuned for smooth 60fps on mid mobile)
+ * - Canvas only resizes on window resize, not per-frame
+ * - Reduced-motion: stars freeze, just a static field
+ * - Saves battery via document.hidden — pauses rAF when tab not visible
+ *
+ * Used on every page (BaseLayout + v4 index.astro) so the visual is
+ * consistent across the whole site.
+ */
+---
+
+<canvas id="starfield-canvas" class="starfield" aria-hidden="true"></canvas>
+
+<style>
+  .starfield {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    pointer-events: none;
+    background: radial-gradient(ellipse at center, #0a0820 0%, #050414 60%, #000000 100%);
+  }
+</style>
+
+<script is:inline>
+  (() => {
+    const canvas = document.getElementById('starfield-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d', { alpha: false });
+    if (!ctx) return;
+
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const STAR_COUNT = 220;
+    const SPEED = 0.022;        // 0.01 = slow drift, 0.03 = fast hyperspace
+    const TRAIL_INTENSITY = 0.85; // 0 = no trails, 1 = full motion blur
+    const ACCENT_HUE = 264;       // violet matching v4 palette
+
+    let w = 0, h = 0, cx = 0, cy = 0, dpr = 1;
+    let stars = [];
+
+    function makeStar() {
+      return {
+        x: (Math.random() - 0.5) * 2,
+        y: (Math.random() - 0.5) * 2,
+        z: Math.random(),                       // 0..1 (1 = far, 0 = near)
+        pz: 0,                                  // previous z for trail
+        c: Math.random() < 0.18 ? 'accent' : 'white',
+      };
+    }
+
+    function resize() {
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      w = window.innerWidth;
+      h = window.innerHeight;
+      cx = w / 2;
+      cy = h / 2;
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      canvas.style.width = w + 'px';
+      canvas.style.height = h + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    function init() {
+      resize();
+      stars = Array.from({ length: STAR_COUNT }, makeStar);
+      stars.forEach((s) => (s.pz = s.z));
+    }
+
+    function project(s) {
+      // Perspective: closer stars (z near 0) appear further from center
+      const k = 0.65 / s.z;
+      return { sx: cx + s.x * cx * k, sy: cy + s.y * cy * k, k };
+    }
+
+    function frame() {
+      if (document.hidden) {
+        // Tab hidden, skip drawing — reschedule sparsely
+        setTimeout(() => requestAnimationFrame(frame), 500);
+        return;
+      }
+
+      // Motion blur via semi-transparent fill instead of clearRect — leaves
+      // bright trails for fast stars while gradually fading them.
+      ctx.fillStyle = `rgba(5, 4, 20, ${1 - TRAIL_INTENSITY})`;
+      ctx.fillRect(0, 0, w, h);
+
+      for (let i = 0; i < stars.length; i++) {
+        const s = stars[i];
+        s.pz = s.z;
+        if (!reduced) s.z -= SPEED;
+        if (s.z <= 0.02) {
+          // Star passed viewer → respawn far away with new x/y
+          s.x = (Math.random() - 0.5) * 2;
+          s.y = (Math.random() - 0.5) * 2;
+          s.z = 1;
+          s.pz = 1;
+          s.c = Math.random() < 0.18 ? 'accent' : 'white';
+          continue;
+        }
+
+        const { sx, sy, k } = project(s);
+        // Skip stars projected off-screen
+        if (sx < -10 || sx > w + 10 || sy < -10 || sy > h + 10) continue;
+
+        // Previous position for trail
+        const pk = 0.65 / s.pz;
+        const psx = cx + s.x * cx * pk;
+        const psy = cy + s.y * cy * pk;
+
+        const brightness = Math.min(1, (1 - s.z) * 1.4);
+        const size = Math.max(0.4, k * 1.1);
+
+        if (s.c === 'accent') {
+          ctx.strokeStyle = `hsla(${ACCENT_HUE}, 90%, 70%, ${brightness})`;
+        } else {
+          ctx.strokeStyle = `rgba(255, 255, 255, ${brightness})`;
+        }
+        ctx.lineWidth = size;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(psx, psy);
+        ctx.lineTo(sx, sy);
+        ctx.stroke();
+      }
+
+      requestAnimationFrame(frame);
+    }
+
+    init();
+    window.addEventListener('resize', resize, { passive: true });
+    requestAnimationFrame(frame);
+  })();
+</script>
