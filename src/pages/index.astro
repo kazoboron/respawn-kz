@@ -132,7 +132,7 @@ function fmtPrice(n: number): string {
          catalog page reads via queryToFilters() in filters.ts. -->
     <section class="v4-searchbar-section v4-searchbar-section--top" aria-label="Поиск клубов">
       <div class="v4-container">
-        <form class="v4-searchbar v4-fade-up" action="/clubs/" method="get" role="search">
+        <form class="v4-searchbar v4-fade-up" id="v4-search-form" action="/clubs/" method="get" role="search">
           <label class="v4-searchbar__field v4-searchbar__field--city">
             <span class="v4-searchbar__label">Город</span>
             <select name="city" class="v4-searchbar__select" aria-label="Город">
@@ -660,6 +660,20 @@ function fmtPrice(n: number): string {
         });
       }, { threshold: 0.15 });
       els.forEach((el) => io.observe(el));
+    })();
+
+    // Auto-submit search form when city select changes — users expect
+    // picking a city in the dropdown to jump immediately to /clubs/?city=…,
+    // they don't reach for the "Найти" button.
+    (() => {
+      const form = document.getElementById('v4-search-form');
+      const select = form?.querySelector('select[name="city"]');
+      if (!form || !select) return;
+      select.addEventListener('change', () => {
+        // Only auto-submit if user actually chose a city (not the empty
+        // "Все города" default — then they probably want to type a query)
+        if (select.value) form.submit();
+      });
     })();
   </script>
 </body>
