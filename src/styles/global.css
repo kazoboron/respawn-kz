@@ -2160,12 +2160,16 @@ body.menu-open {
 .club-page__main {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 14px;
 }
 
 .club-section__title {
-  font-size: 20px;
-  margin-bottom: 10px;
+  font-size: 19px;
+  margin-bottom: 6px;
+}
+
+.club-section__text {
+  margin: 0;
 }
 
 /* Dark Google Maps iframe — Google embed renders light-themed by
