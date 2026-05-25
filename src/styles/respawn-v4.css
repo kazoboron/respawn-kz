@@ -860,7 +860,50 @@
   color: var(--v4-text-muted);
   margin-bottom: 2px;
   line-height: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
+
+/* Geo-pin button inside the city field label — quick "find me" action. */
+.v4-searchbar__geo-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(139, 92, 246, 0.10);
+  border: 1px solid rgba(139, 92, 246, 0.25);
+  color: var(--v4-accent);
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 200ms ease, border-color 200ms ease, color 200ms ease;
+  line-height: 1;
+}
+.v4-searchbar__geo-btn:hover:not(:disabled) {
+  background: rgba(139, 92, 246, 0.18);
+  border-color: var(--v4-accent);
+}
+.v4-searchbar__geo-btn:disabled { opacity: 0.6; cursor: progress; }
+.v4-searchbar__geo-btn.is-loading { color: var(--v4-text-secondary); }
+.v4-searchbar__geo-btn.is-success {
+  background: rgba(139, 92, 246, 0.22);
+  border-color: var(--v4-accent);
+  color: var(--v4-text-primary);
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 10px;
+}
+.v4-searchbar__geo-btn.is-error {
+  background: rgba(244, 63, 94, 0.10);
+  border-color: rgba(244, 63, 94, 0.35);
+  color: #fda4af;
+}
+.v4-searchbar__geo-btn svg { flex: 0 0 auto; }
 .v4-searchbar__select,
 .v4-searchbar__input {
   background: transparent;

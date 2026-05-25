@@ -134,7 +134,17 @@ function fmtPrice(n: number): string {
       <div class="v4-container">
         <form class="v4-searchbar v4-fade-up" id="v4-search-form" action="/clubs/" method="get" role="search">
           <label class="v4-searchbar__field v4-searchbar__field--city">
-            <span class="v4-searchbar__label">Город</span>
+            <span class="v4-searchbar__label">
+              Город
+              <button type="button" class="v4-searchbar__geo-btn" id="v4-searchbar-geo" aria-label="Найти ближайший город по геолокации">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M12 2 L12 5 M12 19 L12 22 M22 12 L19 12 M5 12 L2 12"/>
+                  <circle cx="12" cy="12" r="4"/>
+                  <circle cx="12" cy="12" r="9"/>
+                </svg>
+                <span>Рядом</span>
+              </button>
+            </span>
             <select name="city" class="v4-searchbar__select" aria-label="Город">
               <option value="">Все города</option>
               {cities.map((c) => (
@@ -807,6 +817,99 @@ function fmtPrice(n: number): string {
       closeBtn?.addEventListener('click', () => {
         hide();
         chips.forEach((c) => c.classList.remove('is-active'));
+      });
+
+      // Expose for the geo-button IIFE below — both need to render
+      // the inline-results section but live in separate scopes.
+      window.__v4ShowCity = showCity;
+    })();
+
+    // Geo pin → find nearest city → show its clubs inline.
+    // Uses the same #v4-clubs-data JSON + window.__v4ShowCity from the
+    // inline-results IIFE. Cities + coords are inlined separately so this
+    // IIFE doesn't need access to CITIES from the SSG context.
+    (() => {
+      const btn = document.getElementById('v4-searchbar-geo');
+      const select = document.querySelector('#v4-search-form select[name="city"]');
+      if (!btn || !select) return;
+
+      // Inline city coords for Haversine. Keep in sync with src/data/cities.ts.
+      const CITY_COORDS = [
+        { id: 'almaty',    label: 'Алматы',           lat: 43.2389, lon: 76.8897 },
+        { id: 'astana',    label: 'Астана',           lat: 51.1605, lon: 71.4704 },
+        { id: 'shymkent',  label: 'Шымкент',          lat: 42.3417, lon: 69.5901 },
+        { id: 'karaganda', label: 'Караганда',        lat: 49.8047, lon: 73.1094 },
+        { id: 'aktobe',    label: 'Актобе',           lat: 50.2839, lon: 57.1670 },
+        { id: 'taraz',     label: 'Тараз',            lat: 42.9000, lon: 71.3667 },
+        { id: 'pavlodar',  label: 'Павлодар',         lat: 52.2873, lon: 76.9670 },
+        { id: 'oskemen',   label: 'Усть-Каменогорск', lat: 49.9468, lon: 82.6075 },
+        { id: 'semey',     label: 'Семей',            lat: 50.4111, lon: 80.2275 },
+        { id: 'atyrau',    label: 'Атырау',           lat: 47.1167, lon: 51.8833 },
+      ];
+      function distanceKm(lat1, lon1, lat2, lon2) {
+        const R = 6371;
+        const toRad = (d) => (d * Math.PI) / 180;
+        const dLat = toRad(lat2 - lat1);
+        const dLon = toRad(lon2 - lon1);
+        const a = Math.sin(dLat / 2) ** 2 +
+          Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+        return 2 * R * Math.asin(Math.sqrt(a));
+      }
+      function findClosestCity(lat, lon) {
+        let best = CITY_COORDS[0];
+        let bestDist = Infinity;
+        for (const c of CITY_COORDS) {
+          const d = distanceKm(lat, lon, c.lat, c.lon);
+          if (d < bestDist) { bestDist = d; best = c; }
+        }
+        return { city: best, distance: bestDist };
+      }
+
+      function setBtnState(text, state) {
+        btn.classList.remove('is-loading', 'is-success', 'is-error');
+        if (state) btn.classList.add(`is-${state}`);
+        const span = btn.querySelector('span');
+        if (span) span.textContent = text;
+      }
+
+      btn.addEventListener('click', () => {
+        if (!navigator.geolocation) {
+          setBtnState('Не поддерживается', 'error');
+          return;
+        }
+        btn.disabled = true;
+        setBtnState('Определяем…', 'loading');
+
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            const { latitude, longitude } = pos.coords;
+            const { city, distance } = findClosestCity(latitude, longitude);
+            // Set dropdown value WITHOUT dispatching change (would auto-submit).
+            select.value = city.id;
+            // Visual feedback on button + show inline-results for that city
+            const distText = distance < 1 ? 'вы внутри' : `~${Math.round(distance)} км`;
+            setBtnState(`${city.label} · ${distText}`, 'success');
+            btn.disabled = false;
+            // Reactivate chip if matching one exists
+            document.querySelectorAll('[data-city-chip]').forEach((c) =>
+              c.classList.toggle('is-active', c.getAttribute('data-city-chip') === city.id)
+            );
+            // Show inline results
+            if (typeof window.__v4ShowCity === 'function') {
+              window.__v4ShowCity(city.id);
+            }
+          },
+          (err) => {
+            const messages = {
+              1: 'Доступ запрещён',
+              2: 'Не удалось определить',
+              3: 'Слишком долго',
+            };
+            setBtnState(messages[err.code] || 'Ошибка', 'error');
+            btn.disabled = false;
+          },
+          { timeout: 8000, maximumAge: 60000 }
+        );
       });
     })();
   </script>
