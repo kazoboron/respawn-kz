@@ -828,88 +828,73 @@
 .v4-searchbar {
   display: flex;
   align-items: stretch;
-  gap: 8px;
-  padding: 8px;
+  gap: 6px;
+  padding: 5px;
   background: var(--v4-bg-surface);
   border: 1px solid var(--v4-border-soft);
   border-radius: 999px;
-  /* Soft glow so the bar reads as an interactive surface, not a passive card */
   box-shadow: 0 12px 36px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(139, 92, 246, 0.08);
   position: relative;
   z-index: 4;
-  /* Narrow + centered — only holds [Город ▾ Рядом] + [Найти], no need
-     to span the full container. 2026-XX cleanup after removing the
-     'Что ищешь' text input. */
-  max-width: 440px;
+  /* Slim + a touch wider per user 2026-XX feedback. Just holds
+     [city select] + [geo pin] + [Найти] — pure icons where possible. */
+  max-width: 520px;
   margin-left: auto;
   margin-right: auto;
+  height: 48px;
 }
 .v4-searchbar__field {
   flex: 1 1 auto;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 8px 18px;
+  align-items: center;
+  padding: 0 16px;
   border-radius: 999px;
   transition: background 200ms ease;
-  min-width: 0;  /* allow shrink */
+  min-width: 0;
 }
 .v4-searchbar__field:hover { background: rgba(255, 255, 255, 0.03); }
 .v4-searchbar__field--city { flex: 1 1 auto; }
-.v4-searchbar__field--query { flex: 1 1 auto; }
-.v4-searchbar__label {
-  font-family: 'JetBrains Mono', ui-monospace, monospace;
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: var(--v4-text-muted);
-  margin-bottom: 2px;
-  line-height: 1;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
 
-/* Geo-pin button inside the city field label — quick "find me" action. */
+/* Geo-pin button — standalone, just an icon. Title attr explains on hover. */
 .v4-searchbar__geo-btn {
+  flex: 0 0 38px;
+  width: 38px;
+  height: 38px;
+  align-self: center;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 3px 8px;
+  justify-content: center;
+  padding: 0;
   border-radius: 999px;
-  background: rgba(139, 92, 246, 0.10);
-  border: 1px solid rgba(139, 92, 246, 0.25);
+  background: rgba(139, 92, 246, 0.12);
+  border: 1px solid rgba(139, 92, 246, 0.28);
   color: var(--v4-accent);
-  font-family: 'JetBrains Mono', ui-monospace, monospace;
-  font-size: 9px;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
   cursor: pointer;
-  transition: background 200ms ease, border-color 200ms ease, color 200ms ease;
-  line-height: 1;
+  transition: background 200ms ease, border-color 200ms ease, transform 200ms ease;
 }
 .v4-searchbar__geo-btn:hover:not(:disabled) {
-  background: rgba(139, 92, 246, 0.18);
-  border-color: var(--v4-accent);
-}
-.v4-searchbar__geo-btn:disabled { opacity: 0.6; cursor: progress; }
-.v4-searchbar__geo-btn.is-loading { color: var(--v4-text-secondary); }
-.v4-searchbar__geo-btn.is-success {
   background: rgba(139, 92, 246, 0.22);
   border-color: var(--v4-accent);
-  color: var(--v4-text-primary);
-  text-transform: none;
-  letter-spacing: 0;
-  font-size: 10px;
+  transform: scale(1.05);
+}
+.v4-searchbar__geo-btn:active:not(:disabled) { transform: scale(0.95); }
+.v4-searchbar__geo-btn:disabled { opacity: 0.6; cursor: progress; }
+.v4-searchbar__geo-btn.is-loading { animation: v4-geo-pulse 1.2s ease-in-out infinite; }
+.v4-searchbar__geo-btn.is-success {
+  background: rgba(139, 92, 246, 0.32);
+  border-color: var(--v4-accent);
+  color: #fff;
 }
 .v4-searchbar__geo-btn.is-error {
-  background: rgba(244, 63, 94, 0.10);
-  border-color: rgba(244, 63, 94, 0.35);
+  background: rgba(244, 63, 94, 0.14);
+  border-color: rgba(244, 63, 94, 0.45);
   color: #fda4af;
 }
 .v4-searchbar__geo-btn svg { flex: 0 0 auto; }
+@keyframes v4-geo-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
 .v4-searchbar__select,
 .v4-searchbar__input {
   background: transparent;
@@ -919,10 +904,12 @@
   font: inherit;
   font-size: 15px;
   font-family: 'Inter', sans-serif;
+  font-weight: 500;
   letter-spacing: -0.01em;
   padding: 0;
   width: 100%;
   min-width: 0;
+  height: 100%;
 }
 .v4-searchbar__select {
   appearance: none;
@@ -941,8 +928,11 @@
 .v4-searchbar__input::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }
 .v4-searchbar__submit {
   flex: 0 0 auto;
-  padding: 14px 24px;
+  align-self: center;
+  padding: 0 18px;
+  height: 38px;
   border-radius: 999px;
+  font-size: 14px;
 }
 .v4-searchbar__submit svg { flex: 0 0 auto; }
 
