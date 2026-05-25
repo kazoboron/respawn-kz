@@ -162,17 +162,19 @@ function fmtPrice(n: number): string {
           </button>
         </form>
 
-        <!-- Quick links under the bar — popular cities as one-click filters,
-             plus a short trust line on the right. Same /clubs/?city=… URL
-             contract as the search form. -->
+        <!-- Quick links under the bar — popular cities as one-click filters.
+             Clicking a chip renders the matching clubs INLINE in
+             #v4-inline-results below, without leaving the homepage.
+             The href is kept as a fallback if JS fails: same /clubs/?city=…
+             URL contract as the search form. -->
         <div class="v4-searchbar__chips v4-fade-up">
           <div class="v4-searchbar__chips-group" aria-label="Популярные города">
             <span class="v4-searchbar__chips-label">Популярные города:</span>
-            <a href="/clubs/?city=almaty" class="v4-searchbar__chip">Алматы</a>
-            <a href="/clubs/?city=astana" class="v4-searchbar__chip">Астана</a>
-            <a href="/clubs/?city=shymkent" class="v4-searchbar__chip">Шымкент</a>
-            <a href="/clubs/?city=karaganda" class="v4-searchbar__chip">Караганда</a>
-            <a href="/clubs/?city=aktobe" class="v4-searchbar__chip">Актобе</a>
+            <a href="/clubs/?city=almaty" data-city-chip="almaty" class="v4-searchbar__chip">Алматы</a>
+            <a href="/clubs/?city=astana" data-city-chip="astana" class="v4-searchbar__chip">Астана</a>
+            <a href="/clubs/?city=shymkent" data-city-chip="shymkent" class="v4-searchbar__chip">Шымкент</a>
+            <a href="/clubs/?city=karaganda" data-city-chip="karaganda" class="v4-searchbar__chip">Караганда</a>
+            <a href="/clubs/?city=aktobe" data-city-chip="aktobe" class="v4-searchbar__chip">Актобе</a>
           </div>
           <p class="v4-searchbar__chips-info v4-mono">
             <span class="v4-accent">{allClubs.length}+</span>&nbsp;клубов
@@ -184,6 +186,51 @@ function fmtPrice(n: number): string {
         </div>
       </div>
     </section>
+
+    <!-- INLINE RESULTS — appears when user clicks a city chip above.
+         Hidden by default; populated by JS from #v4-clubs-data JSON. -->
+    <section class="v4-inline-results" id="v4-inline-results" hidden aria-live="polite">
+      <div class="v4-container">
+        <header class="v4-inline-results__head">
+          <h2 class="v4-inline-results__title">
+            Клубы в&nbsp;<span data-inline-city-label>—</span>
+            <span class="v4-inline-results__count v4-mono" data-inline-count></span>
+          </h2>
+          <button type="button" class="v4-inline-results__close" id="v4-inline-results-close" aria-label="Закрыть результаты">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M6 6l12 12"/><path d="M18 6L6 18"/>
+            </svg>
+            Закрыть
+          </button>
+        </header>
+        <div class="v4-catalog__grid" id="v4-inline-results-grid"></div>
+        <p class="v4-inline-results__empty" id="v4-inline-results-empty" hidden>
+          В этом городе пока нет клубов. Скоро добавим.
+        </p>
+        <a class="v4-inline-results__more" data-inline-more href="/clubs/">
+          Все клубы города в полном каталоге
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M5 12h14"/><path d="M13 6l6 6-6 6"/>
+          </svg>
+        </a>
+      </div>
+    </section>
+
+    <!-- All-clubs data inlined for client-side filtering by city chips above.
+         Small enough (12 clubs × ~400 bytes ≈ 5 KB) that parsing cost is
+         negligible vs the network round-trip we'd otherwise need. -->
+    <script id="v4-clubs-data" type="application/json" is:inline set:html={JSON.stringify(allClubs.map((c) => ({
+      slug: c.slug,
+      name: c.name,
+      city: c.city,
+      district: c.district,
+      rating: c.rating,
+      reviews_count: c.reviews_count,
+      price_per_hour: c.price_per_hour,
+      initial: c.initial,
+      photos: c.photos,
+    })))}></script>
+    <script id="v4-city-labels" type="application/json" is:inline set:html={JSON.stringify(Object.fromEntries(cities.map((c) => [c.id, c.label])))}></script>
 
     <!-- HERO: pinned 300vh with scroll-scrub portal video -->
     <section id="top" class="v4-hero" aria-label="Hero" data-v4-hero>
@@ -673,6 +720,93 @@ function fmtPrice(n: number): string {
         // Only auto-submit if user actually chose a city (not the empty
         // "Все города" default — then they probably want to type a query)
         if (select.value) form.submit();
+      });
+    })();
+
+    // City chip click → inline filtered results above the hero. Reads
+    // pre-rendered #v4-clubs-data JSON, filters by city, renders cards
+    // into #v4-inline-results-grid. Anchors still have href as a fallback
+    // (e.preventDefault stops navigation only when JS runs).
+    (() => {
+      const clubsScript = document.getElementById('v4-clubs-data');
+      const labelsScript = document.getElementById('v4-city-labels');
+      const resultsSection = document.getElementById('v4-inline-results');
+      const grid = document.getElementById('v4-inline-results-grid');
+      const emptyEl = document.getElementById('v4-inline-results-empty');
+      const countEl = document.querySelector('[data-inline-count]');
+      const labelEl = document.querySelector('[data-inline-city-label]');
+      const moreLink = document.querySelector('[data-inline-more]');
+      const closeBtn = document.getElementById('v4-inline-results-close');
+      if (!clubsScript || !resultsSection || !grid) return;
+
+      let allClubs = [];
+      let cityLabels = {};
+      try {
+        allClubs = JSON.parse(clubsScript.textContent || '[]');
+        cityLabels = JSON.parse(labelsScript?.textContent || '{}');
+      } catch (_) { return; }
+
+      function fmtPrice(n) {
+        return new Intl.NumberFormat('ru-RU').format(n);
+      }
+
+      function renderCard(club) {
+        const cover = club.photos && club.photos[0]
+          ? `background-image:url(${club.photos[0]});background-size:cover;background-position:center;`
+          : '';
+        const captionFallback = !club.photos || !club.photos[0]
+          ? `<div class="v4-card__photo-caption">${club.initial || club.name.charAt(0).toUpperCase()}</div>`
+          : '';
+        const districtPart = club.district ? ` · ${club.district}` : '';
+        return `
+          <a href="/clubs/${club.slug}/" class="v4-card v4-fade-up is-in" style="text-decoration:none;color:inherit;">
+            <div class="v4-card__photo" style="${cover}">${captionFallback}</div>
+            <div class="v4-card__divider"></div>
+            <div class="v4-card__body">
+              <h3 class="v4-card__title">${club.name}</h3>
+              <p class="v4-card__meta">${club.city}${districtPart}</p>
+              <div class="v4-card__rating v4-mono">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M12 2l2.9 6.9L22 10l-5.5 4.8L18 22l-6-3.6L6 22l1.5-7.2L2 10l7.1-1.1L12 2z"/>
+                </svg>
+                <span class="v4-accent">${Number(club.rating).toFixed(1)}</span>
+                <span class="v4-muted">(${club.reviews_count}&nbsp;отзывов)</span>
+              </div>
+              <p class="v4-card__price v4-mono">от <span class="v4-accent">${fmtPrice(club.price_per_hour)} ₸</span> /час</p>
+            </div>
+          </a>
+        `;
+      }
+
+      function showCity(citySlug) {
+        const matches = allClubs.filter((c) => c.city === citySlug);
+        if (labelEl) labelEl.textContent = cityLabels[citySlug] || citySlug;
+        if (countEl) countEl.textContent = matches.length ? `· ${matches.length}` : '';
+        grid.innerHTML = matches.map(renderCard).join('');
+        if (emptyEl) emptyEl.hidden = matches.length > 0;
+        if (moreLink) moreLink.setAttribute('href', `/clubs/?city=${citySlug}`);
+        resultsSection.hidden = false;
+        // Smooth scroll into view if needed (not always — chip is already visible)
+        resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+
+      function hide() {
+        resultsSection.hidden = true;
+      }
+
+      const chips = document.querySelectorAll('[data-city-chip]');
+      chips.forEach((chip) => {
+        chip.addEventListener('click', (e) => {
+          e.preventDefault();
+          const slug = chip.getAttribute('data-city-chip');
+          chips.forEach((c) => c.classList.toggle('is-active', c === chip));
+          showCity(slug);
+        });
+      });
+
+      closeBtn?.addEventListener('click', () => {
+        hide();
+        chips.forEach((c) => c.classList.remove('is-active'));
       });
     })();
   </script>

@@ -897,6 +897,95 @@
 }
 .v4-searchbar__submit svg { flex: 0 0 auto; }
 
+/* Inline results — appears when user clicks a city chip above the hero */
+.v4-inline-results {
+  padding: 24px 0 40px;
+  position: relative;
+  z-index: 3;
+  /* Slight tint so the section reads as a "filter result" surface, not the hero */
+  background: linear-gradient(180deg, rgba(139, 92, 246, 0.04) 0%, transparent 100%);
+  border-top: 1px solid var(--v4-border-soft);
+}
+.v4-inline-results[hidden] { display: none; }
+.v4-inline-results__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+.v4-inline-results__title {
+  font-size: clamp(22px, 3vw, 32px);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin: 0;
+  color: var(--v4-text-primary);
+}
+.v4-inline-results__count {
+  font-size: 0.65em;
+  color: var(--v4-text-muted);
+  margin-left: 8px;
+  font-weight: 500;
+}
+.v4-inline-results__close {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--v4-border-soft);
+  background: transparent;
+  color: var(--v4-text-secondary);
+  font-size: 13px;
+  cursor: pointer;
+  transition: border-color 200ms ease, color 200ms ease;
+}
+.v4-inline-results__close:hover {
+  border-color: var(--v4-border-hover);
+  color: var(--v4-text-primary);
+}
+.v4-inline-results__empty {
+  color: var(--v4-text-muted);
+  font-size: 14px;
+  text-align: center;
+  padding: 24px 0;
+}
+.v4-inline-results__more {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 24px;
+  color: var(--v4-accent);
+  font-size: 15px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: gap 200ms ease, color 200ms ease;
+}
+.v4-inline-results__more:hover {
+  color: var(--v4-accent-glow);
+  gap: 14px;
+}
+/* Override the catalog grid inside inline-results to use 2-col on phones,
+   matching the main catalog teaser further down the page. */
+.v4-inline-results .v4-catalog__grid {
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+}
+@media (max-width: 640px) {
+  .v4-inline-results .v4-catalog__grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+}
+
+/* Active state for chip when its city is currently shown — optional polish,
+   triggered by the same click that shows results. */
+.v4-searchbar__chip.is-active {
+  background: rgba(139, 92, 246, 0.16);
+  border-color: rgba(139, 92, 246, 0.4);
+  color: var(--v4-text-primary);
+}
+
 /* Quick chips row under the search bar — popular cities + trust info */
 .v4-searchbar__chips {
   display: flex;
