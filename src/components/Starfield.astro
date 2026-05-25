@@ -56,24 +56,30 @@
     function makeStar(initial) {
       // Depth 0..1 — used for parallax speed + size + brightness
       const depth = Math.random();
+      // 4% of stars become "diamonds" — large bright cores with 4-point
+      // cross glare rays. Visually dominate the field at any given moment.
+      const diamond = Math.random() < 0.04;
       return {
         // If initial=true, spread across whole screen; otherwise spawn at right edge
         x: initial ? Math.random() * w : w + Math.random() * 50,
         y: Math.random() * h,
         depth,
         speed: BASE_SPEED + depth * SPEED_RANGE,
-        size: 0.4 + depth * 1.6,
-        brightness: 0.25 + depth * 0.75,
-        accent: Math.random() < 0.18,
+        size: diamond ? 1.8 + depth * 1.4 : 0.4 + depth * 1.6,
+        brightness: diamond ? 0.9 : 0.25 + depth * 0.75,
+        accent: !diamond && Math.random() < 0.18, // diamonds stay pure white for max sparkle
+        diamond,
+        rayLen: diamond ? 7 + Math.random() * 9 : 0, // cross-ray length in px
         // Chaotic twinkling — each star has its own clock + amplitude
         // so they sparkle independently rather than in lockstep.
         twinklePhase: Math.random() * Math.PI * 2,
-        twinkleSpeed: 0.5 + Math.random() * 4.5,        // 0.5x..5x — wide variety
-        twinkleAmp: 0.35 + Math.random() * 0.55,         // 0.35..0.9 — some stars
-                                                         // nearly disappear, others
-                                                         // stay mostly bright
-        // ~6% of stars get occasional sharp flares (bright burst on top of base)
-        flareChance: Math.random() < 0.06 ? Math.random() * 0.003 : 0,
+        // Diamonds pulse slower + with more drama (deeper amplitude)
+        twinkleSpeed: diamond ? 0.4 + Math.random() * 1.6 : 0.5 + Math.random() * 4.5,
+        twinkleAmp: diamond ? 0.55 + Math.random() * 0.4 : 0.35 + Math.random() * 0.55,
+        // Flares: rare for normal stars, slightly more often for diamonds
+        flareChance: diamond
+          ? 0.001 + Math.random() * 0.004
+          : (Math.random() < 0.06 ? Math.random() * 0.003 : 0),
         flareUntil: 0,
       };
     }
@@ -140,14 +146,43 @@
           }
         }
 
-        if (s.accent) {
-          ctx.fillStyle = `hsla(${ACCENT_HUE}, 90%, 72%, ${alpha})`;
+        const color = s.accent
+          ? `hsla(${ACCENT_HUE}, 90%, 72%, ${alpha})`
+          : `rgba(255, 255, 255, ${alpha})`;
+
+        if (s.diamond) {
+          // Diamond render: cross-shaped lens-flare rays + soft halo + bright core.
+          // Ray length scales with twinkle so the sparkle expands/contracts.
+          const ray = s.rayLen * (0.6 + tw * 0.4);
+          ctx.lineCap = 'round';
+          // 4-point cross — vertical + horizontal rays
+          ctx.strokeStyle = `rgba(255, 255, 255, ${alpha * 0.85})`;
+          ctx.lineWidth = 0.8;
+          ctx.beginPath();
+          ctx.moveTo(s.x - ray, s.y);
+          ctx.lineTo(s.x + ray, s.y);
+          ctx.moveTo(s.x, s.y - ray);
+          ctx.lineTo(s.x, s.y + ray);
+          ctx.stroke();
+          // Soft halo: large faint glow circle behind the core
+          const grad = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.size * 3.5);
+          grad.addColorStop(0, `rgba(255, 255, 255, ${alpha * 0.5})`);
+          grad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+          ctx.fillStyle = grad;
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, s.size * 3.5, 0, Math.PI * 2);
+          ctx.fill();
+          // Bright core
+          ctx.fillStyle = color;
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+          ctx.fill();
         } else {
-          ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
+          ctx.fillStyle = color;
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+          ctx.fill();
         }
-        ctx.beginPath();
-        ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
-        ctx.fill();
       }
 
       requestAnimationFrame(frame);
