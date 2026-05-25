@@ -2160,15 +2160,24 @@ body.menu-open {
 .club-page__main {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 6px;
+}
+
+.club-section {
+  margin: 0;
 }
 
 .club-section__title {
-  font-size: 19px;
-  margin-bottom: 6px;
+  font-size: 18px;
+  margin-bottom: 4px;
 }
 
 .club-section__text {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.equipment-list {
   margin: 0;
 }
 
