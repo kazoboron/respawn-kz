@@ -220,6 +220,15 @@ export const supabase: SupabaseClient = supabaseConfigured
         persistSession: true,
         autoRefreshToken: true,
         detectSessionInUrl: true,
+        // Switched 2026-05-21 from default PKCE → implicit. PKCE requires the
+        // magic link to be opened in the SAME browser/storage that requested
+        // it (code_verifier lives in localStorage); users reading email on
+        // phone vs requesting on desktop, or via Gmail in-app browser, were
+        // breaking that contract. Implicit puts the access_token into the URL
+        // fragment briefly (the fragment never hits the server), then Supabase
+        // JS picks it up via detectSessionInUrl. Trade-off: a momentary
+        // exposure of the token in URL bar. Acceptable for closed beta.
+        flowType: 'implicit',
       },
     })
   : (makeDemoClient() as unknown as SupabaseClient);
