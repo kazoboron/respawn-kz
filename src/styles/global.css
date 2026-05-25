@@ -2402,6 +2402,33 @@ body.menu-open {
   color: var(--text-primary);
   font-family: inherit;
   transition: border-color var(--t-fast);
+  /* Tell Chrome/Safari to render native controls (date picker calendar
+     icon, dropdown, picker popup) in dark theme so they don't have white
+     backgrounds standing out from our dark inputs. */
+  color-scheme: dark;
+}
+
+/* Webkit-specific: the calendar icon in date inputs has its own bg by
+   default; invert it so it shows light-on-dark like the rest of the field. */
+.auth-input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.85);
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity var(--t-fast);
+}
+.auth-input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+}
+/* Some Chrome versions inject light backgrounds for the inner spinner /
+   datetime-edit wrapper — explicitly transparent. */
+.auth-input[type="date"]::-webkit-datetime-edit,
+.auth-input[type="date"]::-webkit-datetime-edit-fields-wrapper,
+.auth-input[type="date"]::-webkit-datetime-edit-text,
+.auth-input[type="date"]::-webkit-datetime-edit-month-field,
+.auth-input[type="date"]::-webkit-datetime-edit-day-field,
+.auth-input[type="date"]::-webkit-datetime-edit-year-field {
+  background: transparent;
+  color: var(--text-primary);
 }
 
 .auth-input:hover,
