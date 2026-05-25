@@ -184,13 +184,10 @@ function fmtPrice(n: number): string {
              The href is kept as a fallback if JS fails: same /clubs/?city=…
              URL contract as the search form. -->
         <div class="v4-searchbar__chips v4-fade-up">
-          <div class="v4-searchbar__chips-group" aria-label="Популярные города">
-            <span class="v4-searchbar__chips-label">Популярные города:</span>
-            <a href="/clubs/?city=almaty" data-city-chip="almaty" class="v4-searchbar__chip">Алматы</a>
-            <a href="/clubs/?city=astana" data-city-chip="astana" class="v4-searchbar__chip">Астана</a>
-            <a href="/clubs/?city=shymkent" data-city-chip="shymkent" class="v4-searchbar__chip">Шымкент</a>
-            <a href="/clubs/?city=karaganda" data-city-chip="karaganda" class="v4-searchbar__chip">Караганда</a>
-            <a href="/clubs/?city=aktobe" data-city-chip="aktobe" class="v4-searchbar__chip">Актобе</a>
+          <div class="v4-searchbar__chips-group" aria-label="Города">
+            {cities.map((c) => (
+              <a href={`/clubs/?city=${c.id}`} data-city-chip={c.id} class="v4-searchbar__chip">{c.label}</a>
+            ))}
           </div>
         </div>
       </div>
