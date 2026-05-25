@@ -2452,13 +2452,36 @@ body.menu-open {
    ============================================ */
 .booking-form__row {
   display: grid;
-  /* Equal columns so the hours stepper (~112px min) fits in the third
-     track. The previous 1.2/1/0.8 split squeezed the stepper, causing
-     visible overflow + parent-row shift when buttons were clicked. */
-  grid-template-columns: 1fr 1fr 1fr;
+  /* minmax(0, 1fr) prevents intrinsic content (long select options like
+     "10:00 — 1500 ₸ — 1 ч свободно") from inflating the grid track
+     beyond its share. Plain 1fr defaults to min-content sizing which
+     is the longest option's width — that made columns asymmetric AND
+     made them shift each time the select options changed (e.g., when
+     refreshSlots() repopulated the dropdown after a date change).
+     With minmax(0, 1fr) tracks are exactly 1/3 of available width
+     no matter what content they hold. */
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
   gap: 12px;
   margin-bottom: 16px;
   align-items: end;
+}
+/* Force all fields inside the booking row to respect their grid track,
+   so they don't drive the track width themselves. */
+.booking-form__row > .auth-field {
+  min-width: 0;
+}
+.booking-form__row .auth-field > .auth-input,
+.booking-form__row .auth-field > .hours-stepper {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+.booking-form__row select.auth-input {
+  /* Selects with long option text can otherwise size to longest option.
+     text-overflow on the SELECTED value (Chrome supports). */
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 
 /* Hours stepper — replaces ugly native number input arrows. The native
