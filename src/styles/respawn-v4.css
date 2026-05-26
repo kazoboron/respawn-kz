@@ -874,6 +874,7 @@
 .v4-searchbar {
   display: flex;
   align-items: center;       /* center children vertically, no stretching */
+  flex-wrap: nowrap;          /* never let buttons drop below */
   gap: 6px;
   padding: 4px 4px 4px 6px;
   background: var(--v4-bg-surface);
@@ -992,6 +993,27 @@
   box-sizing: border-box;
 }
 .v4-searchbar__submit svg { flex: 0 0 auto; width: 14px; height: 14px; }
+
+/* On phones the "Найти" label + icon button is too wide and was
+   spilling outside the pill onto the city chips below. Collapse to
+   an icon-only round 40px pill matching the geo button. The bar
+   becomes: [input ……………………] [📍] [🔍] all snug inside one rail. */
+@media (max-width: 640px) {
+  .v4-searchbar__submit {
+    width: 40px;
+    height: 40px;
+    padding: 0 !important;
+    border-radius: 50%;
+    flex: 0 0 40px;
+  }
+  .v4-searchbar__submit span { display: none; }
+  .v4-searchbar__submit svg { width: 16px; height: 16px; }
+  /* Bar tightens its own padding too so the two pills sit neatly */
+  .v4-searchbar {
+    gap: 4px;
+    padding: 4px;
+  }
+}
 
 /* Inline results — appears when user clicks a city chip above the hero */
 .v4-inline-results {
