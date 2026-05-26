@@ -197,6 +197,19 @@
   height: 100%;
   object-fit: cover;
   z-index: 0;
+  /* Mask-fade the edges so the video blends into the starfield bg
+     instead of having a sharp rectangular boundary. 14% fade top + 14%
+     fade bottom — center stays fully opaque. Horizontal: subtle 4%
+     fade so the left/right corners also dissolve when there's no
+     surrounding container. */
+  -webkit-mask-image:
+    linear-gradient(180deg, transparent 0%, #000 14%, #000 86%, transparent 100%),
+    linear-gradient(90deg, transparent 0%, #000 4%, #000 96%, transparent 100%);
+  -webkit-mask-composite: source-in;
+          mask-image:
+    linear-gradient(180deg, transparent 0%, #000 14%, #000 86%, transparent 100%),
+    linear-gradient(90deg, transparent 0%, #000 4%, #000 96%, transparent 100%);
+          mask-composite: intersect;
 }
 
 /* Nuke every native control pseudo-element webkit might inject.
@@ -233,7 +246,12 @@
 .v4-hero__vignette {
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse at center, transparent 35%, rgba(0,0,0,0.55) 100%);
+  /* Pairs with the mask-faded video — adds extra dark gradient to make
+     the top and bottom edges dissolve completely into the starfield
+     background. Centre of the video stays unobscured. */
+  background:
+    radial-gradient(ellipse at center, transparent 35%, rgba(0,0,0,0.55) 100%),
+    linear-gradient(180deg, rgba(5,4,20,0.7) 0%, transparent 18%, transparent 82%, rgba(5,4,20,0.7) 100%);
   pointer-events: none;
   z-index: 1;
 }
