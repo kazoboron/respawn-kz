@@ -197,18 +197,45 @@
   height: 100%;
   object-fit: cover;
   z-index: 0;
-  /* Mask-fade the edges so the video blends into the starfield bg
-     instead of having a sharp rectangular boundary. 14% fade top + 14%
-     fade bottom — center stays fully opaque. Horizontal: subtle 4%
-     fade so the left/right corners also dissolve when there's no
-     surrounding container. */
+  /* Soft semi-transparent edges — multi-stop gradients give a wide
+     fade zone where the video is partially see-through, so the
+     starfield stars in the background show through. Center stays
+     fully opaque. */
   -webkit-mask-image:
-    linear-gradient(180deg, transparent 0%, #000 14%, #000 86%, transparent 100%),
-    linear-gradient(90deg, transparent 0%, #000 4%, #000 96%, transparent 100%);
+    linear-gradient(180deg,
+      rgba(0,0,0,0)    0%,
+      rgba(0,0,0,0.25) 6%,
+      rgba(0,0,0,0.6)  14%,
+      rgba(0,0,0,1)    28%,
+      rgba(0,0,0,1)    72%,
+      rgba(0,0,0,0.6)  86%,
+      rgba(0,0,0,0.25) 94%,
+      rgba(0,0,0,0)    100%),
+    linear-gradient(90deg,
+      rgba(0,0,0,0)    0%,
+      rgba(0,0,0,0.55) 4%,
+      rgba(0,0,0,1)    10%,
+      rgba(0,0,0,1)    90%,
+      rgba(0,0,0,0.55) 96%,
+      rgba(0,0,0,0)    100%);
   -webkit-mask-composite: source-in;
           mask-image:
-    linear-gradient(180deg, transparent 0%, #000 14%, #000 86%, transparent 100%),
-    linear-gradient(90deg, transparent 0%, #000 4%, #000 96%, transparent 100%);
+    linear-gradient(180deg,
+      rgba(0,0,0,0)    0%,
+      rgba(0,0,0,0.25) 6%,
+      rgba(0,0,0,0.6)  14%,
+      rgba(0,0,0,1)    28%,
+      rgba(0,0,0,1)    72%,
+      rgba(0,0,0,0.6)  86%,
+      rgba(0,0,0,0.25) 94%,
+      rgba(0,0,0,0)    100%),
+    linear-gradient(90deg,
+      rgba(0,0,0,0)    0%,
+      rgba(0,0,0,0.55) 4%,
+      rgba(0,0,0,1)    10%,
+      rgba(0,0,0,1)    90%,
+      rgba(0,0,0,0.55) 96%,
+      rgba(0,0,0,0)    100%);
           mask-composite: intersect;
 }
 
@@ -246,12 +273,12 @@
 .v4-hero__vignette {
   position: absolute;
   inset: 0;
-  /* Pairs with the mask-faded video — adds extra dark gradient to make
-     the top and bottom edges dissolve completely into the starfield
-     background. Centre of the video stays unobscured. */
+  /* Lighter vignette — video mask already fades edges; vignette only
+     softens the corners + adds slight depth without overpowering the
+     starfield showing through the translucent video edges. */
   background:
-    radial-gradient(ellipse at center, transparent 35%, rgba(0,0,0,0.55) 100%),
-    linear-gradient(180deg, rgba(5,4,20,0.7) 0%, transparent 18%, transparent 82%, rgba(5,4,20,0.7) 100%);
+    radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.35) 100%),
+    linear-gradient(180deg, rgba(5,4,20,0.35) 0%, transparent 14%, transparent 86%, rgba(5,4,20,0.35) 100%);
   pointer-events: none;
   z-index: 1;
 }
