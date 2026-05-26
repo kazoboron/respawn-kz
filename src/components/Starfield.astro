@@ -95,8 +95,65 @@
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
 
+    // Pre-render a sparkle sprite once — gradient cross + halo with
+    // smooth alpha falloff. Drawing this via drawImage looks anti-aliased
+    // and reads as 'lens flare', not pixel-thin lines. 1 drawImage per
+    // diamond per frame instead of 4 strokes + 2 fills.
+    const SPRITE_SIZE = 64;       // px in sprite space; we scale down at draw time
+    let sparkleSprite = null;
+    function buildSparkleSprite() {
+      const c = document.createElement('canvas');
+      c.width = c.height = SPRITE_SIZE;
+      const cx = SPRITE_SIZE / 2;
+      const sctx = c.getContext('2d');
+      if (!sctx) return null;
+      sctx.translate(cx, cx);
+
+      // Soft round halo behind everything
+      const halo = sctx.createRadialGradient(0, 0, 0, 0, 0, cx);
+      halo.addColorStop(0,    'rgba(255,255,255,0.55)');
+      halo.addColorStop(0.18, 'rgba(255,255,255,0.18)');
+      halo.addColorStop(0.55, 'rgba(255,255,255,0.04)');
+      halo.addColorStop(1,    'rgba(255,255,255,0)');
+      sctx.fillStyle = halo;
+      sctx.fillRect(-cx, -cx, SPRITE_SIZE, SPRITE_SIZE);
+
+      // 4-point cross via linear gradients (transparent → bright → transparent).
+      // Drawn as thin rects with gradients so edges fade naturally — no pixel
+      // ladder like ctx.stroke() with line width <1.
+      const rayHalf = cx * 0.92;         // ray reaches almost to sprite edge
+      const rayThick = 1.4;
+      const lg = (x0, y0, x1, y1) => {
+        const g = sctx.createLinearGradient(x0, y0, x1, y1);
+        g.addColorStop(0,   'rgba(255,255,255,0)');
+        g.addColorStop(0.5, 'rgba(255,255,255,0.95)');
+        g.addColorStop(1,   'rgba(255,255,255,0)');
+        return g;
+      };
+      // Horizontal ray
+      sctx.fillStyle = lg(-rayHalf, 0, rayHalf, 0);
+      sctx.fillRect(-rayHalf, -rayThick / 2, rayHalf * 2, rayThick);
+      // Vertical ray
+      sctx.fillStyle = lg(0, -rayHalf, 0, rayHalf);
+      sctx.fillRect(-rayThick / 2, -rayHalf, rayThick, rayHalf * 2);
+
+      // Bright tiny core in the middle (slightly larger than the rays
+      // intersection so the center reads as a sharp point, not a cross)
+      const core = sctx.createRadialGradient(0, 0, 0, 0, 0, 4);
+      core.addColorStop(0, 'rgba(255,255,255,1)');
+      core.addColorStop(0.6, 'rgba(255,255,255,0.4)');
+      core.addColorStop(1, 'rgba(255,255,255,0)');
+      sctx.fillStyle = core;
+      sctx.beginPath();
+      sctx.arc(0, 0, 4, 0, Math.PI * 2);
+      sctx.fill();
+
+      return c;
+    }
+
     function init() {
       resize();
+      sparkleSprite = buildSparkleSprite();
       stars = Array.from({ length: STAR_COUNT }, () => makeStar(true));
     }
 
@@ -150,28 +207,15 @@
           ? `hsla(${ACCENT_HUE}, 90%, 72%, ${alpha})`
           : `rgba(255, 255, 255, ${alpha})`;
 
-        if (s.diamond) {
-          // Diamond render: cross-shaped lens-flare rays + soft halo + bright core.
-          // Ray length scales with twinkle so the sparkle expands/contracts.
-          const ray = s.rayLen * (0.6 + tw * 0.4);
-          ctx.lineCap = 'round';
-          // 4-point cross — vertical + horizontal rays
-          ctx.strokeStyle = `rgba(255, 255, 255, ${alpha * 0.85})`;
-          ctx.lineWidth = 0.8;
-          ctx.beginPath();
-          ctx.moveTo(s.x - ray, s.y);
-          ctx.lineTo(s.x + ray, s.y);
-          ctx.moveTo(s.x, s.y - ray);
-          ctx.lineTo(s.x, s.y + ray);
-          ctx.stroke();
-          // Soft halo: large faint glow circle behind the core
-          const grad = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.size * 3.5);
-          grad.addColorStop(0, `rgba(255, 255, 255, ${alpha * 0.5})`);
-          grad.addColorStop(1, 'rgba(255, 255, 255, 0)');
-          ctx.fillStyle = grad;
-          ctx.beginPath();
-          ctx.arc(s.x, s.y, s.size * 3.5, 0, Math.PI * 2);
-          ctx.fill();
+        if (s.diamond && sparkleSprite) {
+          // Diamond: draw the pre-rendered sparkle sprite scaled by twinkle.
+          // The sprite already has a fading gradient cross + halo + core
+          // anti-aliased into its pixels, so we get soft edges for free.
+          // Total size = rayLen * (twinkle factor) — pulses with the star.
+          const size = s.rayLen * (0.7 + tw * 0.5);
+          ctx.globalAlpha = alpha;
+          ctx.drawImage(sparkleSprite, s.x - size, s.y - size, size * 2, size * 2);
+          ctx.globalAlpha = 1;
           // Bright core
           ctx.fillStyle = color;
           ctx.beginPath();
