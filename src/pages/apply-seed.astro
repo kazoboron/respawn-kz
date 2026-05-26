@@ -1,0 +1,51 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Apply Seed · respawn.kz">
+  <section class="auth-page" id="apply-seed-root">
+    <div class="container">
+      <div class="auth-card" style="text-align:center;max-width:760px">
+        <h1 class="auth-card__title">Применяю seed 15 реальных клубов…</h1>
+        <p class="auth-card__subtitle" id="apply-status">Connecting…</p>
+        <pre id="apply-output" style="text-align:left;background:var(--bg-surface);padding:16px;border-radius:8px;border:1px solid var(--border);font-family:monospace;font-size:12px;white-space:pre-wrap;word-break:break-word;margin-top:24px;min-height:80px"></pre>
+        <p style="margin-top:24px;color:var(--text-secondary);font-size:13px">
+          Эта страница вызывает одноразовую edge-функцию apply-clubs-seed.
+          После «✓ Готово» — удалю функцию + страницу.
+        </p>
+      </div>
+    </div>
+  </section>
+  <script>
+    import { supabase } from '../lib/supabase';
+
+    const statusEl = document.getElementById('apply-status') as HTMLElement;
+    const outputEl = document.getElementById('apply-output') as HTMLElement;
+
+    function setStatus(text: string, kind?: 'success' | 'error') {
+      statusEl.textContent = text;
+      statusEl.style.color = kind === 'success' ? 'var(--success)' : kind === 'error' ? 'var(--danger)' : 'var(--text-secondary)';
+    }
+
+    (async () => {
+      try {
+        setStatus('Запрос к edge-функции…');
+        const res = await supabase.functions.invoke('apply-clubs-seed', { method: 'POST' });
+        outputEl.textContent = JSON.stringify(res.data ?? res.error, null, 2);
+        if (res.error) {
+          setStatus('❌ Сбой вызова — см. лог', 'error');
+          return;
+        }
+        const data = res.data as { ok?: boolean; before_count?: number; after_count?: number };
+        if (data?.ok && data.after_count === 15) {
+          setStatus(`✓ Готово. Было ${data.before_count} клубов, стало ${data.after_count} (15 реальных).`, 'success');
+        } else {
+          setStatus('⚠️ Результат не как ожидалось — см. лог', 'error');
+        }
+      } catch (e) {
+        setStatus('❌ Сбой при вызове', 'error');
+        outputEl.textContent = String(e instanceof Error ? e.message : e);
+      }
+    })();
+  </script>
+</BaseLayout>
